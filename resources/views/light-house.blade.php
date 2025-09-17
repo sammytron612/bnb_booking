@@ -149,6 +149,9 @@
                 </div>
             </div>
         </div>
+
+        <x-location-map location="SR7 7HN"/>
+
     </div>
 
     <x-booking-modal />

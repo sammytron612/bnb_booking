@@ -82,8 +82,8 @@
                 <div class="p-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        Named after the local heritage, Saras offers a perfect blend of comfort and coastal charm.
-                        Just steps from the famous seaglass beach and Tommy statue, ideal for families and couples alike.
+                        Named after dear friend, Saras offers a perfect blend of comfort and coastal charm.
+                        Just a 2 minute drive from the famous seaglass beach and Tommy statue, ideal for families and couples alike.
                     </p>
 
                     <!-- Features -->
@@ -155,7 +155,27 @@
                     </p>
                 </div>
             </div>
+            <div class="text-left">
+                <h2 class="text-2xlmt-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                    Welcome to Seaham: A Coastal Gem of History and Charm
+                </h2>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Discover Seaham’s Rich Heritage</h3>
+                <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham’s transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
+                <p>Seaham also holds literary significance—Lord Byron married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union</p>
+                <p>The town’s industrial past is commemorated through landmarks like the East Durham Heritage & Lifeboat Centre, which honours the brave lifeboat crews and miners who shaped Seaham’s legacy</p>
+                <h3>Modern Seaham: Where Heritage Meets Coastal Beauty</h3>
+                <p>Today, Seaham has reinvented itself as a vibrant seaside destination. Its regeneration has brought new life to the town, blending historical reverence with modern leisure.</p>
+                <h3>Top Attractions in Seaham</h3>
+                <ul class="list-disc list-inside text-left text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                    <li><strong>Seaham Beach:</strong> Famous for its unique seaglass, the beach is a haven for collectors and nature lovers alike.</li>
+                    <li><strong>Seaham Harbour:</strong> A picturesque spot perfect for leisurely strolls, fishing, and enjoying fresh seafood at local eateries.</li>
+                    <li><strong>Durham Heritage Coast:</strong> Explore stunning cliff walks and breathtaking views along this designated Area of Outstanding Natural Beauty.</li>
+                    <li><strong>Tommy statue:</strong> A powerful corten-steel sculpture by Ray Lonsdale, depicting a WWI soldier in the moment peace was declared. It’s a moving tribute and one of the most photographed landmarks in the North East.</li>
+                    <li><strong>Local Festivals:</strong> Experience Seaham’s vibrant community through events like the Seaham Food Festival and the annual Seaglass Festival.</li>
+            </div>
         </div>
+
+
     </div>
 </x-layouts.app>
 
