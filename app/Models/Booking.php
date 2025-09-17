@@ -27,6 +27,8 @@ class Booking extends Model
         'total_price',
         'status',
         'notes',
+        'pay_method',
+        'is_paid',
     ];
 
     /**

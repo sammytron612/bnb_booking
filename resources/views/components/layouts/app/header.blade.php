@@ -20,13 +20,13 @@
                 <flux:navbar.item :href="route('light-house')" :current="request()->routeIs('light-house')" wire:navigate class="!text-black hover:!text-blue-800">
                     The Light House
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800">
+                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800" wire:navigate>
                     Saras
                 </flux:navbar.item>
-                <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800">
+                <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800" wire:navigate>
                     About Seaham
                 </flux:navbar.item>
-                <flux:navbar.item href="#" :current="request()->routeIs('contact')" class="!text-black hover:!text-blue-800">
+                <flux:navbar.item href="{{ route('home') }}#contact" :current="request()->routeIs('contact')" class="!text-black hover:!text-blue-800" wire:navigate>
                     Contact
                 </flux:navbar.item>
             </flux:navbar>
@@ -70,6 +70,7 @@
         </flux:sidebar>
 
         {{ $slot }}
+
 
         @fluxScripts
     </body>

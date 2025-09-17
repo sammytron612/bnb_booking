@@ -22,7 +22,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
-                    title="Gallery Coming Soon"
+                    title="The Light House"
                     badge="Premium Property"
                     badge-color="blue"
                     price="£120/night"
@@ -73,7 +73,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
-                    title="Gallery Coming Soon"
+                    title="Sara's"
                     badge="Family Friendly"
                     badge-color="green"
                     price="£95/night"
@@ -82,7 +82,7 @@
                 <div class="p-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        Named after dear friend, Saras offers a perfect blend of comfort and coastal charm.
+                        Named after a family member, Saras offers a perfect blend of comfort and coastal charm.
                         Just a 2 minute drive from the famous seaglass beach and Tommy statue, ideal for families and couples alike.
                     </p>
 
@@ -92,7 +92,7 @@
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
                             </svg>
-                            3 Bedrooms
+                            2 Bedrooms
                         </div>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -114,7 +114,7 @@
                         </div>
                     </div>
 
-                    <a href="{{route('light-house')}}" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                    <a href="{{route('saras')}}" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
                         View Details & Book
                     </a>
                 </div>
@@ -233,8 +233,6 @@
                 <p class="text-gray-600 dark:text-gray-300">If you have any questions or inquiries, feel free to reach out to us!</p>
             </section>
         </div>
-
-
     </div>
 </x-layouts.app>
 

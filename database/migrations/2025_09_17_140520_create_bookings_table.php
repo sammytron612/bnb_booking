@@ -23,6 +23,8 @@ return new class extends Migration
             $table->decimal('total_price', 10, 2)->default(0.00);
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
+            $table->integer('pay_method')->nullable();
+            $table->boolean('is_paid')->default(false);
             $table->timestamps();
         });
     }

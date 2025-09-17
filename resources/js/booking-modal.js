@@ -52,13 +52,14 @@ const gridEl = document.getElementById('daysGrid');
 const bookingModal = document.getElementById('bookingModal');
 const openBookingBtn = document.getElementById('openBookingModal');
 const closeBookingBtn = document.getElementById('closeBookingModal');
-const proceedBookingBtn = document.getElementById('proceedBooking');
+// Note: proceedBooking and clearSelection elements don't exist - they're Livewire methods
+const proceedBookingBtn = null; // This element doesn't exist in current implementation
 const prevMonthBtn = document.getElementById('prevMonth');
 const nextMonthBtn = document.getElementById('nextMonth');
-const clearSelectionBtn = document.getElementById('clearSelection');
+const clearSelectionBtn = null; // This is handled by Livewire, not a DOM element
 
 // Only proceed if essential elements exist
-if (titleEl && gridEl) {
+if (titleEl && gridEl && bookingModal) {
 
     // Render calendar
     function renderCalendar() {
@@ -160,9 +161,8 @@ if (titleEl && gridEl) {
         });
     }
 
-    if (clearSelectionBtn) {
-        clearSelectionBtn.addEventListener('click', clearSelection);
-    }
+    // clearSelectionBtn is handled by Livewire, not a DOM element
+    // No need to add event listener here
 
     // Update sidebar and emit Livewire events
     function updateSelectionUI() {
@@ -368,55 +368,9 @@ if (titleEl && gridEl) {
             }
         });
 
-        // Handle proceed booking (only if button exists)
-        if (proceedBookingBtn) {
-            proceedBookingBtn.addEventListener('click', () => {
-                if (checkIn && checkOut) {
-                    const nights = diffDays(checkIn, checkOut);
-                    const total = nightlyRate * nights;
-                    const checkInStr = checkIn.toLocaleDateString();
-                    const checkOutStr = checkOut.toLocaleDateString();
-
-                    // Get form data if form is visible
-                    const bookingFormEl = document.getElementById('bookingForm');
-                    if (bookingFormEl && !bookingFormEl.classList.contains('hidden')) {
-                        const guestNameEl = document.getElementById('guestName');
-                        const guestEmailEl = document.getElementById('guestEmail');
-                        const guestPhoneEl = document.getElementById('guestPhone');
-
-                        if (guestNameEl && guestEmailEl && guestPhoneEl) {
-                            const guestName = guestNameEl.value.trim();
-                            const guestEmail = guestEmailEl.value.trim();
-                            const guestPhone = guestPhoneEl.value.trim();
-
-                            // Validate required fields
-                            if (!guestName || !guestEmail || !guestPhone) {
-                                alert('Please fill in all required fields (Name, Email, and Phone Number) to complete your booking.');
-                                return;
-                            }
-
-                            // Basic email validation
-                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (!emailRegex.test(guestEmail)) {
-                                alert('Please enter a valid email address.');
-                                return;
-                            }
-
-                            // Here you would normally integrate with a booking system
-                            alert(`Booking Request Submitted!\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nGuest Details:\nName: ${guestName}\nEmail: ${guestEmail}\nPhone: ${guestPhone}\n\nThank you! We'll contact you shortly to confirm your booking.`);
-
-                            // Clear the form after submission
-                            const form = document.getElementById('guestDetailsForm');
-                            if (form) form.reset();
-                            clearSelection();
-                        }
-                    } else {
-                        // Fallback for when form is not shown
-                        alert(`Booking Request:\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nThis would normally redirect to a booking form or payment system.`);
-                    }
-                }
-            });
-        }
+        // Note: proceedBooking button doesn't exist in current implementation
+        // Booking is handled through Livewire component instead
+        console.log('Booking functionality is handled through Livewire component');
     }
 
 } else {
