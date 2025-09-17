@@ -215,3 +215,22 @@
     }
   },1000);
 })();
+
+
+
+    // Amenities modal
+    const showBtn = document.getElementById('showAmenitiesBtn');
+    const amenitiesModal = document.getElementById('amenitiesModal');
+    const closeBtn = document.getElementById('closeAmenitiesBtn');
+    showBtn.addEventListener('click', () => {
+        amenitiesModal.classList.remove('hidden');
+    });
+    closeBtn.addEventListener('click', () => {
+        amenitiesModal.classList.add('hidden');
+    });
+    window.addEventListener('click', (e) => {
+        if (e.target === amenitiesModal) {
+            amenitiesModal.classList.add('hidden');
+        }
+    });
+

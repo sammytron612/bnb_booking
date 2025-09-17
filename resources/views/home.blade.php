@@ -63,9 +63,9 @@
                         </div>
                     </div>
 
-                    <button class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                    <a href="{{route('light-house')}}" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
                         View Details & Book
-                    </button>
+                    </a>
                 </div>
             </div>
 
@@ -128,10 +128,8 @@
             </h2>
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="p-6">
-                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
-                        </svg>
+                    <div class="flex items-center justify-center mx-auto mb-4">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seaglass2.jpg') }}" alt="Seaham Seaglass">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaglass Hunting</h3>
                     <p class="text-gray-600 dark:text-gray-300">
@@ -139,10 +137,8 @@
                     </p>
                 </div>
                 <div class="p-6">
-                    <div class="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clip-rule="evenodd"/>
-                        </svg>
+                    <div class="flex items-center justify-center mx-auto mb-4">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seahamcoastline.webp') }}" alt="Seaham Coastline">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Natural Beauty</h3>
                     <p class="text-gray-600 dark:text-gray-300">
@@ -150,10 +146,8 @@
                     </p>
                 </div>
                 <div class="p-6">
-                    <div class="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-purple-600 dark:text-purple-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <div class="flex items-center justify-center mx-auto mb-4">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/durham.jpg') }}" alt="Durham City">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Perfect Location</h3>
                     <p class="text-gray-600 dark:text-gray-300">

@@ -6,7 +6,7 @@ use Livewire\Volt\Volt;
 
 Route::view('/', 'home')
     ->name('home');
-Route::view('/saras', 'light-house')
+Route::view('/light-house', 'light-house')
     ->name('light-house');
 
 Route::view('/saras', 'saras')
