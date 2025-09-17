@@ -17,16 +17,16 @@
                 <flux:navbar.item :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="!text-black hover:!text-blue-800">
                     Home
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('light-house')" :current="request()->routeIs('light-house')" wire:navigate class="!text-black hover:!text-blue-800">
+                <flux:navbar.item :href="route('light-house')" :current="request()->routeIs('light-house')"  class="!text-black hover:!text-blue-800">
                     The Light House
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800" wire:navigate>
+                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800">
                     Saras
                 </flux:navbar.item>
-                <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800" wire:navigate>
+                <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800">
                     About Seaham
                 </flux:navbar.item>
-                <flux:navbar.item href="{{ route('home') }}#contact" :current="request()->routeIs('contact')" class="!text-black hover:!text-blue-800" wire:navigate>
+                <flux:navbar.item href="{{ route('home') }}#contact" :current="request()->routeIs('contact')" class="!text-black hover:!text-blue-800">
                     Contact
                 </flux:navbar.item>
             </flux:navbar>
@@ -50,7 +50,7 @@
                     <flux:navlist.item :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="text-black hover:text-blue-800">
                         Home
                     </flux:navlist.item>
-                    <flux:navlist.item :href="route('light-house')" :current="request()->routeIs('light-house')" wire:navigate class="text-black hover:text-blue-800">
+                    <flux:navlist.item :href="route('light-house')" :current="request()->routeIs('light-house')" class="text-black hover:text-blue-800">
                         The Light House
                     </flux:navlist.item>
                     <flux:navlist.item href="#" class="text-black hover:text-blue-800">

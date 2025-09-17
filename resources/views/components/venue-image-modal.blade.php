@@ -85,26 +85,42 @@
         </script>
 
         <script>
+            // Image modal module - wrapped in IIFE to prevent conflicts
+            (function() {
+                'use strict';
 
-            // Image modal
-            const imageModal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImg');
-            const closeImageBtn = document.getElementById('closeImageBtn');
-            document.querySelectorAll('.enlargeable').forEach(img => {
-                img.addEventListener('click', () => {
-                    modalImg.src = img.getAttribute('data-img') || img.src;
-                    imageModal.classList.remove('hidden');
+                // Prevent multiple initializations
+                if (window.imageModalInitialized) {
+                    return;
+                }
+                window.imageModalInitialized = true;
+
+                // Image modal
+                const imageModal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImg');
+                const closeImageBtn = document.getElementById('closeImageBtn');
+
+                if (!imageModal || !modalImg || !closeImageBtn) {
+                    console.log('Image modal elements not found - skipping initialization');
+                    return;
+                }
+
+                document.querySelectorAll('.enlargeable').forEach(img => {
+                    img.addEventListener('click', () => {
+                        modalImg.src = img.getAttribute('data-img') || img.src;
+                        imageModal.classList.remove('hidden');
+                    });
                 });
-            });
-            closeImageBtn.addEventListener('click', () => {
-                imageModal.classList.add('hidden');
-                modalImg.src = '';
-            });
-            window.addEventListener('click', (e) => {
-                if (e.target === imageModal) {
+                closeImageBtn.addEventListener('click', () => {
                     imageModal.classList.add('hidden');
                     modalImg.src = '';
-                }
-            });
+                });
+                window.addEventListener('click', (e) => {
+                    if (e.target === imageModal) {
+                        imageModal.classList.add('hidden');
+                        modalImg.src = '';
+                    }
+                });
+            })();
         </script>
     </div>

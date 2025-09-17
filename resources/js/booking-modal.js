@@ -1,4 +1,12 @@
-// --- Booking calendar state ---
+// --- Booking calendar module ---
+(function() {
+    'use strict';
+
+    // Prevent multiple initializations
+    if (window.bookingCalendarInitialized) {
+        return;
+    }
+    window.bookingCalendarInitialized = true;
 
 const minNights = 2;
 let today = new Date();
@@ -46,20 +54,31 @@ const addDays = (d, n) => {
 
 const diffDays = (a,b) => Math.round((b - a) / (1000*60*60*24));
 
-// Get elements with null checks
-const titleEl = document.getElementById('calendarTitle');
-const gridEl = document.getElementById('daysGrid');
-const bookingModal = document.getElementById('bookingModal');
-const openBookingBtn = document.getElementById('openBookingModal');
-const closeBookingBtn = document.getElementById('closeBookingModal');
-// Note: proceedBooking and clearSelection elements don't exist - they're Livewire methods
-const proceedBookingBtn = null; // This element doesn't exist in current implementation
-const prevMonthBtn = document.getElementById('prevMonth');
-const nextMonthBtn = document.getElementById('nextMonth');
-const clearSelectionBtn = null; // This is handled by Livewire, not a DOM element
+// Wait for DOM to be ready
+function initializeBookingCalendar() {
+    // Get elements with null checks
+    const titleEl = document.getElementById('calendarTitle');
+    const gridEl = document.getElementById('daysGrid');
+    const bookingModal = document.getElementById('bookingModal');
+    const openBookingBtn = document.getElementById('openBookingModal');
+    const closeBookingBtn = document.getElementById('closeBookingModal');
+    // Note: proceedBooking and clearSelection elements don't exist - they're Livewire methods
+    const proceedBookingBtn = null; // This element doesn't exist in current implementation
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    const clearSelectionBtn = null; // This is handled by Livewire, not a DOM element
 
-// Only proceed if essential elements exist
-if (titleEl && gridEl && bookingModal) {
+    // Debug logging
+    console.log('Booking modal elements:', {
+        titleEl: !!titleEl,
+        gridEl: !!gridEl,
+        bookingModal: !!bookingModal,
+        openBookingBtn: !!openBookingBtn,
+        closeBookingBtn: !!closeBookingBtn
+    });
+
+    // Only proceed if essential elements exist
+    if (titleEl && gridEl && bookingModal) {
 
     // Render calendar
     function renderCalendar() {
@@ -377,3 +396,15 @@ if (titleEl && gridEl && bookingModal) {
     // Console log when essential elements are missing
     console.log('Booking calendar elements not found - skipping initialization');
 }
+
+} // End of initializeBookingCalendar function
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeBookingCalendar);
+} else {
+    // DOM is already loaded
+    initializeBookingCalendar();
+}
+
+})(); // End of IIFE
