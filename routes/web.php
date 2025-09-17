@@ -6,6 +6,11 @@ use Livewire\Volt\Volt;
 
 Route::view('/', 'home')
     ->name('home');
+Route::view('/saras', 'light-house')
+    ->name('light-house');
+
+Route::view('/saras', 'saras')
+    ->name('saras');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
