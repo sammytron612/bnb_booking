@@ -1,22 +1,66 @@
 // --- Booking calendar state ---
-    const nightlyRate = 140; // GBP
-    const minNights = 2;
-    let today = new Date();
-    let viewYear = today.getFullYear();
-    let viewMonth = today.getMonth(); // 0-11
-    let bookedDates = new Set(); // 'YYYY-MM-DD'
-    let checkIn = null; // Date
-    let checkOut = null; // Date
+const nightlyRate = 140; // GBP
+const minNights = 2;
+let today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-11
+let bookedDates = new Set(); // 'YYYY-MM-DD'
+let checkIn = null; // Date
+let checkOut = null; // Date
 
-    // Helpers
-    const fmt = (d) => d ? d.toISOString().slice(0,10) : '';
-    const dFrom = (s) => new Date(s + 'T00:00:00');
-    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
-    const diffDays = (a,b) => Math.round((b - a) / (1000*60*60*24));
+// Detect current venue from URL or page content
+function getCurrentVenue() {
+    const url = window.location.pathname;
+    if (url.includes('light-house')) {
+        return 'The Light House';
+    } else if (url.includes('saras')) {
+        return 'Saras';
+    }
+    // Default fallback - could also check page title or meta tag
+    return 'The Light House';
+}
+
+const currentVenue = getCurrentVenue();
+
+// Helpers - Fixed for timezone issues
+const fmt = (d) => {
+    if (!d) return '';
+    // Use local date without timezone conversion
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const dFrom = (s) => {
+    if (!s) return null;
+    // Parse date string directly without timezone conversion
+    const [year, month, day] = s.split('-').map(Number);
+    return new Date(year, month - 1, day); // month is 0-indexed in JS
+};
+
+const addDays = (d, n) => {
+    const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+    return x;
+};
+
+const diffDays = (a,b) => Math.round((b - a) / (1000*60*60*24));
+
+// Get elements with null checks
+const titleEl = document.getElementById('calendarTitle');
+const gridEl = document.getElementById('daysGrid');
+const bookingModal = document.getElementById('bookingModal');
+const openBookingBtn = document.getElementById('openBookingModal');
+const closeBookingBtn = document.getElementById('closeBookingModal');
+const proceedBookingBtn = document.getElementById('proceedBooking');
+const prevMonthBtn = document.getElementById('prevMonth');
+const nextMonthBtn = document.getElementById('nextMonth');
+const clearSelectionBtn = document.getElementById('clearSelection');
+
+// Only proceed if essential elements exist
+if (titleEl && gridEl) {
 
     // Render calendar
-    const titleEl = document.getElementById('calendarTitle');
-    const gridEl = document.getElementById('daysGrid');
     function renderCalendar() {
         const first = new Date(viewYear, viewMonth, 1);
         const startDay = first.getDay();
@@ -29,7 +73,9 @@
         for (let d=1; d<=daysInMonth; d++) {
             const date = new Date(viewYear, viewMonth, d);
             const key = fmt(date);
-            const isPast = date < dFrom(fmt(today));
+            // Fix past date comparison to avoid timezone issues
+            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const isPast = date < todayStart;
             const isBooked = bookedDates.has(key);
             const inRange = checkIn && checkOut && date >= checkIn && date <= addDays(checkOut,-1);
             const isStart = checkIn && fmt(date)===fmt(checkIn);
@@ -91,36 +137,92 @@
         renderCalendar();
     }
 
-    // Navigation
-    document.getElementById('prevMonth').addEventListener('click', () => {
-        viewMonth--; if (viewMonth<0) { viewMonth=11; viewYear--; } renderCalendar();
-    });
-    document.getElementById('nextMonth').addEventListener('click', () => {
-        viewMonth++; if (viewMonth>11) { viewMonth=0; viewYear++; } renderCalendar();
-    });
-    document.getElementById('clearSelection').addEventListener('click', clearSelection);
+    // Navigation (with null checks)
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', async () => {
+            viewMonth--;
+            if (viewMonth < 0) {
+                viewMonth = 11;
+                viewYear--;
+            }
+            await loadAllBookedDates(currentVenue);
+        });
+    }
 
-    // Update sidebar
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', async () => {
+            viewMonth++;
+            if (viewMonth > 11) {
+                viewMonth = 0;
+                viewYear++;
+            }
+            await loadAllBookedDates(currentVenue);
+        });
+    }
+
+    if (clearSelectionBtn) {
+        clearSelectionBtn.addEventListener('click', clearSelection);
+    }
+
+    // Update sidebar and emit Livewire events
     function updateSelectionUI() {
-        const inEl = document.getElementById('selCheckIn');
-        const outEl = document.getElementById('selCheckOut');
-        const nightsEl = document.getElementById('selNights');
-        const totalEl = document.getElementById('selTotal');
-        const bookingFormEl = document.getElementById('bookingForm');
-        const nf = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'GBP' });
+        // Check if Livewire is available before using it
+        if (typeof Livewire !== 'undefined') {
+            // Emit Livewire events when dates change
+            if (checkIn && checkOut) {
+                // Format dates for Livewire
+                const checkInDate = formatDateForLivewire(checkIn);
+                const checkOutDate = formatDateForLivewire(checkOut);
 
-        if (checkIn) inEl.textContent = checkIn.toDateString(); else inEl.textContent = '—';
-        if (checkIn && checkOut) outEl.textContent = checkOut.toDateString(); else outEl.textContent = '—';
-        const nights = (checkIn && checkOut) ? diffDays(checkIn, checkOut) : 0;
-        nightsEl.textContent = nights;
-        totalEl.textContent = nf.format(nightlyRate * nights);
-
-        // Show/hide booking form based on whether both dates are selected
-        if (checkIn && checkOut && nights >= 2) {
-            bookingFormEl.classList.remove('hidden');
-        } else {
-            bookingFormEl.classList.add('hidden');
+                // Emit to Livewire component
+                Livewire.dispatch('datesSelected', {
+                    checkIn: checkInDate,
+                    checkOut: checkOutDate
+                });
+            } else {
+                // Emit clear event to Livewire
+                Livewire.dispatch('datesCleared');
+            }
         }
+
+        // Update proceed button if it exists
+        updateProceedButton();
+    }
+
+    // Helper function to format dates for Livewire
+    function formatDateForLivewire(date) {
+        if (!date) return null;
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    }
+
+    // Listen for clear events from Livewire (only if Livewire is available)
+    if (typeof Livewire !== 'undefined') {
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('clearCalendarSelection', () => {
+                // Clear the JavaScript calendar
+                checkIn = null;
+                checkOut = null;
+                renderCalendar();
+                updateSelectionUI();
+            });
+
+            Livewire.on('bookingSubmitted', (event) => {
+                // Close modal on successful booking
+                if (bookingModal) {
+                    bookingModal.classList.add('hidden');
+                    bookingModal.classList.remove('flex');
+                    document.body.classList.remove('overflow-hidden');
+                }
+
+                // Show success notification
+                alert('Booking submitted successfully! We will contact you shortly.');
+            });
+        });
     }
 
     // --- iCal parsing ---
@@ -155,7 +257,32 @@
         return added.length;
     }
 
-    // URL load (note: may require CORS; Airbnb often allows direct fetch when hosted server-side. If blocked in browser, load via your backend.)
+    // Load booked dates from Laravel database
+    async function loadBookedDatesFromDatabase(venue = null) {
+        try {
+            const url = venue ? `/api/booked-dates?venue=${encodeURIComponent(venue)}` : '/api/booked-dates';
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.success) {
+                // Add dates from database to bookedDates Set
+                data.bookedDates.forEach(dateStr => {
+                    bookedDates.add(dateStr);
+                });
+
+                console.log(`Loaded ${data.bookedDates.length} booked dates from database`);
+                return data.bookedDates.length;
+            } else {
+                console.error('Failed to load booked dates:', data);
+                return 0;
+            }
+        } catch (error) {
+            console.error('Error loading booked dates from database:', error);
+            return 0;
+        }
+    }
+
+    // Modified iCal loading function
     async function loadIcalFromUrl(url) {
         const status = document.getElementById('icalStatus');
         if (status) status.textContent = 'Loading iCal from URL…';
@@ -164,53 +291,37 @@
             if (!res.ok) throw new Error('HTTP '+res.status);
             const text = await res.text();
             const count = parseIcs(text);
-            if (status) status.textContent = `Imported ${count} booked days from URL.`;
-            renderCalendar();
+            if (status) status.textContent = `Imported ${count} booked days from iCal.`;
+            console.log(`Loaded ${count} booked dates from iCal`);
+            return count;
         } catch (err) {
-            if (status) status.textContent = 'Failed to load iCal (likely CORS). Configure a backend proxy or host this page on your server.';
+            console.error('iCal load error:', err);
+            if (status) status.textContent = 'Failed to load iCal calendar.';
+            return 0;
         }
     }
 
-    // Hard-coded Airbnb iCal URL — replace with your listing's iCal link
-    const AIRBNB_ICAL_URL = 'https://example.com/your-airbnb-calendar.ics';
+    // Load all booked dates (database + iCal)
+    async function loadAllBookedDates(venue = null) {
+        // Clear existing booked dates
+        bookedDates.clear();
 
-    // Initial render
-    renderCalendar();
-    // Auto-sync iCal once on load
-    loadIcalFromUrl(AIRBNB_ICAL_URL);
+        // Load from database first
+        await loadBookedDatesFromDatabase(venue);
 
-    // Booking Modal functionality
-    const bookingModal = document.getElementById('bookingModal');
-    const openBookingBtn = document.getElementById('openBookingModal');
-    const closeBookingBtn = document.getElementById('closeBookingModal');
-    const proceedBookingBtn = document.getElementById('proceedBooking');
+        // Optionally load from iCal (if you have a valid URL)
+        // Uncomment the lines below if you want to use iCal integration
+        // const icalUrl = 'https://your-actual-ical-url.ics';
+        // await loadIcalFromUrl(icalUrl);
 
-    // Open booking modal
-    openBookingBtn.addEventListener('click', () => {
-        bookingModal.classList.remove('hidden');
-        bookingModal.classList.add('flex');
-        document.body.style.overflow = 'hidden';
-        renderCalendar(); // Refresh calendar when modal opens
-    });
-
-    // Close booking modal
-    function closeBookingModal() {
-        bookingModal.classList.add('hidden');
-        bookingModal.classList.remove('flex');
-        document.body.style.overflow = '';
+        // Re-render calendar with updated booked dates
+        renderCalendar();
     }
-
-    closeBookingBtn.addEventListener('click', closeBookingModal);
-
-    // Close modal when clicking outside
-    bookingModal.addEventListener('click', (e) => {
-        if (e.target === bookingModal) {
-            closeBookingModal();
-        }
-    });
 
     // Enable/disable proceed button based on selection
     function updateProceedButton() {
+        if (!proceedBookingBtn) return; // Exit if button doesn't exist
+
         const nights = (checkIn && checkOut) ? diffDays(checkIn, checkOut) : 0;
         if (nights >= 2) {
             proceedBookingBtn.disabled = false;
@@ -221,51 +332,94 @@
         }
     }
 
-    // Update the existing updateSelectionUI function to also update the proceed button
-    const originalUpdateSelectionUI = updateSelectionUI;
-    updateSelectionUI = function() {
-        originalUpdateSelectionUI();
-        updateProceedButton();
-    };
+    // Initial render and data loading
+    loadAllBookedDates(currentVenue); // Load booked dates from database
 
-    // Handle proceed booking
-    proceedBookingBtn.addEventListener('click', () => {
-        if (checkIn && checkOut) {
-            const nights = diffDays(checkIn, checkOut);
-            const total = nightlyRate * nights;
-            const checkInStr = checkIn.toLocaleDateString();
-            const checkOutStr = checkOut.toLocaleDateString();
+    // Auto-sync iCal once on load (disabled by default, uncomment if needed)
+    // const AIRBNB_ICAL_URL = 'https://example.com/your-airbnb-calendar.ics';
+    // loadIcalFromUrl(AIRBNB_ICAL_URL);
 
-            // Get form data if form is visible
-            const bookingFormEl = document.getElementById('bookingForm');
-            if (!bookingFormEl.classList.contains('hidden')) {
-                const guestName = document.getElementById('guestName').value.trim();
-                const guestEmail = document.getElementById('guestEmail').value.trim();
-                const guestPhone = document.getElementById('guestPhone').value.trim();
+    // Booking Modal functionality (only if elements exist)
+    if (bookingModal && openBookingBtn) {
+        // Open booking modal
+        openBookingBtn.addEventListener('click', async () => {
+            bookingModal.classList.remove('hidden');
+            bookingModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            // Refresh booked dates from database when modal opens
+            await loadAllBookedDates(currentVenue);
+        });
 
-                // Validate required fields
-                if (!guestName || !guestEmail || !guestPhone) {
-                    alert('Please fill in all required fields (Name, Email, and Phone Number) to complete your booking.');
-                    return;
-                }
-
-                // Basic email validation
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(guestEmail)) {
-                    alert('Please enter a valid email address.');
-                    return;
-                }
-
-                // Here you would normally integrate with a booking system
-                // For now, we'll show an alert with the guest details
-                alert(`Booking Request Submitted!\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nGuest Details:\nName: ${guestName}\nEmail: ${guestEmail}\nPhone: ${guestPhone}\n\nThank you! We'll contact you shortly to confirm your booking.`);
-
-                // Clear the form after submission
-                document.getElementById('guestDetailsForm').reset();
-                clearSelection();
-            } else {
-                // Fallback for when form is not shown
-                alert(`Booking Request:\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nThis would normally redirect to a booking form or payment system.`);
-            }
+        // Close booking modal
+        function closeBookingModal() {
+            bookingModal.classList.add('hidden');
+            bookingModal.classList.remove('flex');
+            document.body.style.overflow = '';
         }
-    });
+
+        if (closeBookingBtn) {
+            closeBookingBtn.addEventListener('click', closeBookingModal);
+        }
+
+        // Close modal when clicking outside
+        bookingModal.addEventListener('click', (e) => {
+            if (e.target === bookingModal) {
+                closeBookingModal();
+            }
+        });
+
+        // Handle proceed booking (only if button exists)
+        if (proceedBookingBtn) {
+            proceedBookingBtn.addEventListener('click', () => {
+                if (checkIn && checkOut) {
+                    const nights = diffDays(checkIn, checkOut);
+                    const total = nightlyRate * nights;
+                    const checkInStr = checkIn.toLocaleDateString();
+                    const checkOutStr = checkOut.toLocaleDateString();
+
+                    // Get form data if form is visible
+                    const bookingFormEl = document.getElementById('bookingForm');
+                    if (bookingFormEl && !bookingFormEl.classList.contains('hidden')) {
+                        const guestNameEl = document.getElementById('guestName');
+                        const guestEmailEl = document.getElementById('guestEmail');
+                        const guestPhoneEl = document.getElementById('guestPhone');
+
+                        if (guestNameEl && guestEmailEl && guestPhoneEl) {
+                            const guestName = guestNameEl.value.trim();
+                            const guestEmail = guestEmailEl.value.trim();
+                            const guestPhone = guestPhoneEl.value.trim();
+
+                            // Validate required fields
+                            if (!guestName || !guestEmail || !guestPhone) {
+                                alert('Please fill in all required fields (Name, Email, and Phone Number) to complete your booking.');
+                                return;
+                            }
+
+                            // Basic email validation
+                            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (!emailRegex.test(guestEmail)) {
+                                alert('Please enter a valid email address.');
+                                return;
+                            }
+
+                            // Here you would normally integrate with a booking system
+                            alert(`Booking Request Submitted!\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nGuest Details:\nName: ${guestName}\nEmail: ${guestEmail}\nPhone: ${guestPhone}\n\nThank you! We'll contact you shortly to confirm your booking.`);
+
+                            // Clear the form after submission
+                            const form = document.getElementById('guestDetailsForm');
+                            if (form) form.reset();
+                            clearSelection();
+                        }
+                    } else {
+                        // Fallback for when form is not shown
+                        alert(`Booking Request:\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nThis would normally redirect to a booking form or payment system.`);
+                    }
+                }
+            });
+        }
+    }
+
+} else {
+    // Console log when essential elements are missing
+    console.log('Booking calendar elements not found - skipping initialization');
+}

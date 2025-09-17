@@ -121,4 +121,47 @@ class BookingController extends Controller
             'booking' => $booking
         ]);
     }
+
+    /**
+     * Get all booked dates for calendar display
+     */
+    public function getBookedDates(Request $request)
+    {
+        $venue = $request->query('venue'); // Optional venue filter
+
+        // Get confirmed and pending bookings (exclude cancelled)
+        $bookingsQuery = Booking::where('status', '!=', 'cancelled')
+            ->where('leave', '>=', Carbon::today()) // Only future/current bookings
+            ->select('depart', 'leave', 'venue');
+
+        // Filter by venue if specified
+        if ($venue) {
+            $bookingsQuery->where('venue', $venue);
+        }
+
+        $bookings = $bookingsQuery->get();
+
+        $bookedDates = [];
+
+        foreach ($bookings as $booking) {
+            $start = Carbon::parse($booking->depart);
+            $end = Carbon::parse($booking->leave);
+
+            // Add each date from check-in to check-out (exclusive of check-out date)
+            while ($start < $end) {
+                $bookedDates[] = $start->format('Y-m-d');
+                $start->addDay();
+            }
+        }
+
+        // Remove duplicates and sort
+        $bookedDates = array_unique($bookedDates);
+        sort($bookedDates);
+
+        return response()->json([
+            'success' => true,
+            'bookedDates' => $bookedDates,
+            'count' => count($bookedDates)
+        ]);
+    }
 }

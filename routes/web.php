@@ -16,6 +16,7 @@ Route::view('/saras', 'saras')
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/venue/{venue}', [BookingController::class, 'getBookingsForVenue'])->name('bookings.venue');
 Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
+Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
 Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 
 Route::middleware(['auth'])->group(function () {
