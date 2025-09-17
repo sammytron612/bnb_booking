@@ -114,9 +114,9 @@
                         </div>
                     </div>
 
-                    <button class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                    <a href="{{route('light-house')}}" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
                         View Details & Book
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -155,24 +155,83 @@
                     </p>
                 </div>
             </div>
-            <div class="text-left">
-                <h2 class="text-2xlmt-8 text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                    Welcome to Seaham: A Coastal Gem of History and Charm
-                </h2>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Discover Seaham’s Rich Heritage</h3>
-                <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham’s transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
-                <p>Seaham also holds literary significance—Lord Byron married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union</p>
-                <p>The town’s industrial past is commemorated through landmarks like the East Durham Heritage & Lifeboat Centre, which honours the brave lifeboat crews and miners who shaped Seaham’s legacy</p>
-                <h3>Modern Seaham: Where Heritage Meets Coastal Beauty</h3>
-                <p>Today, Seaham has reinvented itself as a vibrant seaside destination. Its regeneration has brought new life to the town, blending historical reverence with modern leisure.</p>
-                <h3>Top Attractions in Seaham</h3>
-                <ul class="list-disc list-inside text-left text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                    <li><strong>Seaham Beach:</strong> Famous for its unique seaglass, the beach is a haven for collectors and nature lovers alike.</li>
-                    <li><strong>Seaham Harbour:</strong> A picturesque spot perfect for leisurely strolls, fishing, and enjoying fresh seafood at local eateries.</li>
-                    <li><strong>Durham Heritage Coast:</strong> Explore stunning cliff walks and breathtaking views along this designated Area of Outstanding Natural Beauty.</li>
-                    <li><strong>Tommy statue:</strong> A powerful corten-steel sculpture by Ray Lonsdale, depicting a WWI soldier in the moment peace was declared. It’s a moving tribute and one of the most photographed landmarks in the North East.</li>
-                    <li><strong>Local Festivals:</strong> Experience Seaham’s vibrant community through events like the Seaham Food Festival and the annual Seaglass Festival.</li>
-            </div>
+            <section id="about" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 lg:p-12 shadow-lg">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+                            A Coastal Gem of History and Charm
+                        </h2>
+                        <div class="w-24 h-1 bg-blue-500 mx-auto rounded-full"></div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <!-- Heritage Section -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                            <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4 flex items-center justify-center">
+                                Discover Seaham's Rich Heritage
+                            </h3>
+                            <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed">
+                                <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham's transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
+
+                                <p>Seaham also holds literary significance—<a class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" href="https://en.wikipedia.org/wiki/Lord_Byron">Lord Byron</a> married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union.</p>
+
+                                <p>The town's industrial past is commemorated through landmarks like the <a href="https://www.thisisdurham.com/things-to-do/east-durham-heritage-and-lifeboat-centre-p722171" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200">East Durham Heritage & Lifeboat Centre</a>, which honours the brave lifeboat crews and miners who shaped Seaham's legacy.</p>
+                            </div>
+                        </div>
+
+                        <!-- Modern Seaham Section -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                            <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4 flex items-center justify-center">
+                                Modern Seaham: Where Heritage Meets Coastal Beauty
+                            </h3>
+                            <p class="text-gray-700 text-center dark:text-gray-300 leading-relaxed">
+                                Today, Seaham has reinvented itself as a vibrant seaside destination. Its regeneration has brought new life to the town, blending historical reverence with modern leisure.
+                            </p>
+                        </div>
+
+                        <!-- Attractions Section -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                            <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6 flex items-center justify-center">
+                                Top Attractions in Seaham
+                            </h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="space-y-4">
+                                    <div class="border-l-4 border-blue-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Seaham Beach</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Famous for its unique seaglass, the beach is a haven for collectors and nature lovers alike.</p>
+                                    </div>
+                                    <div class="border-l-4 border-green-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Seaham Harbour</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">A picturesque spot perfect for leisurely strolls, fishing, and enjoying fresh seafood at local eateries.</p>
+                                    </div>
+                                    <div class="border-l-4 border-purple-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Durham Heritage Coast</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Explore stunning cliff walks and breathtaking views along this designated Area of Outstanding Natural Beauty.</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="border-l-4 border-red-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Tommy Statue</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">A powerful corten-steel sculpture by Ray Lonsdale, depicting a WWI soldier in the moment peace was declared. A moving tribute and one of the most photographed landmarks in the North East.</p>
+                                    </div>
+                                    <div class="border-l-4 border-yellow-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Local Festivals</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Experience Seaham's vibrant community through events like the Seaham Food Festival and the annual Seaglass Festival.</p>
+                                    </div>
+                                    <div class="border-l-4 border-yellow-900 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Seaham Hotel & Spa</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Indulge in luxury at the Seaham Hotel & Spa, offering stunning coastal views, a world-class spa, and fine dining experiences.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="contact" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 lg:p-12 shadow-lg">
+                <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6">Contact Us</h3>
+                <p class="text-gray-600 dark:text-gray-300">If you have any questions or inquiries, feel free to reach out to us!</p>
+            </section>
         </div>
 
 

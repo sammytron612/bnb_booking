@@ -1,9 +1,9 @@
 @props([
   // Allow passing custom images; fallback to storage ones
   'images' => [
+    ['/storage/tommy.webp', 'Tommy'],
     ['/storage/coast.webp', 'Coast'],
-    ['/storage/seaglass.jpg', 'Seaglass'],
-    ['/storage/tommy.jpg', 'Tommy']
+    ['/storage/seaglass.jpg', 'Seaglass']
   ],
   'interval' => 3000,
   // display mode: cover (crop to fill) or contain (letterbox)

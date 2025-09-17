@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:header container sticky class="border-b border-blue-200 bg-gradient-to-r from-blue-200 via-blue-300 to-blue-500 dark:border-blue-700 shadow-lg py-8 z-50">
+        <flux:header container sticky class="border-b border-blue-200 bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 dark:border-blue-700 shadow-lg py-8 z-50">
             <flux:sidebar.toggle class="lg:hidden text-black" icon="bars-2" inset="left" />
 
             <a href="{{ route('home') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
@@ -20,10 +20,10 @@
                 <flux:navbar.item :href="route('light-house')" :current="request()->routeIs('light-house')" wire:navigate class="!text-black hover:!text-blue-800">
                     The Light House
                 </flux:navbar.item>
-                <flux:navbar.item href="#"  :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800">
+                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="!text-black hover:!text-blue-800">
                     Saras
                 </flux:navbar.item>
-                <flux:navbar.item href="#" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800">
+                <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="!text-black hover:!text-blue-800">
                     About Seaham
                 </flux:navbar.item>
                 <flux:navbar.item href="#" :current="request()->routeIs('contact')" class="!text-black hover:!text-blue-800">
@@ -36,7 +36,7 @@
         </flux:header>
 
         <!-- Mobile Menu -->
-        <flux:sidebar stashable sticky class="lg:hidden border-e border-blue-200 bg-gradient-to-b from-blue-200 via-blue-300 to-blue-500 dark:border-blue-700">
+        <flux:sidebar stashable sticky class="lg:hidden border-e border-blue-50 bg-gradient-to-b from-blue-50 via-blue-100 to-blue-200 dark:border-blue-700">
             <flux:sidebar.toggle class="lg:hidden text-black" icon="x-mark" />
 
             <a href="{{ route('home') }}" class="ms-1 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
@@ -56,7 +56,7 @@
                     <flux:navlist.item href="#" class="text-black hover:text-blue-800">
                         Saras
                     </flux:navlist.item>
-                    <flux:navlist.item href="#" class="text-black hover:text-blue-800">
+                    <flux:navlist.item href="{{ route('home') }}#about" class="text-black hover:text-blue-800">
                         About Seaham
                     </flux:navlist.item>
                     <flux:navlist.item href="#" class="text-black hover:text-blue-800">

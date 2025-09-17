@@ -1,5 +1,5 @@
 // --- Booking calendar state ---
-const nightlyRate = 140; // GBP
+
 const minNights = 2;
 let today = new Date();
 let viewYear = today.getFullYear();

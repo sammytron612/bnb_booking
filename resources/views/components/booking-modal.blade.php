@@ -1,4 +1,5 @@
 <!-- Booking Modal -->
+    @props(['price', 'venue'])
     <div
         id="bookingModal"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
@@ -22,7 +23,7 @@
                 <!-- Pricing Summary -->
                 <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                     <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                        £120<span class="text-lg font-normal text-gray-600 dark:text-gray-300">/night</span>
+                        £{{$price}}<span class="text-lg font-normal text-gray-600 dark:text-gray-300">/night</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300">
                         Minimum 2-night stay • All amenities included
@@ -56,7 +57,7 @@
                     </div>
 
                     <!-- Booking Summary Sidebar -->
-                    <livewire:booking-form>
+                    <livewire:booking-form :pricePerNight="$price" :venue="$venue" />
                 </div>
 
                 <!-- Terms and Cancellation -->

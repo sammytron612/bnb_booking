@@ -154,7 +154,7 @@
 
     </div>
 
-    <x-booking-modal />
+    <x-booking-modal price="120" venue="The Light House" />
 
     <x-venue-image-modal />
 

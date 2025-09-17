@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class BookingForm extends Component
 {
     // Public properties for form data
-    public $venue = '';
+    public $venue;
     public $checkIn = null;
     public $checkOut = null;
     public $guestName = '';
@@ -17,7 +17,7 @@ class BookingForm extends Component
     public $guestPhone = '';
     public $nights = 0;
     public $totalPrice = 0;
-    public $pricePerNight = 120;
+    public $pricePerNight;
 
     // Validation rules
     protected $rules = [
@@ -44,7 +44,7 @@ class BookingForm extends Component
         'datesCleared' => 'clearDates'
     ];
 
-    public function mount($venue = 'The Light House', $pricePerNight = 120)
+    public function mount($venue, $pricePerNight)
     {
         $this->venue = $venue;
         $this->pricePerNight = $pricePerNight;
