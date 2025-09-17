@@ -122,7 +122,7 @@
         </div>
 
         <!-- About Seaham Section -->
-        <div class="mt-20 text-center">
+        <div id="about" class="mt-20 text-center">
             <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
                 Why Choose Seaham?
             </h2>
@@ -228,11 +228,12 @@
                     </div>
                 </div>
             </section>
-            <section id="contact" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 lg:p-12 shadow-lg">
-                <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6">Contact Us</h3>
-                <p class="text-gray-600 dark:text-gray-300">If you have any questions or inquiries, feel free to reach out to us!</p>
-            </section>
         </div>
+        <section id="contact" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 lg:p-12 shadow-lg">
+            <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6">Contact Us</h3>
+            <p class="text-gray-600 dark:text-gray-300">If you have any questions or inquiries, feel free to reach out to us!</p>
+        </section>
+
     </div>
 </x-layouts.app>
 
