@@ -76,7 +76,56 @@
                                 </div>
                             </div>
 
-
+                            <!-- Booking Form (appears when dates are selected) -->
+                            <div id="bookingForm" class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 hidden">
+                                <h5 class="font-semibold text-green-800 dark:text-green-200 mb-3">Guest Details</h5>
+                                <form id="guestDetailsForm" class="space-y-3">
+                                    <div>
+                                        <label for="guestName" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Full Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="guestName"
+                                            name="guestName"
+                                            required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                            placeholder="Enter your full name"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label for="guestEmail" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Email Address *
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="guestEmail"
+                                            name="guestEmail"
+                                            required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                            placeholder="Enter your email address"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label for="guestPhone" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Phone Number *
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            id="guestPhone"
+                                            name="guestPhone"
+                                            required
+                                            class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                                            placeholder="Enter your phone number"
+                                        >
+                                    </div>
+                                    <div class="pt-1">
+                                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                                            * Required fields for booking confirmation
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
 
                             <div class="mt-4 space-y-3">
 

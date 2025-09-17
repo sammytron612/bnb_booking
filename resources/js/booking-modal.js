@@ -58,7 +58,13 @@
     }
 
     function clearSelection() {
-        checkIn = null; checkOut = null; renderCalendar();
+        checkIn = null; checkOut = null;
+        // Reset the booking form
+        const form = document.getElementById('guestDetailsForm');
+        if (form) {
+            form.reset();
+        }
+        renderCalendar();
     }
 
     function onPick(date) {
@@ -100,12 +106,21 @@
         const outEl = document.getElementById('selCheckOut');
         const nightsEl = document.getElementById('selNights');
         const totalEl = document.getElementById('selTotal');
+        const bookingFormEl = document.getElementById('bookingForm');
         const nf = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'GBP' });
+
         if (checkIn) inEl.textContent = checkIn.toDateString(); else inEl.textContent = '—';
         if (checkIn && checkOut) outEl.textContent = checkOut.toDateString(); else outEl.textContent = '—';
         const nights = (checkIn && checkOut) ? diffDays(checkIn, checkOut) : 0;
         nightsEl.textContent = nights;
         totalEl.textContent = nf.format(nightlyRate * nights);
+
+        // Show/hide booking form based on whether both dates are selected
+        if (checkIn && checkOut && nights >= 2) {
+            bookingFormEl.classList.remove('hidden');
+        } else {
+            bookingFormEl.classList.add('hidden');
+        }
     }
 
     // --- iCal parsing ---
@@ -221,8 +236,36 @@
             const checkInStr = checkIn.toLocaleDateString();
             const checkOutStr = checkOut.toLocaleDateString();
 
-            // Here you would normally integrate with a booking system
-            // For now, we'll show an alert
-            alert(`Booking Request:\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nThis would normally redirect to a booking form or payment system.`);
+            // Get form data if form is visible
+            const bookingFormEl = document.getElementById('bookingForm');
+            if (!bookingFormEl.classList.contains('hidden')) {
+                const guestName = document.getElementById('guestName').value.trim();
+                const guestEmail = document.getElementById('guestEmail').value.trim();
+                const guestPhone = document.getElementById('guestPhone').value.trim();
+
+                // Validate required fields
+                if (!guestName || !guestEmail || !guestPhone) {
+                    alert('Please fill in all required fields (Name, Email, and Phone Number) to complete your booking.');
+                    return;
+                }
+
+                // Basic email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(guestEmail)) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+
+                // Here you would normally integrate with a booking system
+                // For now, we'll show an alert with the guest details
+                alert(`Booking Request Submitted!\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nGuest Details:\nName: ${guestName}\nEmail: ${guestEmail}\nPhone: ${guestPhone}\n\nThank you! We'll contact you shortly to confirm your booking.`);
+
+                // Clear the form after submission
+                document.getElementById('guestDetailsForm').reset();
+                clearSelection();
+            } else {
+                // Fallback for when form is not shown
+                alert(`Booking Request:\n\nProperty: The Light House\nCheck-in: ${checkInStr}\nCheck-out: ${checkOutStr}\nNights: ${nights}\nTotal: £${total}\n\nThis would normally redirect to a booking form or payment system.`);
+            }
         }
     });

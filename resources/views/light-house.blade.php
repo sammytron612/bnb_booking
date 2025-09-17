@@ -4,7 +4,7 @@
         <!-- Page Header -->
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-                The Light House Gallery
+                The Light House
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
                 Explore every corner of our stunning coastal retreat. From panoramic sea views to elegant interiors,
