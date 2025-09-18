@@ -2,8 +2,19 @@
 
 return [
 
+
     /*
     |--------------------------------------------------------------------------
+    | Owner Email Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This email address is used for administrative notifications and
+    | as the recipient for booking notifications sent to the property owner.
+    |
+    */
+
+    'owner_email' => env('OWNER_EMAIL', 'admin@example.com'),
+    /*|--------------------------------------------------------------------------
     | Default Mailer
     |--------------------------------------------------------------------------
     |

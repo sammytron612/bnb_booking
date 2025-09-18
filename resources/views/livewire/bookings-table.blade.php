@@ -36,7 +36,7 @@
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->venue }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $booking->depart->format('M d') }} - {{ $booking->leave->format('M d') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ $booking->check_in->format('M d') }} - {{ $booking->check_out->format('M d') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">£{{ number_format($booking->total_price, 2) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($booking->status === 'confirmed')

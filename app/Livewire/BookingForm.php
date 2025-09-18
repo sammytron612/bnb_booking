@@ -102,23 +102,16 @@ class BookingForm extends Component
                 'name' => $this->guestName,
                 'email' => $this->guestEmail,
                 'phone' => $this->guestPhone,
-                'depart' => $this->checkIn,
-                'leave' => $this->checkOut,
+                'check_in' => $this->checkIn,
+                'check_out' => $this->checkOut,
                 'venue' => $this->venue,
                 'nights' => $this->nights,
                 'total_price' => $this->totalPrice,
                 'status' => 'pending',
             ]);
 
-            // Success message
-            session()->flash('booking_success', 'Booking request submitted successfully! We will contact you shortly to confirm your reservation.');
-
-            // Clear form
-            $this->resetForm();
-            $this->clearDates();
-
-            // Emit success event to close modal
-            $this->dispatch('bookingSubmitted', bookingId: $booking->id);
+            // Redirect to Stripe checkout
+            return redirect()->route('payment.checkout', ['booking' => $booking->id]);
 
         } catch (\Exception $e) {
             session()->flash('booking_error', 'Sorry, there was an error processing your booking. Please try again.');

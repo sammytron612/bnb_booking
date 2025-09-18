@@ -49,8 +49,8 @@ class BookingController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
-                'depart' => $request->depart,
-                'leave' => $request->leave,
+                'check_in' => $request->depart,
+                'check_out' => $request->leave,
                 'venue' => $request->venue,
                 'nights' => $nights,
                 'total_price' => $request->total_price,
@@ -78,7 +78,7 @@ class BookingController extends Controller
     public function getBookingsForVenue($venue)
     {
         $bookings = Booking::forVenue($venue)
-            ->orderBy('depart', 'asc')
+            ->orderBy('check_in', 'asc')
             ->get();
 
         return response()->json($bookings);
@@ -90,8 +90,8 @@ class BookingController extends Controller
     public function getUpcomingBookings()
     {
         $bookings = Booking::where('status', '!=', 'cancelled')
-            ->where('leave', '>=', Carbon::today())
-            ->select('depart', 'leave', 'venue')
+            ->where('check_out', '>=', Carbon::today())
+            ->select('check_in', 'check_out', 'venue')
             ->get();
 
         return response()->json($bookings);
@@ -131,8 +131,8 @@ class BookingController extends Controller
 
         // Get confirmed and pending bookings (exclude cancelled)
         $bookingsQuery = Booking::where('status', '!=', 'cancelled')
-            ->where('leave', '>=', Carbon::today()) // Only future/current bookings
-            ->select('depart', 'leave', 'venue');
+            ->where('check_out', '>=', Carbon::today()) // Only future/current bookings
+            ->select('check_in', 'check_out', 'venue');
 
         // Filter by venue if specified
         if ($venue) {

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PaymentController;
 
 Route::view('/', 'home')
     ->name('home');
@@ -21,6 +22,13 @@ Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->n
 Route::patch('/bookings/{booking}/status', [BookingController::class, ':updateStatus'])->name('bookings.updateStatus');
 
 Route::get('/admin', [AdminController::class,'index'])->name('admin')->middleware('auth');
+
+// Payment routes
+Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])->name('payment.checkout');
+Route::post('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])->name('payment.checkout.post');
+Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
+Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])->name('stripe.webhook');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
