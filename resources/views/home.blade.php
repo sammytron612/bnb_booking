@@ -1,6 +1,4 @@
 <x-layouts.app>
-    <!-- Hero Image Slider -->
-    <x-image-slider />
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -15,8 +13,16 @@
             </p>
         </div>
 
+        <!-- Hero Image Slider -->
+
+        <x-image-slider />
+
+        <h2 class="text-2xl md:text-4xl text-center font-bold text-gray-900 dark:text-white mt-12 mb-6">
+            Explore Our Properties
+        </h2>
+
         <!-- Properties Grid -->
-        <div class="grid md:grid-cols-2 gap-12 lg:gap-16">
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
 
             <!-- The Light House -->
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
@@ -170,7 +176,8 @@
                             <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4 flex items-center justify-center">
                                 Discover Seaham's Rich Heritage
                             </h3>
-                            <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed">
+                            <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed text-left">
+                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/knackpit.jpg') }}" alt="The knackpit in Seaham">
                                 <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham's transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
 
                                 <p>Seaham also holds literary significance—<a class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" href="https://en.wikipedia.org/wiki/Lord_Byron">Lord Byron</a> married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union.</p>
@@ -184,8 +191,10 @@
                             <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4 flex items-center justify-center">
                                 Modern Seaham: Where Heritage Meets Coastal Beauty
                             </h3>
-                            <p class="text-gray-700 text-center dark:text-gray-300 leading-relaxed">
-                                Today, Seaham has reinvented itself as a vibrant seaside destination. Its regeneration has brought new life to the town, blending historical reverence with modern leisure.
+                            <p class="text-gray-700 text-left dark:text-gray-300 leading-relaxed">
+                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
+                                The town’s coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town’s glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham’s maritime legacy.
+                                Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like St Mary the Virgin Church, one of the oldest in the region, offering a glimpse into centuries of local history.
                             </p>
                         </div>
 

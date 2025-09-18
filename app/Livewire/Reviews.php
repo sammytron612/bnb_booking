@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Review;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class Reviews extends Component
@@ -26,11 +27,20 @@ class Reviews extends Component
     {
         $path = request()->path();
 
-        // Extract venue from URL paths like 'light-house' or 'saras'
+        // Map URL paths to database venue names
         if ($path === 'light-house') {
-            return 'light-house';
+            return 'The Light House';
         } elseif ($path === 'saras') {
-            return 'saras';
+            return 'Saras';
+        }
+
+        // Also try other possible venue names
+        if (str_contains($path, 'lighthouse') || str_contains($path, 'light')) {
+            return 'The Light House';
+        }
+
+        if (str_contains($path, 'sara')) {
+            return 'Saras';
         }
 
         return null;
@@ -39,19 +49,35 @@ class Reviews extends Component
     private function loadReviews()
     {
         if ($this->venue) {
-            // Get total count of reviews for this venue
-            $this->totalReviews = Review::whereHas('booking', function($query) {
-                $query->where('venue', $this->venue);
-            })->count();
 
-            // Get limited reviews for this venue through the booking relationship
-            $this->reviews = Review::whereHas('booking', function($query) {
-                $query->where('venue', $this->venue);
-            })->with('booking')->orderBy('created_at', 'desc')->limit($this->reviewsToShow)->get();
+            try {
+                // Debug: Log the venue we're looking for
+                logger('Looking for reviews for venue: ' . $this->venue);
+
+                // Get total count of reviews for this venue
+                $this->totalReviews = Review::whereHas('booking', function($query) {
+                    $query->where('venue', $this->venue);
+                })->count();
+
+                logger('Found ' . $this->totalReviews . ' reviews for venue: ' . $this->venue);
+
+                // Get limited reviews for this venue through the booking relationship
+                $this->reviews = Review::whereHas('booking', function($query) {
+                    $query->where('venue', $this->venue);
+                })->with(['booking', 'reply'])->orderBy('created_at', 'desc')->limit($this->reviewsToShow)->get();
+
+            } catch (\Exception $e) {
+                // If relationship fails, fall back to getting all reviews
+                logger('Reviews relationship error: ' . $e->getMessage());
+                $this->reviews = Review::with(['booking', 'reply'])->orderBy('created_at', 'desc')->limit($this->reviewsToShow)->get();
+                $this->totalReviews = Review::count();
+            }
         } else {
+            logger('No venue found from URL: ' . request()->path());
             $this->reviews = collect();
             $this->totalReviews = 0;
         }
+
     }
 
     public function loadMore()

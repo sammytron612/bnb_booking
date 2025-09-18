@@ -28,7 +28,7 @@
                 alt="{{ $images[0]['alt'] }}"
                 class="w-full h-full object-cover cursor-pointer"
                 data-modal-trigger="{{ $galleryId }}"
-                data-image-index="0"
+                data-image-index="0" loading="lazy"
             >
 
             <!-- Thumbnail Grid Overlay -->

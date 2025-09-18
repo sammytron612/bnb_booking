@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
@@ -21,7 +22,7 @@ Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings
 Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
 Route::patch('/bookings/{booking}/status', [BookingController::class, ':updateStatus'])->name('bookings.updateStatus');
 
-Route::get('/admin', [AdminController::class,'index'])->name('admin')->middleware('auth');
+;
 
 // Payment routes
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])->name('payment.checkout');
@@ -30,6 +31,14 @@ Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSucc
 Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])->name('stripe.webhook');
 
+// Review routes
+Route::get('/reviews/create/{booking}', function (Request $request, $booking) {
+    return view('create-review', ['booking' => $booking]);
+})->name('reviews.create')->middleware('signed');
+
+// Test route for review link generation
+Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -37,5 +46,14 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 });
+
+//admin routes
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
+    Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
+    Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
+});
+
 
 require __DIR__.'/auth.php';

@@ -35,6 +35,21 @@
                         <div class="mt-2 text-xs text-gray-400">
                             Reviewed on {{ $review->created_at->format('M j, Y') }}
                         </div>
+
+                        @if($review->reply)
+                            <div class="mt-4 pl-4 border-l-4 border-blue-200 bg-blue-50 rounded-r-lg p-3">
+                                <div class="flex items-center mb-2">
+                                    <svg class="w-4 h-4 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="text-sm font-medium text-blue-800">Management Response</span>
+                                </div>
+                                <p class="text-sm text-blue-700 leading-relaxed">{{ $review->reply->reply }}</p>
+                                <div class="mt-2 text-xs text-blue-500">
+                                    Replied on {{ $review->reply->created_at->format('M j, Y') }}
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>

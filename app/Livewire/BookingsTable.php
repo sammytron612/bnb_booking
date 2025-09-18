@@ -10,7 +10,7 @@ class BookingsTable extends Component
 {
     use WithPagination;
 
-    public $sortBy = 'depart';
+    public $sortBy = 'check_in';
     public $sortDirection = 'asc';
     public $perPage = 15;
     public $search = '';
@@ -25,7 +25,7 @@ class BookingsTable extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'sortBy' => ['except' => 'depart'],
+        'sortBy' => ['except' => 'check_in'],
         'sortDirection' => ['except' => 'asc'],
     ];
 

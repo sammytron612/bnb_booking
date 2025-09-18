@@ -22,8 +22,6 @@
         </div>
 
         <div class="content">
-            <h2>Hello {{ $booking->name }},</h2>
-
             <p>A new booking has been confirmed and payment has been successfully processed.</p>
 
             <div class="booking-details">

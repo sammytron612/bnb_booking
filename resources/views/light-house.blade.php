@@ -58,7 +58,7 @@
                                 alt="{{ $image['alt'] }}"
                                 class="w-full h-32 object-cover"
                                 data-modal-trigger="lighthouselh-gallery"
-                                data-image-index="{{ $index + 1 }}"
+                                data-image-index="{{ $index + 1 }}" loading="lazy"
                             >
                         </div>
                     @endforeach

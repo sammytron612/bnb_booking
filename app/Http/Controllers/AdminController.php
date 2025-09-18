@@ -10,4 +10,18 @@ class AdminController extends Controller
     {
         return view('admin.index');
     }
+    public function bookings()
+    {
+        return view('admin.bookings');
+    }
+
+    public function reviews()
+    {
+        return view('admin.reviews');
+    }
+
+    public function analytics()
+    {
+        return view('admin.analytics');
+    }
 }

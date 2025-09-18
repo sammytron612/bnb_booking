@@ -188,7 +188,7 @@
                                             </svg>
                                         </div>
                                         <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Check-in</p>
-                                        <p class="font-bold text-gray-900">{{ $selectedBooking->depart->format('M d, Y') }}</p>
+                                        <p class="font-bold text-gray-900">{{ $selectedBooking->check_in->format('M d, Y') }}</p>
                                     </div>
                                     <div class="text-center bg-white rounded-lg p-4">
                                         <div class="w-12 h-12 bg-red-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
@@ -197,7 +197,7 @@
                                             </svg>
                                         </div>
                                         <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Check-out</p>
-                                        <p class="font-bold text-gray-900">{{ $selectedBooking->leave->format('M d, Y') }}</p>
+                                        <p class="font-bold text-gray-900">{{ $selectedBooking->check_out->format('M d, Y') }}</p>
                                     </div>
                                     <div class="text-center bg-white rounded-lg p-4">
                                         <div class="w-12 h-12 bg-green-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
