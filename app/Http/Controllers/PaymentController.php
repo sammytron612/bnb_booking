@@ -38,7 +38,7 @@ class PaymentController extends Controller
                         'currency' => 'gbp',
                         'product_data' => [
                             'name' => $booking->venue . ' Booking',
-                            'description' => 'Booking from ' . Carbon::parse($booking->depart)->format('M j, Y') . ' to ' . Carbon::parse($booking->leave)->format('M j, Y'),
+                            'description' => 'Booking from ' . Carbon::parse($booking->check_in)->format('M j, Y') . ' to ' . Carbon::parse($booking->check_out)->format('M j, Y'),
                         ],
                         'unit_amount' => (int) ($booking->total_price * 100), // Convert to pence
                     ],
@@ -150,6 +150,7 @@ class PaymentController extends Controller
 
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
+            Log::info('Stripe webhook received', ['type' => $event['type']]);
         } catch (SignatureVerificationException $e) {
             Log::error('Webhook signature verification failed: ' . $e->getMessage());
             return response('', 400);
@@ -160,14 +161,23 @@ class PaymentController extends Controller
             case 'checkout.session.completed':
                 $this->handleCheckoutSessionCompleted($event['data']['object']);
                 break;
+            case 'payment_intent.created':
+                $this->handlePaymentIntentCreated($event['data']['object']);
+                break;
             case 'payment_intent.succeeded':
                 $this->handlePaymentIntentSucceeded($event['data']['object']);
                 break;
             case 'payment_intent.payment_failed':
                 $this->handlePaymentIntentFailed($event['data']['object']);
                 break;
+            case 'charge.updated':
+                $this->handleChargeUpdated($event['data']['object']);
+                break;
+            case 'charge.succeeded':
+                $this->handleChargeSucceeded($event['data']['object']);
+                break;
             default:
-                Log::info('Received unknown event type: ' . $event['type']);
+                Log::info('Unhandled webhook event type: ' . $event['type']);
         }
 
         return response('', 200);
@@ -184,6 +194,9 @@ class PaymentController extends Controller
             $booking = Booking::find($bookingId);
 
             if ($booking) {
+                // Check if booking is already paid to prevent duplicate emails
+                $wasAlreadyPaid = $booking->is_paid;
+
                 $updateData = [
                     'is_paid' => true,
                     'status' => 'confirmed',
@@ -200,13 +213,23 @@ class PaymentController extends Controller
 
                 $booking->update($updateData);
 
-
-                // Send emails
-                Mail::to($booking->email)->send(new BookingConfirmation($booking));
-                Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
-
-                Log::info('Booking payment confirmed via webhook', ['booking_id' => $bookingId]);
+                // Only send emails if booking wasn't already paid (prevents duplicates)
+                if (!$wasAlreadyPaid) {
+                    try {
+                        Mail::to($booking->email)->send(new BookingConfirmation($booking));
+                        Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
+                        Log::info('Booking confirmed and emails sent', ['booking_id' => $booking->id]);
+                    } catch (Exception $e) {
+                        Log::error('Failed to send confirmation email: ' . $e->getMessage());
+                    }
+                } else {
+                    Log::info('Booking already paid, skipped duplicate email', ['booking_id' => $bookingId]);
+                }
+            } else {
+                Log::error('Booking not found for webhook', ['booking_id' => $bookingId]);
             }
+        } else {
+            Log::error('No booking_id in webhook metadata');
         }
     }
 
@@ -217,6 +240,14 @@ class PaymentController extends Controller
     {
         // Additional handling if needed
         Log::info('Payment intent succeeded', ['payment_intent_id' => $paymentIntent['id']]);
+    }
+
+    /**
+     * Handle payment intent created webhook
+     */
+    private function handlePaymentIntentCreated($paymentIntent)
+    {
+        // Payment intent created - no action needed
     }
 
     /**
@@ -232,6 +263,50 @@ class PaymentController extends Controller
                 'booking_id' => $booking->id,
                 'payment_intent_id' => $paymentIntent['id']
             ]);
+        }
+    }
+
+    /**
+     * Handle charge updated webhook
+     */
+    private function handleChargeUpdated($charge)
+    {
+        // If charge is succeeded, try to find and update booking
+        if ($charge['status'] === 'succeeded' && !empty($charge['payment_intent'])) {
+            $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
+
+            if ($booking && !$booking->is_paid) {
+                $booking->update([
+                    'is_paid' => true,
+                    'status' => 'confirmed',
+                    'payment_completed_at' => now(),
+                    'pay_method' => 'stripe',
+                ]);
+
+                Log::info('Booking updated via charge.updated', ['booking_id' => $booking->id]);
+            }
+        }
+    }
+
+    /**
+     * Handle charge succeeded webhook
+     */
+    private function handleChargeSucceeded($charge)
+    {
+        // Try to find booking by payment intent and update if not already paid
+        if (!empty($charge['payment_intent'])) {
+            $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
+
+            if ($booking && !$booking->is_paid) {
+                $booking->update([
+                    'is_paid' => true,
+                    'status' => 'confirmed',
+                    'payment_completed_at' => now(),
+                    'pay_method' => 'stripe',
+                ]);
+
+                Log::info('Booking updated via charge.succeeded', ['booking_id' => $booking->id]);
+            }
         }
     }
 }

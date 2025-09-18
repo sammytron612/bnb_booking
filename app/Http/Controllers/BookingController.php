@@ -144,8 +144,8 @@ class BookingController extends Controller
         $bookedDates = [];
 
         foreach ($bookings as $booking) {
-            $start = Carbon::parse($booking->depart);
-            $end = Carbon::parse($booking->leave);
+            $start = Carbon::parse($booking->check_in);
+            $end = Carbon::parse($booking->check_out);
 
             // Add each date from check-in to check-out (exclusive of check-out date)
             while ($start < $end) {

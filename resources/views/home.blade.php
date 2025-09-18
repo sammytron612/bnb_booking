@@ -280,44 +280,7 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Quick Contact Form -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg border border-slate-200 dark:border-gray-700 max-w-2xl mx-auto">
-                <h4 class="text-xl font-semibold text-slate-800 dark:text-slate-200 mb-6 text-center">Quick Inquiry</h4>
-                <form class="space-y-4">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="contact-name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Name</label>
-                            <input type="text" id="contact-name" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors" placeholder="Your name">
-                        </div>
-                        <div>
-                            <label for="contact-email" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Email</label>
-                            <input type="email" id="contact-email" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors" placeholder="your@email.com">
-                        </div>
-                    </div>
-                    <div>
-                        <label for="contact-subject" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subject</label>
-                        <select id="contact-subject" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors">
-                            <option>General Inquiry</option>
-                            <option>Booking Question</option>
-                            <option>The Light House</option>
-                            <option>Saras</option>
-                            <option>Group Booking</option>
-                            <option>Special Requirements</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="contact-message" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Message</label>
-                        <textarea id="contact-message" rows="4" class="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors resize-none" placeholder="How can we help you plan your perfect coastal getaway?"></textarea>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-lg hover:shadow-xl">
-                            Send Message
-                        </button>
-                    </div>
-                </form>
-            </div>
-
+            <livewire:contact-form>
             <!-- Additional Info -->
             <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-gray-700">
                 <p class="text-sm text-slate-600 dark:text-slate-400">
