@@ -152,6 +152,11 @@
 
         <x-location-map location="SR7 7HX"/>
 
+        <!-- Reviews Section -->
+        <div class="mt-16">
+            <livewire:reviews />
+        </div>
+
     </div>
 
     <x-booking-modal price="95" venue="Saras" />
