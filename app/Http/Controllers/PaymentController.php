@@ -200,6 +200,7 @@ class PaymentController extends Controller
 
                 $booking->update($updateData);
 
+
                 // Send emails
                 Mail::to($booking->email)->send(new BookingConfirmation($booking));
                 Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
