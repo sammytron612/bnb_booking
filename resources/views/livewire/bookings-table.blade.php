@@ -8,7 +8,9 @@
     @endif
 
 
-
+    <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+        Back to Dashboard
+    </a>
     <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">

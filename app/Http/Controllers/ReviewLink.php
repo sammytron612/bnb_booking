@@ -40,8 +40,6 @@ class ReviewLink extends Controller
             Mail::to($booking->email)->send(new ReviewLinkMail($data));
 
         }
-
-
         die();
 
     }

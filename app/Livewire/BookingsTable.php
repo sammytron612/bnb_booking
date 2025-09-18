@@ -11,7 +11,7 @@ class BookingsTable extends Component
     use WithPagination;
 
     public $sortBy = 'check_in';
-    public $sortDirection = 'asc';
+    public $sortDirection = 'desc';
     public $perPage = 15;
     public $search = '';
     public $statusFilter = '';
