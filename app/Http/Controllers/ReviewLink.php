@@ -28,7 +28,7 @@ class ReviewLink extends Controller
                 ['booking' => $booking->id]
             );
 
-            // Fix the data array construction
+            // create the data array
             $data = [
                 'reviewLink' => $reviewLink,
                 'booking_id' => $booking->id,
