@@ -113,8 +113,8 @@ class PaymentController extends Controller
 
                     // Send confirmation email
                     try {
-                        Mail::to($booking->email)->send(new BookingConfirmation($booking));
-                        Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
+                        //Mail::to($booking->email)->send(new BookingConfirmation($booking));
+                        //Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
                         Log::info('Booking confirmation email sent', ['booking_id' => $booking->id]);
                     } catch (Exception $e) {
                         Log::error('Failed to send confirmation email: ' . $e->getMessage());
@@ -199,6 +199,10 @@ class PaymentController extends Controller
                 }
 
                 $booking->update($updateData);
+
+                // Send emails
+                Mail::to($booking->email)->send(new BookingConfirmation($booking));
+                Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
 
                 Log::info('Booking payment confirmed via webhook', ['booking_id' => $bookingId]);
             }
