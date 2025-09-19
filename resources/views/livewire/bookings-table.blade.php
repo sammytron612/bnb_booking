@@ -204,7 +204,7 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('booking_id')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('booking_id')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Booking ID</span>
                             @if($sortBy === 'booking_id')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +218,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('name')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('name')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Guest</span>
                             @if($sortBy === 'name')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +232,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('venue')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('venue')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Venue</span>
                             @if($sortBy === 'venue')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,7 +246,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('created_at')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('created_at')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Date Booked</span>
                             @if($sortBy === 'created_at')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,7 +260,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('check_in')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('check_in')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Check In</span>
                             @if($sortBy === 'check_in')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,7 +274,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('check_out')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('check_out')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Check Out</span>
                             @if($sortBy === 'check_out')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +288,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('nights')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('nights')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Nights</span>
                             @if($sortBy === 'nights')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +302,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('total_price')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('total_price')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Total Price</span>
                             @if($sortBy === 'total_price')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +316,7 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('status')" class="flex items-center space-x-1">
+                        <button wire:click="sortByField('status')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Status</span>
                             @if($sortBy === 'status')
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
