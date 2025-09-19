@@ -246,6 +246,20 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <button wire:click="sortBy('created_at')" class="flex items-center space-x-1">
+                            <span>Date Booked</span>
+                            @if($sortBy === 'created_at')
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    @if($sortDirection === 'asc')
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                    @else
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    @endif
+                                </svg>
+                            @endif
+                        </button>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <button wire:click="sortBy('check_in')" class="flex items-center space-x-1">
                             <span>Check In</span>
                             @if($sortBy === 'check_in')
@@ -315,20 +329,6 @@
                             @endif
                         </button>
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortBy('created_at')" class="flex items-center space-x-1">
-                            <span>Date Booked</span>
-                            @if($sortBy === 'created_at')
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    @if($sortDirection === 'asc')
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                                    @else
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    @endif
-                                </svg>
-                            @endif
-                        </button>
-                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -343,6 +343,7 @@
                             <div class="text-sm text-gray-500">{{ $booking->email }}</div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->venue }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
@@ -356,7 +357,6 @@
                                 {{ ucfirst($booking->status) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button wire:click="editBooking({{ $booking->id }})" class="text-white  bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-lg p-2 mr-3">Edit</button>
                             <button wire:click="deleteBooking({{ $booking->id }})" class="text-white bg-red-600 hover:bg-red-700 hover:cursor-pointer rounded-lg p-2" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
@@ -421,6 +421,16 @@
                                 <option value="cancelled">Cancelled</option>
                             </select>
                             @error('editStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Payment Status Field -->
+                        <div>
+                            <label for="editPayment" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+                            <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="0">Unpaid</option>
+                                <option value="1">Paid</option>
+                            </select>
+                            @error('editPayment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <!-- Notes Field -->
