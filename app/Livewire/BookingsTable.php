@@ -15,7 +15,7 @@ class BookingsTable extends Component
     public $perPage = 15;
     public $search = '';
     public $statusFilter = '';
-    public $showBooking = false;
+    public $showEditModal = false;
     public ?Booking $selectedBooking = null;
 
     // Form fields for editing
@@ -49,19 +49,31 @@ class BookingsTable extends Component
         }
     }
 
-    public function openBookingModal($bookingId)
+    public function editBooking($bookingId)
     {
         $this->selectedBooking = Booking::find($bookingId);
         $this->editStatus = $this->selectedBooking->status;
         $this->editNotes = $this->selectedBooking->notes ?? '';
         $this->editPayment = $this->selectedBooking->is_paid ? "1" : "0";
-        $this->showBooking = true;
+        $this->showEditModal = true;
     }
 
-    public function closeModal()
+    public function closeEditModal()
     {
-        $this->showBooking = false;
+        $this->showEditModal = false;
         $this->selectedBooking = null;
+        $this->editStatus = '';
+        $this->editNotes = '';
+        $this->editPayment = "0";
+    }
+
+    public function deleteBooking($bookingId)
+    {
+        $booking = Booking::find($bookingId);
+        if ($booking) {
+            $booking->delete();
+            session()->flash('success', 'Booking deleted successfully.');
+        }
     }
 
     public function saveBooking()
@@ -84,7 +96,11 @@ class BookingsTable extends Component
             'is_paid' => $validated['editPayment'] === "1"
         ]);
 
-        $this->showBooking = false;
+        $this->showEditModal = false;
+        $this->selectedBooking = null;
+        $this->editStatus = '';
+        $this->editNotes = '';
+        $this->editPayment = "0";
         session()->flash('success', 'Booking updated successfully.');
     }
 
@@ -93,7 +109,7 @@ class BookingsTable extends Component
         $days = collect();
         $startDate = now();
 
-        for ($i = 0; $i < 7; $i++) {
+        for ($i = 0; $i < 14; $i++) {
             $date = $startDate->copy()->addDays($i);
 
             // Get bookings for this date
