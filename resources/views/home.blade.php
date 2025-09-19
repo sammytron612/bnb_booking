@@ -8,7 +8,7 @@
                 Seaham Coastal Retreats
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Discover luxury coastal living in County Durham. Two stunning apartments overlooking the dramatic Seaham coastline,
+                Discover luxury coastal apartments in Seaham County Durham. Two stunning apartments overlooking the dramatic Seaham coastline,
                 where industrial heritage meets natural beauty and seaglass treasures wash ashore daily.
             </p>
         </div>
@@ -192,7 +192,7 @@
                                 Modern Seaham: Where Heritage Meets Coastal Beauty
                             </h3>
                             <p class="text-gray-700 text-left dark:text-gray-300 leading-relaxed">
-                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham" loading="lazy" width="256" height="256" decoding="async">
+                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
                                 The town’s coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town’s glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham’s maritime legacy.
                                 Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like <a href="https://www.nationalchurchestrust.org/church/st-mary-virgin-seaham" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow">St Mary the Virgin Church</a>, one of the oldest in the region, offering a glimpse into centuries of local history.
                             </p>
