@@ -28,7 +28,11 @@
                 alt="{{ $images[0]['alt'] }}"
                 class="w-full h-full object-cover cursor-pointer"
                 data-modal-trigger="{{ $galleryId }}"
-                data-image-index="0" loading="lazy"
+                data-image-index="0"
+                loading="lazy"
+                decoding="async"
+                width="400"
+                height="320"
             >
 
             <!-- Thumbnail Grid Overlay -->
@@ -115,7 +119,7 @@
                 id="modal-image-{{ $galleryId }}"
                 src="{{ count($images) > 0 ? $images[0]['src'] : '' }}"
                 alt="{{ count($images) > 0 ? $images[0]['alt'] : '' }}"
-                class="max-w-full max-h-full object-contain"
+                class="max-w-full max-h-full object-contain" loading="lazy" decoding="async"
             >
         </div>
 
@@ -133,6 +137,7 @@
                     class="w-16 h-16 object-cover rounded cursor-pointer opacity-60 hover:opacity-100 transition-opacity {{ $index === 0 ? 'ring-2 ring-white opacity-100' : '' }}"
                     data-modal-thumb="{{ $galleryId }}"
                     data-thumb-index="{{ $index }}"
+                loading="lazy" decoding="async"
                 >
             @endforeach
         </div>

@@ -6,8 +6,8 @@
             <div class="space-y-4">
                 @foreach($reviews as $review)
                     <div class="bg-white rounded-lg shadow p-6 border">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="font-semibold text-lg">{{ $review->name }}</h4>
+                        <div class="flex items-center mb-3">
+                            <h4 class="font-semibold text-lg mr-4">{{ $review->name }}</h4>
                             <div class="flex items-center">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <= $review->rating)

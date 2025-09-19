@@ -1,7 +1,7 @@
 <x-layouts.app>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto md:px-4 sm:px-2 lg:px-8 py-12">
         <!-- Hero Section -->
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
@@ -133,27 +133,27 @@
                 Why Choose Seaham?
             </h2>
             <div class="grid md:grid-cols-3 gap-8">
-                <div class="p-6">
+                <div class="p-2 md:p-6">
                     <div class="flex items-center justify-center mx-auto mb-4">
-                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seaglass2.jpg') }}" alt="Seaham Seaglass">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seaglass2.jpg') }}" alt="Seaham Seaglass" loading="lazy" width="256" height="256" decoding="async">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaglass Hunting</h3>
                     <p class="text-gray-600 dark:text-gray-300">
                         Seaham's world-famous seaglass beaches offer daily treasures. Hunt for rare blues, greens, and frosted whites along our unique coastline shaped by Victorian glass dumping.
                     </p>
                 </div>
-                <div class="p-6">
+                <div class="p-2 md:p-6">
                     <div class="flex items-center justify-center mx-auto mb-4">
-                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seahamcoastline.webp') }}" alt="Seaham Coastline">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seahamcoastline.webp') }}" alt="Seaham Coastline" loading="lazy" width="256" height="256" decoding="async">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Natural Beauty</h3>
                     <p class="text-gray-600 dark:text-gray-300">
                         Stunning cliff walks, seaglass-studded beaches, and dramatic coastal views along the Durham Heritage Coast. Watch the waves tumble fresh seaglass daily onto our shores.
                     </p>
                 </div>
-                <div class="p-6">
+                <div class="p-2 md:p-6">
                     <div class="flex items-center justify-center mx-auto mb-4">
-                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/durham.jpg') }}" alt="Durham City">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/durham.jpg') }}" alt="Durham City" loading="lazy" width="256" height="256" decoding="async">
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Perfect Location</h3>
                     <p class="text-gray-600 dark:text-gray-300">
@@ -161,7 +161,7 @@
                     </p>
                 </div>
             </div>
-            <section id="about" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 lg:p-12 shadow-lg">
+            <section id="about" class="mt-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl p-4 lg:p-12 shadow-lg">
                 <div class="max-w-4xl mx-auto">
                     <div class="text-center mb-12">
                         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">
@@ -177,29 +177,29 @@
                                 Discover Seaham's Rich Heritage
                             </h3>
                             <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed text-left">
-                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/knackpit.jpg') }}" alt="The knackpit in Seaham">
+                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/knackpit.jpg') }}" alt="The knackpit in Seaham" loading="lazy" width="256" height="256" decoding="async">
                                 <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham's transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
 
-                                <p>Seaham also holds literary significance—<a class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" href="https://en.wikipedia.org/wiki/Lord_Byron">Lord Byron</a> married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union.</p>
+                                <p>Seaham also holds literary significance—<a class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" href="https://en.wikipedia.org/wiki/Lord_Byron" target="_blank " rel="nofollow">Lord Byron</a> married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union.</p>
 
-                                <p>The town's industrial past is commemorated through landmarks like the <a href="https://www.thisisdurham.com/things-to-do/east-durham-heritage-and-lifeboat-centre-p722171" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200">East Durham Heritage & Lifeboat Centre</a>, which honours the brave lifeboat crews and miners who shaped Seaham's legacy.</p>
+                                <p>The town's industrial past is commemorated through landmarks like the <a href="https://www.thisisdurham.com/things-to-do/east-durham-heritage-and-lifeboat-centre-p722171" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow">East Durham Heritage & Lifeboat Centre</a>, which honours the brave lifeboat crews and miners who shaped Seaham's legacy.</p>
                             </div>
                         </div>
 
                         <!-- Modern Seaham Section -->
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-6 shadow-md">
                             <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4 flex items-center justify-center">
                                 Modern Seaham: Where Heritage Meets Coastal Beauty
                             </h3>
                             <p class="text-gray-700 text-left dark:text-gray-300 leading-relaxed">
-                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
+                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham" loading="lazy" width="256" height="256" decoding="async">
                                 The town’s coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town’s glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham’s maritime legacy.
-                                Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like St Mary the Virgin Church, one of the oldest in the region, offering a glimpse into centuries of local history.
+                                Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like <a href="https://www.nationalchurchestrust.org/church/st-mary-virgin-seaham" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow">St Mary the Virgin Church</a>, one of the oldest in the region, offering a glimpse into centuries of local history.
                             </p>
                         </div>
 
                         <!-- Attractions Section -->
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-6 shadow-md">
                             <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6 flex items-center justify-center">
                                 Top Attractions in Seaham
                             </h3>
@@ -238,7 +238,7 @@
                 </div>
             </section>
         </div>
-        <section id="contact" class="mt-20 bg-gradient-to-br from-blue-50 via-white to-slate-50 dark:from-gray-800 dark:via-gray-900 dark:to-slate-800 rounded-2xl p-8 lg:p-12 shadow-xl border border-blue-100 dark:border-gray-700">
+        <section id="contact" class="mt-20 bg-gradient-to-br from-blue-50 via-white to-slate-50 dark:from-gray-800 dark:via-gray-900 dark:to-slate-800 rounded-2xl p-4 lg:p-12 shadow-xl border border-blue-100 dark:border-gray-700">
             <div class="text-center mb-12">
                 <h3 class="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-4">Get In Touch</h3>
                 <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">

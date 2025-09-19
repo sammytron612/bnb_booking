@@ -161,7 +161,5 @@
 
     <x-booking-modal price="120" venue="The Light House" />
 
-    <!--<x-venue-image-modal />-->
-
     <script src="{{ Vite::asset('resources/js/booking-modal.js') }}" defer></script>
 </x-layouts.app>

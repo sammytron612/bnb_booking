@@ -7,8 +7,13 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<link rel="preconnect" href="https://fonts.bunny.net">
-<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+<!-- Resource Hints for Performance -->
+<link rel="dns-prefetch" href="//fonts.bunny.net">
+<link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+
+<!-- Font Loading with Performance Optimization -->
+<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet"></noscript>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 @livewireStyles
