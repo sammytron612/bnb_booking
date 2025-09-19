@@ -104,7 +104,8 @@ class Booking extends Model
      */
     public function getDisplayBookingId(): string
     {
-        return $this->booking_id ?? $this->id;
+        $bookingId = $this->booking_id ?? $this->id;
+        return 'BNB-' . $bookingId;
     }
 
     /**

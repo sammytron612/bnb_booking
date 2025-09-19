@@ -20,7 +20,7 @@ class NewBooking extends Mailable
 
     public function build()
     {
-        return $this->subject('New Booking - BNB-' . $this->booking->getDisplayBookingId() . ' - ' . $this->booking->venue)
+        return $this->subject('New Booking - ' . $this->booking->getDisplayBookingId() . ' - ' . $this->booking->venue)
                     ->view('emails.new-booking');
     }
 }

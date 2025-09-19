@@ -52,7 +52,7 @@
                                         <div class="border-b border-gray-700 pb-2 mb-2 last:border-b-0 last:pb-0 last:mb-0">
                                             <div class="flex items-center justify-between mb-1">
                                                 <div class="font-semibold text-white">{{ $booking->name }}</div>
-                                                <div class="font-mono text-xs text-blue-300">Booking Id-{{ $booking->id }}</div>
+                                                <div class="font-mono text-xs text-blue-300">{{ $booking->getDisplayBookingId() }}</div>
                                             </div>
                                             <div class="text-gray-300 flex items-center mt-1">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@
                 @forelse($bookings as $booking)
                     <tr class="hover:bg-gray-50 cursor-pointer" wire:key="booking-{{ $booking->id }}" wire:click="openBookingModal({{ $booking->id }})">
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="font-mono text-sm text-gray-600">{{ $booking->id }}</span>
+                            <span class="font-mono text-sm text-gray-600">{{ $booking->getDisplayBookingId() }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->email }}</td>
