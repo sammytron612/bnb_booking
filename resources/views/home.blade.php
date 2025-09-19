@@ -28,10 +28,10 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
-                    title="The Light House"
+                    title="{{ $venues[0]->venue_name }}"
                     badge="Premium Property"
                     badge-color="blue"
-                    price="£120/night"
+                    price="£{{ $venues[0]->price }}/night"
                 />
 
                 <div class="p-6">
@@ -79,10 +79,10 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
-                    title="Sara's"
+                    title="{{ $venues[1]->venue_name }}"
                     badge="Family Friendly"
                     badge-color="green"
-                    price="£95/night"
+                    price="£{{ $venues[1]->price }}/night"
                 />
 
                 <div class="p-6">

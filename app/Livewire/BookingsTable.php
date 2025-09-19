@@ -21,7 +21,7 @@ class BookingsTable extends Component
     // Form fields for editing
     public $editStatus = '';
     public $editNotes = '';
-    public $editPayment = false;
+    public $editPayment = "0";
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -54,7 +54,7 @@ class BookingsTable extends Component
         $this->selectedBooking = Booking::find($bookingId);
         $this->editStatus = $this->selectedBooking->status;
         $this->editNotes = $this->selectedBooking->notes ?? '';
-        $this->editPayment = (bool) $this->selectedBooking->is_paid;
+        $this->editPayment = $this->selectedBooking->is_paid ? "1" : "0";
         $this->showBooking = true;
     }
 
@@ -73,7 +73,7 @@ class BookingsTable extends Component
         $validated = $this->validate([
             'editStatus' => 'required|in:pending,confirmed,cancelled',
             'editNotes' => 'nullable|string|max:2000',
-            'editPayment' => 'boolean',
+            'editPayment' => 'required|in:0,1',
         ]);
 
         // Get fresh model from database and update it
@@ -81,7 +81,7 @@ class BookingsTable extends Component
         $booking->update([
             'status' => $validated['editStatus'],
             'notes' => $validated['editNotes'],
-            'is_paid' => $validated['editPayment']
+            'is_paid' => $validated['editPayment'] === "1"
         ]);
 
         $this->showBooking = false;

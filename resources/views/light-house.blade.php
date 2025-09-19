@@ -126,7 +126,7 @@
                     </h3>
                     <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 mb-6">
                         <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                            £120<span class="text-lg font-normal text-gray-600 dark:text-gray-300">/night</span>
+                            £{{$venue->price}}<span class="text-lg font-normal text-gray-600 dark:text-gray-300">/night</span>
                         </div>
                         <p class="text-gray-600 dark:text-gray-300">
                             Minimum 2-night stay • Includes all amenities
@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <x-location-map location="SR7 7HN"/>
+        <x-location-map location="{{$venue->postcode}}"/>
 
         <!-- Reviews Section -->
         <div class="mt-16">
@@ -159,7 +159,9 @@
 
     </div>
 
-    <x-booking-modal price="120" venue="The Light House" />
+    <x-booking-modal price="{{ $venue->price }}" venue="{{ $venue->venue_name }}" />
+
+    <x-venue-image-modal />
 
     <script src="{{ Vite::asset('resources/js/booking-modal.js') }}" defer></script>
 </x-layouts.app>

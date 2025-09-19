@@ -6,14 +6,22 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
+use App\Models\Venue;
 
-Route::view('/', 'home')
-    ->name('home');
-Route::view('/light-house', 'light-house')
-    ->name('light-house');
+Route::get('/', function () {
+    $venues = Venue::all();
+    return view('home', compact('venues'));
+})->name('home');
 
-Route::view('/saras', 'saras')
-    ->name('saras');
+Route::get('/light-house', function () {
+    $venue = Venue::find(1);
+    return view('light-house', compact('venue'));
+})->name('light-house');
+
+Route::get('/saras', function () {
+    $venue = Venue::find(2);
+    return view('saras', compact('venue'));
+})->name('saras');
 
 // Booking routes
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
