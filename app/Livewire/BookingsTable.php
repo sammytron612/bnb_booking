@@ -88,6 +88,34 @@ class BookingsTable extends Component
         session()->flash('success', 'Booking updated successfully.');
     }
 
+    public function getCalendarData()
+    {
+        $days = collect();
+        $startDate = now();
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startDate->copy()->addDays($i);
+
+            // Get bookings for this date
+            $dayBookings = Booking::where(function ($query) use ($date) {
+                $query->where('check_in', '<=', $date->format('Y-m-d'))
+                      ->where('check_out', '>', $date->format('Y-m-d'));
+            })
+            ->where('status', '!=', 'cancelled')
+            ->get();
+
+            $days->push([
+                'date' => $date,
+                'bookings' => $dayBookings,
+                'booking_count' => $dayBookings->count(),
+                'is_today' => $date->isToday(),
+                'is_weekend' => $date->isWeekend()
+            ]);
+        }
+
+        return $days;
+    }
+
     public function render()
     {
         $bookings = Booking::query()
@@ -105,8 +133,11 @@ class BookingsTable extends Component
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
 
+        $calendarData = $this->getCalendarData();
+
         return view('livewire.bookings-table', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'calendarData' => $calendarData
         ]);
     }
 }

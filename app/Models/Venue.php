@@ -43,4 +43,12 @@ class Venue extends Model
     {
         return $this->hasOne(PropertyImage::class, 'property_id')->where('featured', true);
     }
+
+    /**
+     * Get the amenities for the venue.
+     */
+    public function amenities()
+    {
+        return $this->hasMany(Amenity::class);
+    }
 }

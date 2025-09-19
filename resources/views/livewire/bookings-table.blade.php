@@ -11,6 +11,110 @@
     <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
         Back to Dashboard
     </a>
+
+    <!-- 7-Day Calendar -->
+    <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            Next 7 Days Overview
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+            @foreach($calendarData as $day)
+                <div class="text-center">
+                    <!-- Day header -->
+                    <div class="text-xs font-medium {{ $day['is_today'] ? 'text-blue-600' : 'text-gray-500' }} mb-1 uppercase tracking-wide">
+                        {{ $day['date']->format('D') }}
+                    </div>
+                    <div class="text-sm font-bold {{ $day['is_today'] ? 'text-blue-700' : 'text-gray-900' }} mb-2">
+                        {{ $day['date']->format('M j') }}
+                    </div>
+
+                    <!-- Booking indicator -->
+                    <div class="relative">
+                        @if($day['booking_count'] > 0)
+                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
+                                 title="{{ $day['booking_count'] }} booking(s)">
+                                <div class="text-white text-xs font-bold">
+                                    {{ $day['booking_count'] }}
+                                </div>
+                                <div class="text-blue-100 text-xs">
+                                    {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
+                                </div>
+
+                                <!-- Enhanced tooltip with booking details -->
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none shadow-xl">
+                                    <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
+                                        {{ $day['date']->format('l, F j, Y') }}
+                                    </div>
+                                    @foreach($day['bookings'] as $booking)
+                                        <div class="border-b border-gray-700 pb-2 mb-2 last:border-b-0 last:pb-0 last:mb-0">
+                                            <div class="flex items-center justify-between mb-1">
+                                                <div class="font-semibold text-white">{{ $booking->name }}</div>
+                                                <div class="font-mono text-xs text-blue-300">Booking Id-{{ $booking->id }}</div>
+                                            </div>
+                                            <div class="text-gray-300 flex items-center mt-1">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                </svg>
+                                                {{ $booking->venue }}
+                                            </div>
+                                            <div class="text-gray-400 text-xs mt-1 flex items-center">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                                {{ $booking->check_in->format('M j') }} - {{ $booking->check_out->format('M j') }}
+                                            </div>
+                                            <div class="text-green-400 text-xs mt-1 font-medium">
+                                                £{{ number_format($booking->total_price, 2) }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <!-- Arrow pointing down -->
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                        <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                                <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                            </div>
+                        @endif
+
+                        <!-- Today indicator -->
+                        @if($day['is_today'])
+                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                        @endif
+
+                        <!-- Weekend indicator -->
+                        @if($day['is_weekend'])
+                            <div class="absolute top-0 left-0 w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-1 animate-pulse"></div>
+                Today
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-yellow-400 rounded-full mr-1"></div>
+                Weekend
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
+                Has Bookings
+            </div>
+        </div>
+    </div>
+
     <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">
@@ -21,6 +125,7 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Booking ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Guest</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Venue</th>
@@ -36,6 +141,9 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($bookings as $booking)
                     <tr class="hover:bg-gray-50 cursor-pointer" wire:key="booking-{{ $booking->id }}" wire:click="openBookingModal({{ $booking->id }})">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-mono text-sm text-gray-600">{{ $booking->id }}</span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $booking->venue }}</td>

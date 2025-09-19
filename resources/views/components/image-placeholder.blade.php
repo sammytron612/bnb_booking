@@ -3,29 +3,42 @@
     'badgeColor' => 'blue',
     'price' => null,
     'height' => 'h-80',
-    'images' => [
-        ['src' => '/storage/lh1.avif', 'alt' => 'Light House - Ocean View'],
-        ['src' => '/storage/lh2.avif', 'alt' => 'Light House - Living Room'],
-        ['src' => '/storage/lh3.jpeg', 'alt' => 'Light House - Kitchen'],
-        ['src' => '/storage/lh4.avif', 'alt' => 'Light House - Bedroom'],
-        ['src' => '/storage/lh5.avif', 'alt' => 'Light House - Bathroom'],
-        ['src' => '/storage/lh6.jpeg', 'alt' => 'Light House - Dining Area'],
-        ['src' => '/storage/lh7.avif', 'alt' => 'Light House - Balcony'],
-        ['src' => '/storage/lh8.avif', 'alt' => 'Light House - Exterior']
-    ]
+    'venue' => null,
+    'images' => []
 ])
 
 @php
+    // Use venue property images if venue is provided, otherwise fall back to images prop
+    if ($venue && $venue->propertyImages) {
+        $venueImages = $venue->propertyImages->map(function($image) use ($venue) {
+            return [
+                'src' => $image->location,
+                'alt' => $venue->venue_name . ' - ' . $image->title
+            ];
+        })->toArray();
+    } else {
+        // Fallback to default images if no venue or venue images
+        $venueImages = !empty($images) ? $images : [
+            ['src' => '/storage/lh1.avif', 'alt' => 'Light House - Ocean View'],
+            ['src' => '/storage/lh2.avif', 'alt' => 'Light House - Living Room'],
+            ['src' => '/storage/lh3.jpeg', 'alt' => 'Light House - Kitchen'],
+            ['src' => '/storage/lh4.avif', 'alt' => 'Light House - Bedroom'],
+            ['src' => '/storage/lh5.avif', 'alt' => 'Light House - Bathroom'],
+            ['src' => '/storage/lh6.jpeg', 'alt' => 'Light House - Dining Area'],
+            ['src' => '/storage/lh7.avif', 'alt' => 'Light House - Balcony'],
+            ['src' => '/storage/lh8.avif', 'alt' => 'Light House - Exterior']
+        ];
+    }
     $galleryId = 'gallery-' . uniqid();
 @endphp
 
 <div class="relative {{ $height }}" data-gallery="{{ $galleryId }}">
     <!-- Main Image Display -->
     <div class="relative w-full h-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
-        @if(count($images) > 0)
+        @if(count($venueImages) > 0)
             <img
-                src="{{ $images[0]['src'] }}"
-                alt="{{ $images[0]['alt'] }}"
+                src="{{ $venueImages[0]['src'] }}"
+                alt="{{ $venueImages[0]['alt'] }}"
                 class="w-full h-full object-cover cursor-pointer"
                 data-modal-trigger="{{ $galleryId }}"
                 data-image-index="0"
@@ -45,7 +58,7 @@
                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
                     </svg>
-                    {{ count($images) }} Photos
+                    {{ count($venueImages) }} Photos
                 </button>
             </div>
         @else
@@ -117,20 +130,20 @@
         <div class="relative w-full h-full flex items-center justify-center pb-24">
             <img
                 id="modal-image-{{ $galleryId }}"
-                src="{{ count($images) > 0 ? $images[0]['src'] : '' }}"
-                alt="{{ count($images) > 0 ? $images[0]['alt'] : '' }}"
+                src="{{ count($venueImages) > 0 ? $venueImages[0]['src'] : '' }}"
+                alt="{{ count($venueImages) > 0 ? $venueImages[0]['alt'] : '' }}"
                 class="max-w-full max-h-full object-contain" loading="lazy" decoding="async"
             >
         </div>
 
         <!-- Image Counter -->
         <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
-            <span id="modal-counter-{{ $galleryId }}">1 / {{ count($images) }}</span>
+            <span id="modal-counter-{{ $galleryId }}">1 / {{ count($venueImages) }}</span>
         </div>
 
         <!-- Thumbnail Strip -->
         <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-60 p-2 rounded-lg max-w-full overflow-x-auto">
-            @foreach($images as $index => $image)
+            @foreach($venueImages as $index => $image)
                 <img
                     src="{{ $image['src'] }}"
                     alt="{{ $image['alt'] }}"
@@ -145,6 +158,6 @@
 
     <!-- Hidden data for JavaScript -->
     <script type="application/json" data-gallery-images="{{ $galleryId }}">
-        {!! json_encode($images) !!}
+        {!! json_encode($venueImages) !!}
     </script>
 </div>

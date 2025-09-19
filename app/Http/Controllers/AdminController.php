@@ -24,4 +24,9 @@ class AdminController extends Controller
     {
         return view('admin.analytics');
     }
+
+    public function properties()
+    {
+        return view('admin.properties');
+    }
 }

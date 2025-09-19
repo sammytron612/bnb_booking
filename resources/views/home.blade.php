@@ -32,13 +32,14 @@
                     badge="Premium Property"
                     badge-color="blue"
                     price="£{{ $venues[0]->price }}/night"
+                    :venue="$venues[0]"
                 />
 
                 <div class="p-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Light House</h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
                         A beacon of luxury overlooking Seaham's iconic lighthouse. This stunning coastal apartment features
-                        panoramic sea views, modern amenities, and a walk to the famous seaglass beaches of the Heritage Coast.
+                         modern amenities, and a walk to the famous seaglass beaches of the Heritage Coast.
                     </p>
 
                     <!-- Features -->
@@ -50,10 +51,11 @@
                             2 Bedrooms
                         </div>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Sea Views
+                            Central Location
                         </div>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -83,6 +85,7 @@
                     badge="Family Friendly"
                     badge-color="green"
                     price="£{{ $venues[1]->price }}/night"
+                    :venue="$venues[1]"
                 />
 
                 <div class="p-6">
@@ -107,10 +110,11 @@
                             Seaglass Beach
                         </div>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
-                            Garden Area
+                            Central Location
                         </div>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -217,6 +221,11 @@
                                         <h4 class="font-semibold text-gray-900 dark:text-white">Durham Heritage Coast</h4>
                                         <p class="text-gray-600 dark:text-gray-300 text-sm">Explore stunning cliff walks and breathtaking views along this designated Area of Outstanding Natural Beauty.</p>
                                     </div>
+                                    <div class="border-l-4 border-purple-500 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">St Mary the Virgin Church</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">
+One of the most outstanding features in Seaham is St. Mary the Virgin Church. Located to the north of Seaham this old Anglo Saxon church has roots thought to date back to the 7th century. The Church is recognised as one of the 20 oldest surviving churches in the whole country.</p>
+                                    </div>
                                 </div>
                                 <div class="space-y-4">
                                     <div class="border-l-4 border-red-500 pl-4">
@@ -230,6 +239,10 @@
                                     <div class="border-l-4 border-yellow-900 pl-4">
                                         <h4 class="font-semibold text-gray-900 dark:text-white">Seaham Hotel & Spa</h4>
                                         <p class="text-gray-600 dark:text-gray-300 text-sm">Indulge in luxury at the Seaham Hotel & Spa, offering stunning coastal views, a world-class spa, and fine dining experiences.</p>
+                                    </div>
+                                    <div class="border-l-4 border-yellow-300 pl-4">
+                                        <h4 class="font-semibold text-gray-900 dark:text-white">Dalton Park Designer Outlet</h4>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">A 5 minute drive from Seaham, this outlet offers a range of designer brands at discounted prices.</p>
                                     </div>
                                 </div>
                             </div>

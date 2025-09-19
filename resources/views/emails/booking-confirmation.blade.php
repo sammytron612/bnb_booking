@@ -28,6 +28,7 @@
 
             <div class="booking-details">
                 <h3>📋 Booking Details</h3>
+                <p><strong>Venue:</strong> {{ $booking->id }}</p>
                 <p><strong>Venue:</strong> {{ $booking->venue }}</p>
                 <p><strong>Guest Name:</strong> {{ $booking->name }}</p>
                 <p><strong>Email:</strong> {{ $booking->email }}</p>
