@@ -1,17 +1,4 @@
 <!-- Modal for Image Gallery (reuse existing modal from image-placeholder component) -->
-    @php
-        $modalImages = [
-            ['src' => '/storage/lh1.avif', 'alt' => 'The Light House - Stunning Ocean View'],
-            ['src' => '/storage/lh2.avif', 'alt' => 'The Light House - Spacious Living Room'],
-            ['src' => '/storage/lh3.avif', 'alt' => 'The Light House - Modern Kitchen'],
-            ['src' => '/storage/lh4.avif', 'alt' => 'The Light House - Comfortable Bedroom'],
-            ['src' => '/storage/lh5.avif', 'alt' => 'The Light House - Luxury Bathroom'],
-            ['src' => '/storage/lh6.avif', 'alt' => 'The Light House - Elegant Dining Area'],
-            ['src' => '/storage/lh7.avif', 'alt' => 'The Light House - Private Balcony'],
-            ['src' => '/storage/lh8.avif', 'alt' => 'The Light House - Beautiful Exterior']
-        ];
-        $galleryId = 'lighthouselh-gallery';
-    @endphp
 
     <!-- Modal -->
     <div
@@ -52,37 +39,48 @@
 
             <!-- Main Modal Image -->
             <div class="relative w-full h-full flex items-center justify-center pb-24">
+                @if($images && $images->count() > 0)
                 <img
                     id="modal-image-{{ $galleryId }}"
-                    src="{{ $modalImages[0]['src'] }}"
-                    alt="{{ $modalImages[0]['alt'] }}"
+                    src="{{ $images->first()->location }}"
+                    alt="{{ $images->first()->desc }}"
                     class="max-w-full max-h-full object-contain"
                 >
+                @endif
             </div>
 
             <!-- Image Counter -->
             <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
-                <span id="modal-counter-{{ $galleryId }}">1 / {{ count($modalImages) }}</span>
+                <span id="modal-counter-{{ $galleryId }}">1 / {{ $images ? $images->count() : 0 }}</span>
             </div>
 
             <!-- Thumbnail Strip -->
             <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-60 p-2 rounded-lg max-w-full overflow-x-auto">
-                @foreach($modalImages as $index => $image)
-                    <img
-                        src="{{ $image['src'] }}"
-                        alt="{{ $image['alt'] }}"
-                        class="w-16 h-16 object-cover rounded cursor-pointer opacity-60 hover:opacity-100 transition-opacity {{ $index === 0 ? 'ring-2 ring-white opacity-100' : '' }}"
-                        data-modal-thumb="{{ $galleryId }}"
-                        data-thumb-index="{{ $index }}"
-                    >
-                @endforeach
+                @if($images)
+                    @foreach($images as $index => $image)
+                        <img
+                            src="{{ $image->location }}"
+                            alt="{{ $image->desc }}"
+                            class="w-16 h-16 object-cover rounded cursor-pointer opacity-60 hover:opacity-100 transition-opacity {{ $index === 0 ? 'ring-2 ring-white opacity-100' : '' }}"
+                            data-modal-thumb="{{ $galleryId }}"
+                            data-thumb-index="{{ $index }}"
+                        >
+                    @endforeach
+                @endif
             </div>
         </div>
 
         <!-- Hidden data for JavaScript -->
+        @if($images)
         <script type="application/json" data-gallery-images="{{ $galleryId }}">
-            {!! json_encode($modalImages) !!}
+            {!! json_encode($images->map(function($image) {
+                return [
+                    'src' => $image->location,
+                    'alt' => $image->desc
+                ];
+            })) !!}
         </script>
+        @endif
 
         <script>
             // Image modal module - wrapped in IIFE to prevent conflicts

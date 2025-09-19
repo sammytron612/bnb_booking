@@ -15,47 +15,42 @@
         <!-- Image Gallery Layout -->
         <div class="flex flex-col lg:flex-row gap-6">
             @php
-                $sarasImages = [
-                    ['src' => '/storage/saras1.avif', 'alt' => 'Sara\'s - Stunning Ocean View', 'title' => 'Ocean View'],
-                    ['src' => '/storage/saras2.avif', 'alt' => 'Sara\'s - Spacious Living Room', 'title' => 'Living Room'],
-                    ['src' => '/storage/saras3.jpeg', 'alt' => 'Sara\'s - Modern Kitchen', 'title' => 'Modern Kitchen'],
-                    ['src' => '/storage/saras4.avif', 'alt' => 'Sara\'s - Comfortable Bedroom', 'title' => 'Master Bedroom'],
-                    ['src' => '/storage/saras5.avif', 'alt' => 'Sara\'s - Luxury Bathroom', 'title' => 'Luxury Bathroom'],
-                    ['src' => '/storage/lh6.jpeg', 'alt' => 'The Light House - Elegant Dining Area', 'title' => 'Dining Area'],
-                    ['src' => '/storage/lh7.avif', 'alt' => 'The Light House - Private Balcony', 'title' => 'Private Balcony'],
-                    ['src' => '/storage/lh8.avif', 'alt' => 'The Light House - Beautiful Exterior', 'title' => 'Exterior View']
-                ];
+                $featuredImage = $venue->propertyImages->where('featured', true)->first();
+                $otherImages = $venue->propertyImages->where('featured', false);
+                $allImages = $venue->propertyImages;
             @endphp
 
             <!-- Main Featured Image (50% width) -->
             <div class="w-full lg:w-1/2">
+                @if($featuredImage)
                 <div class="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-xl">
                     <img
-                        src="{{ $sarasImages[0]['src'] }}"
-                        alt="{{ $sarasImages[0]['alt'] }}"
+                        src="{{ $featuredImage->location }}"
+                        alt="{{ $featuredImage->desc }}"
                         class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-500"
                         data-modal-trigger="lighthouselh-gallery"
                         data-image-index="0"
                     >
                     <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     <div class="absolute bottom-4 left-4 text-white">
-                        <h3 class="text-xl font-bold mb-1">{{ $sarasImages[0]['title'] }}</h3>
+                        <h3 class="text-xl font-bold mb-1">{{ $featuredImage->desc }}</h3>
                         <p class="text-sm opacity-90">Click to view gallery</p>
                     </div>
                     <div class="absolute top-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
-                        {{ count($sarasImages) }} Photos
+                        {{ count($allImages) }} Photos
                     </div>
                 </div>
+                @endif
             </div>
 
             <!-- Thumbnail Grid (50% width) -->
             <div class="w-full lg:w-1/2">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                    @foreach(array_slice($sarasImages, 1) as $index => $image)
+                    @foreach($otherImages as $index => $image)
                         <div class="relative cursor-pointer rounded-lg overflow-hidden shadow-md">
                             <img
-                                src="{{ $image['src'] }}"
-                                alt="{{ $image['alt'] }}"
+                                src="{{ $image->location }}"
+                                alt="{{ $image->desc }}"
                                 class="w-full h-32 object-cover"
                                 data-modal-trigger="lighthouselh-gallery"
                                 data-image-index="{{ $index + 1 }}" loading="lazy"
@@ -161,7 +156,7 @@
 
     <x-booking-modal price="{{ $venue->price }}" venue="{{ $venue->venue_name }}" />
 
-    <x-venue-image-modal />
+    <x-venue-image-modal galleryId="saras-gallery":images="$venue->propertyImages" />
 
     <script src="{{ Vite::asset('resources/js/booking-modal.js') }}" defer></script>
 </x-layouts.app>
