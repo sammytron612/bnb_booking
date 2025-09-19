@@ -186,6 +186,34 @@
     <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">
+
+        <!-- Search Legend -->
+        <div class="mt-2 text-sm text-gray-600">
+            <div class="flex items-center space-x-1 mb-1">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="font-medium">Searchable fields:</span>
+            </div>
+            <div class="pl-5 flex flex-wrap gap-x-4 gap-y-1">
+                <span class="inline-flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                    Guest Name
+                </span>
+                <span class="inline-flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                    Email Address
+                </span>
+                <span class="inline-flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                    Venue
+                </span>
+                <span class="inline-flex items-center">
+                    <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                    Booking ID
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Status Filter -->

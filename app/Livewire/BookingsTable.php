@@ -139,7 +139,6 @@ class BookingsTable extends Component
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%')
                       ->orWhere('venue', 'like', '%' . $this->search . '%')
                       ->orWhere('booking_id', 'like', '%' . $this->search . '%');
                 });
