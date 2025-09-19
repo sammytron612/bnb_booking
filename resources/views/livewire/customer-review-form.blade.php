@@ -27,7 +27,7 @@
                         </div>
                         <div>
                             <span class="font-medium text-blue-700">Booking ID:</span>
-                            <span class="text-blue-600">#{{ $booking->id }}</span>
+                            <span class="text-blue-600 font-mono">BNB-{{ $booking->getDisplayBookingId() }}</span>
                         </div>
                         <div>
                             <span class="font-medium text-blue-700">Check-in:</span>

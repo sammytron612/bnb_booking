@@ -37,7 +37,7 @@ class PaymentController extends Controller
                     'price_data' => [
                         'currency' => 'gbp',
                         'product_data' => [
-                            'name' => $booking->venue . ' Booking',
+                            'name' => $booking->venue . ' Booking - BNB-' . $booking->getDisplayBookingId(),
                             'description' => 'Booking from ' . Carbon::parse($booking->check_in)->format('M j, Y') . ' to ' . Carbon::parse($booking->check_out)->format('M j, Y'),
                         ],
                         'unit_amount' => (int) ($booking->total_price * 100), // Convert to pence
@@ -50,6 +50,9 @@ class PaymentController extends Controller
                 'cancel_url' => route('payment.cancel', ['booking' => $booking->id]),
                 'metadata' => [
                     'booking_id' => $booking->id,
+                    'booking_reference' => 'BNB-' . $booking->getDisplayBookingId(),
+                    'venue' => $booking->venue,
+                    'guest_name' => $booking->name,
                 ],
             ]);
 

@@ -30,8 +30,8 @@
 
                 <dl class="space-y-3">
                     <div class="flex justify-between">
-                        <dt class="text-sm font-medium text-gray-500">Booking ID:</dt>
-                        <dd class="text-sm text-gray-900">#{{ $booking->id }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">Booking Reference:</dt>
+                        <dd class="text-sm text-gray-900 font-mono">BNB-{{ $booking->getDisplayBookingId() }}</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Guest Name:</dt>

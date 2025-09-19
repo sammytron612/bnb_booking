@@ -12,11 +12,24 @@ class Booking extends Model
     use HasFactory;
 
     /**
+     * Boot the model and add event listeners
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($booking) {
+            $booking->generateBookingId();
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'booking_id',
         'name',
         'email',
         'phone',
@@ -50,6 +63,49 @@ class Booking extends Model
         'payment_completed_at' => 'datetime',
         'stripe_metadata' => 'array',
     ];
+
+    /**
+     * Generate a unique 7-digit booking ID
+     */
+    public function generateBookingId(): void
+    {
+        if (!$this->booking_id) {
+            do {
+                // Generate a 7-digit number using the record ID and random padding
+                $bookingId = $this->generateUniqueBookingNumber();
+            } while (self::where('booking_id', $bookingId)->exists());
+
+            $this->update(['booking_id' => $bookingId]);
+        }
+    }
+
+    /**
+     * Generate a 7-digit booking number based on record ID
+     */
+    private function generateUniqueBookingNumber(): string
+    {
+        // Take the record ID and pad it to create a 7-digit number
+        $idLength = strlen((string) $this->id);
+
+        if ($idLength >= 7) {
+            // If ID is already 7+ digits, just use the ID
+            return (string) $this->id;
+        }
+
+        // Generate random prefix to make it 7 digits
+        $prefixLength = 7 - $idLength;
+        $prefix = str_pad(rand(1, pow(10, $prefixLength) - 1), $prefixLength, '0', STR_PAD_LEFT);
+
+        return $prefix . $this->id;
+    }
+
+    /**
+     * Get the booking ID for display (fallback to record ID if no booking_id)
+     */
+    public function getDisplayBookingId(): string
+    {
+        return $this->booking_id ?? $this->id;
+    }
 
     /**
      * Calculate the number of nights automatically
@@ -100,6 +156,14 @@ class Booking extends Model
     public function getFormattedTotalAttribute(): string
     {
         return '£' . number_format((float) $this->total_price, 2);
+    }
+
+    /**
+     * Get the booking ID for Stripe and emails
+     */
+    public function getBookingReference(): string
+    {
+        return $this->booking_id ?? $this->id;
     }
 
     /**

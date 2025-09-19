@@ -29,7 +29,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{{ $review->name }}</div>
                                 @if($review->booking)
-                                    <div class="text-sm text-gray-500">Booking #{{ $review->booking->id }}</div>
+                                    <div class="text-sm text-gray-500">Booking BNB-{{ $review->booking->getDisplayBookingId() }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4">

@@ -95,7 +95,7 @@
                     <!-- Availability & Booking Button -->
                     <button
                         id="openBookingModal"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-lg transition-colors text-lg mb-4"
+                        class="w-full bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white font-bold py-4 px-8 rounded-lg transition-colors text-lg mb-4"
                     >
                         Check Availability & Book Now
                     </button>
