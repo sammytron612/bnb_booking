@@ -91,6 +91,13 @@
                                     </div>
                                 @endif
 
+                                <!-- Check-out indicator -->
+                                @if($day['check_out_count'] > 0)
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↑{{ $day['check_out_count'] }}
+                                    </div>
+                                @endif
+
                                 <!-- Enhanced tooltip with booking details -->
                                 <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
@@ -102,6 +109,15 @@
                                             <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_ins'] as $checkin)
                                                 <div class="text-green-200 text-xs mt-1">{{ $checkin->name }} - {{ $checkin->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($day['check_out_count'] > 0)
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_outs'] as $checkout)
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
                                     @endif
@@ -180,6 +196,13 @@
                                     </div>
                                 @endif
 
+                                <!-- Check-out indicator -->
+                                @if($day['check_out_count'] > 0)
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↑{{ $day['check_out_count'] }}
+                                    </div>
+                                @endif
+
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
                                     <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
@@ -198,6 +221,15 @@
                                             <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_ins'] as $checkin)
                                                 <div class="text-green-200 text-xs mt-1">{{ $checkin->name }} - {{ $checkin->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($day['check_out_count'] > 0)
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_outs'] as $checkout)
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
                                     @endif

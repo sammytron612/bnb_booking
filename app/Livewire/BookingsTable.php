@@ -136,12 +136,20 @@ class BookingsTable extends Component
                 ->where('status', '!=', 'cancelled')
                 ->get();
 
+            // Get check-outs for this specific date
+            $checkOuts = Booking::with('venue')
+                ->whereDate('check_out', $date->format('Y-m-d'))
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
             $days->push([
                 'date' => $date,
                 'bookings' => $dayBookings,
                 'booking_count' => $dayBookings->count(),
                 'check_ins' => $checkIns,
                 'check_in_count' => $checkIns->count(),
+                'check_outs' => $checkOuts,
+                'check_out_count' => $checkOuts->count(),
                 'is_today' => $date->isToday(),
                 'is_weekend' => $date->isWeekend()
             ]);
