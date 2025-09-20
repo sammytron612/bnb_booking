@@ -92,11 +92,11 @@
                                 @endif
 
                                 <!-- Enhanced tooltip with booking details -->
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none shadow-xl">
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
-                                    
+
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
                                             <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
@@ -188,11 +188,11 @@
                                 @endif
 
                                 <!-- Enhanced tooltip with booking details -->
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none shadow-xl">
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
-                                    
+
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
                                             <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
