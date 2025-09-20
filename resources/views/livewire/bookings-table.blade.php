@@ -156,10 +156,7 @@
                             <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
-                        <!-- Weekend indicator -->
-                        @if($day['is_weekend'])
-                            <div class="absolute top-0 left-0 w-2 h-2 bg-yellow-400 rounded-full"></div>
-                        @endif
+
                     </div>
                 </div>
             @endforeach
@@ -261,10 +258,7 @@
                             <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
-                        <!-- Weekend indicator -->
-                        @if($day['is_weekend'])
-                            <div class="absolute top-0 left-0 w-2 h-2 bg-yellow-400 rounded-full"></div>
-                        @endif
+
                     </div>
                 </div>
             @endforeach
@@ -276,13 +270,14 @@
                 <div class="w-3 h-3 bg-red-500 rounded-full mr-1 animate-pulse"></div>
                 Today
             </div>
-            <div class="flex items-center">
-                <div class="w-3 h-3 bg-yellow-400 rounded-full mr-1"></div>
-                Weekend
-            </div>
+
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                Check-ins
+                Check-ins <span class="ml-1 text-green-600">↓</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
+                Check-outs <span class="ml-1 text-red-600">↑</span>
             </div>
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
