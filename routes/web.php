@@ -47,6 +47,9 @@ Route::get('/reviews/create/{booking}', function (Request $request, $booking) {
 // Test route for review link generation
 Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
 
+// Test route for email jobs
+Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

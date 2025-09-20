@@ -101,4 +101,22 @@ class ReviewLink extends Controller
         die();
 
     }
+
+    /**
+     * Test the email jobs manually
+     */
+    public function testJobs()
+    {
+        // Dispatch the jobs for testing
+        \App\Jobs\SendCheckinReminders::dispatch();
+        \App\Jobs\SendReviewLinkEmails::dispatch();
+        
+        return response()->json([
+            'message' => 'Email jobs dispatched successfully',
+            'jobs' => [
+                'SendCheckinReminders' => 'Dispatched',
+                'SendReviewLinkEmails' => 'Dispatched'
+            ]
+        ]);
+    }
 }
