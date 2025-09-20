@@ -144,12 +144,42 @@
                             @error('venueDescription') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
-                        <button
-                            type="submit"
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                        >
-                            Update Property
-                        </button>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Maximum Guests
+                            </label>
+                            <input
+                                type="number"
+                                wire:model="venueGuestCapacity"
+                                min="1"
+                                max="20"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter maximum number of guests"
+                            >
+                            @error('venueGuestCapacity') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Check-in Instructions
+                            </label>
+                            <textarea
+                                wire:model="venueInstructions"
+                                rows="6"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter special instructions for guests (WiFi password, parking info, house rules, etc.)"
+                            ></textarea>
+                            @error('venueInstructions') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div class="mt-6">
+                            <button
+                                type="submit"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                            >
+                                Update Property
+                            </button>
+                        </div>
                     </form>
                 </div>
 

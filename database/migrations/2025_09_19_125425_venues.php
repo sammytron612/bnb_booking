@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('venue_name');
             $table->text('description')->nullable();
+            $table->text('instructions')->nullable();
+            $table->integer('guest_capacity')->nullable();
             $table->decimal('price', 8, 2);
             $table->string('address1');
             $table->string('address2')->nullable();
