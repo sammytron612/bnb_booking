@@ -176,7 +176,7 @@
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="font-medium text-gray-900 dark:text-white">{{ $booking->name }}</p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $booking->venue }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $booking->venue->venue_name }}</p>
                                 </div>
                                 <span class="text-sm font-medium text-green-600 dark:text-green-400">
                                     £{{ number_format($booking->total_price, 0) }}
@@ -225,12 +225,14 @@
                     </h3>
                     <div class="space-y-3">
                         @php
-                            $lightHouseBookings = \App\Models\Booking::where('venue', 'light-house')
+                            $lightHouseVenue = \App\Models\Venue::where('venue_name', 'LIKE', '%light%house%')->first();
+                            $sarasVenue = \App\Models\Venue::where('venue_name', 'LIKE', '%saras%')->first();
+                            $lightHouseBookings = $lightHouseVenue ? \App\Models\Booking::where('venue_id', $lightHouseVenue->id)
                                 ->where('check_in', '<=', now())
-                                ->where('check_out', '>=', now())->count();
-                            $sarasBookings = \App\Models\Booking::where('venue', 'saras')
+                                ->where('check_out', '>=', now())->count() : 0;
+                            $sarasBookings = $sarasVenue ? \App\Models\Booking::where('venue_id', $sarasVenue->id)
                                 ->where('check_in', '<=', now())
-                                ->where('check_out', '>=', now())->count();
+                                ->where('check_out', '>=', now())->count() : 0;
                         @endphp
                         <div class="flex justify-between items-center">
                             <span class="text-gray-600 dark:text-gray-300">Light House</span>

@@ -64,7 +64,7 @@
 
         <p>Your feedback is incredibly valuable to us and helps future guests make informed decisions about their stay. If you enjoyed your experience, we would be delighted if you could take a few minutes to share a review.</p>
 
-        <p><strong>This link is valid for 48 hours.</strong></p>
+        <p><strong>This link is valid for 72 hours.</strong></p>
 
         <div style="text-align: center;">
             <a href="{{ $data['reviewLink'] }}" class="btn">Leave a Review</a>

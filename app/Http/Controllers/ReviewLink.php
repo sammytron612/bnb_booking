@@ -12,19 +12,23 @@ class ReviewLink extends Controller
 {
     public function create()
     {
-        $bookings = Booking::where('check_out', '>', now()->addHours(24))->get();
+        //USE THIS TO GENERATE REVIEW LINKS AND EMAIL TO USERS AS A JOB
+        $bookings = Booking::with('venue')
+            ->where('check_out', '<', now()->addHours(24))
+            ->whereDoesntHave('reviews')
+            ->get();
+dd($bookings);
+       /* $bookings = Booking::with('venue')
+        ->where('check_out', '>', now()->addHours(24))
+        ->whereDoesntHave('reviews')
+        ->find(1);*/
 
-        // Check if booking exists
-        if (!$bookings) {
-            return redirect()->route('home')->with('error', 'Booking not found!');
-        }
-
-        foreach($bookings as $booking);
+        foreach($bookings as $booking)
         {
-            // Generate a signed review link that expires in 48 hours
+            // Generate a signed review link that expires in 72 hours
             $reviewLink = URL::temporarySignedRoute(
                 'reviews.create',
-                now()->addHours(48),
+                now()->addHours(96),
                 ['booking' => $booking->id]
             );
 
@@ -33,7 +37,7 @@ class ReviewLink extends Controller
                 'reviewLink' => $reviewLink,
                 'booking_id' => $booking->id,
                 'name' => $booking->name,
-                'venue' => $booking->venue
+                'venue' => $booking->venue->venue_name
             ];
 
             // Send the review link via email

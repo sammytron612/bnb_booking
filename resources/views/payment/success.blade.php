@@ -39,7 +39,7 @@
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Property:</dt>
-                        <dd class="text-sm text-gray-900">{{ $booking->venue }}</dd>
+                        <dd class="text-sm text-gray-900">{{ $booking->venue->venue_name }}</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Check-in:</dt>

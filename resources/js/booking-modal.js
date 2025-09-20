@@ -16,16 +16,16 @@ let bookedDates = new Set(); // 'YYYY-MM-DD'
 let checkIn = null; // Date
 let checkOut = null; // Date
 
-// Detect current venue from URL or page content
+// Detect current venue ID from URL or page content
 function getCurrentVenue() {
     const url = window.location.pathname;
     if (url.includes('light-house')) {
-        return 'The Light House';
+        return 1; // The Light House venue ID
     } else if (url.includes('saras')) {
-        return 'Saras';
+        return 2; // Saras venue ID
     }
-    // Default fallback - could also check page title or meta tag
-    return 'The Light House';
+    // Default fallback
+    return 1;
 }
 
 const currentVenue = getCurrentVenue();
@@ -277,9 +277,9 @@ function initializeBookingCalendar() {
     }
 
     // Load booked dates from Laravel database
-    async function loadBookedDatesFromDatabase(venue = null) {
+    async function loadBookedDatesFromDatabase(venueId = null) {
         try {
-            const url = venue ? `/api/booked-dates?venue=${encodeURIComponent(venue)}` : '/api/booked-dates';
+            const url = venueId ? `/api/booked-dates?venue_id=${venueId}` : '/api/booked-dates';
             const response = await fetch(url);
             const data = await response.json();
 
@@ -321,12 +321,12 @@ function initializeBookingCalendar() {
     }
 
     // Load all booked dates (database + iCal)
-    async function loadAllBookedDates(venue = null) {
+    async function loadAllBookedDates(venueId = null) {
         // Clear existing booked dates
         bookedDates.clear();
 
         // Load from database first
-        await loadBookedDatesFromDatabase(venue);
+        await loadBookedDatesFromDatabase(venueId);
 
         // Optionally load from iCal (if you have a valid URL)
         // Uncomment the lines below if you want to use iCal integration

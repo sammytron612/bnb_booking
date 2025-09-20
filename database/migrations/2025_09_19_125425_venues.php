@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('venue_name');
             $table->text('description')->nullable();
             $table->decimal('price', 8, 2);
-            $table->string('postcode')->nullable();
+            $table->string('address1');
+            $table->string('address2')->nullable();
+            $table->string('postcode');
         });
     }
 

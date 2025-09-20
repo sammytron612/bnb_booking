@@ -29,7 +29,16 @@
             <div class="booking-details">
                 <h3>📋 Booking Details</h3>
                 <p><strong>Booking Reference:</strong> {{ $booking->getDisplayBookingId() }}</p>
-                <p><strong>Venue:</strong> {{ $booking->venue }}</p>
+                <p><strong>Venue:</strong> {{ $booking->venue->venue_name }}</p>
+                @if($booking->venue->address1)
+                    <p><strong>Address:</strong> {{ $booking->venue->address1 }}</p>
+                @endif
+                @if($booking->venue->address2)
+                    <p>{{ $booking->venue->address2 }}</p>
+                @endif
+                @if($booking->venue->postcode)
+                    <p><strong>Postcode:</strong> {{ $booking->venue->postcode }}</p>
+                @endif
                 <p><strong>Guest Name:</strong> {{ $booking->name }}</p>
                 <p><strong>Email:</strong> {{ $booking->email }}</p>
                 <p><strong>Phone:</strong> {{ $booking->phone }}</p>

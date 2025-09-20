@@ -30,6 +30,9 @@
                                 <div class="text-sm font-medium text-gray-900">{{ $review->name }}</div>
                                 @if($review->booking)
                                     <div class="text-sm text-gray-500">Booking {{ $review->booking->getDisplayBookingId() }}</div>
+                                    @if($review->booking->venue)
+                                        <div class="text-xs text-blue-600">{{ $review->booking->venue->venue_name }}</div>
+                                    @endif
                                 @endif
                             </td>
                             <td class="px-6 py-4">

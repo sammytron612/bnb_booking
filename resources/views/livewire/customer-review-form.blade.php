@@ -23,7 +23,7 @@
                     <div class="grid md:grid-cols-2 gap-4 text-sm">
                         <div>
                             <span class="font-medium text-blue-700">Property:</span>
-                            <span class="text-blue-600">{{ $booking->venue }}</span>
+                            <span class="text-blue-600">{{ $booking->venue->venue_name }}</span>
                         </div>
                         <div>
                             <span class="font-medium text-blue-700">Booking ID:</span>
@@ -133,7 +133,7 @@
                         Cancel
                     </a>
                     <button type="submit"
-                            class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                             wire:loading.attr="disabled"
                             wire:loading.class="opacity-50 cursor-not-allowed">
                         <span wire:loading.remove>Submit Review</span>

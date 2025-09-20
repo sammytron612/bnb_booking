@@ -9,7 +9,7 @@ use Carbon\Carbon;
 class BookingForm extends Component
 {
     // Public properties for form data
-    public $venue;
+    public $venueId;
     public $checkIn = null;
     public $checkOut = null;
     public $guestName = '';
@@ -44,9 +44,9 @@ class BookingForm extends Component
         'datesCleared' => 'clearDates'
     ];
 
-    public function mount($venue, $pricePerNight)
+    public function mount($venueId, $pricePerNight)
     {
-        $this->venue = $venue;
+        $this->venueId = $venueId;
         $this->pricePerNight = $pricePerNight;
     }
 
@@ -104,7 +104,7 @@ class BookingForm extends Component
                 'phone' => $this->guestPhone,
                 'check_in' => $this->checkIn,
                 'check_out' => $this->checkOut,
-                'venue' => $this->venue,
+                'venue_id' => $this->venueId,
                 'nights' => $this->nights,
                 'total_price' => $this->totalPrice,
                 'status' => 'pending',

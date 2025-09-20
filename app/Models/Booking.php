@@ -35,7 +35,7 @@ class Booking extends Model
         'phone',
         'check_in',
         'check_out',
-        'venue',
+        'venue_id',
         'nights',
         'total_price',
         'status',
@@ -197,9 +197,20 @@ class Booking extends Model
     /**
      * Scope for specific venue
      */
-    public function scopeForVenue($query, $venue)
+    /**
+     * Get the venue that owns the booking.
+     */
+    public function venue()
     {
-        return $query->where('venue', $venue);
+        return $this->belongsTo(Venue::class);
+    }
+
+    /**
+     * Scope a query to only include bookings for a specific venue.
+     */
+    public function scopeForVenue($query, $venueId)
+    {
+        return $query->where('venue_id', $venueId);
     }
 
     /**

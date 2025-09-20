@@ -113,7 +113,7 @@ class BookingsTable extends Component
             $date = $startDate->copy()->addDays($i);
 
             // Get bookings for this date
-            $dayBookings = Booking::where(function ($query) use ($date) {
+            $dayBookings = Booking::with('venue')->where(function ($query) use ($date) {
                 $query->where('check_in', '<=', $date->format('Y-m-d'))
                       ->where('check_out', '>', $date->format('Y-m-d'));
             })
@@ -134,12 +134,14 @@ class BookingsTable extends Component
 
     public function render()
     {
-        $bookings = Booking::query()
+        $bookings = Booking::with('venue')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
                       ->orWhere('email', 'like', '%' . $this->search . '%')
-                      ->orWhere('venue', 'like', '%' . $this->search . '%')
+                      ->orWhereHas('venue', function($query) {
+                          $query->where('venue_name', 'like', '%' . $this->search . '%');
+                      })
                       ->orWhere('booking_id', 'like', '%' . $this->search . '%');
                 });
             })

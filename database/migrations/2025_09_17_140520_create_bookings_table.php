@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone');
             $table->date('check_in'); // Check-in date
             $table->date('check_out');  // Check-out date
-            $table->string('venue'); // Property name (e.g., 'The Light House', 'Saras')
+            $table->foreignId('venue_id')->constrained('venues')->onDelete('cascade'); // Foreign key to venues table
             $table->integer('nights')->default(0);
             $table->decimal('total_price', 10, 2)->default(0.00);
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');

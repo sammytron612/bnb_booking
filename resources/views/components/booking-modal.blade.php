@@ -1,5 +1,5 @@
 <!-- Booking Modal -->
-    @props(['price', 'venue'])
+    @props(['price', 'venueId'])
     <div
         id="bookingModal"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"
@@ -57,7 +57,7 @@
                     </div>
 
                     <!-- Booking Summary Sidebar -->
-                    <livewire:booking-form :pricePerNight="$price" :venue="$venue" />
+                    <livewire:booking-form :pricePerNight="$price" :venueId="$venueId" />
                 </div>
 
                 <!-- Terms and Cancellation -->

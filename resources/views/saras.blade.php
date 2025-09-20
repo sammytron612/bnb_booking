@@ -117,7 +117,7 @@
 
     </div>
 
-    <x-booking-modal price="{{ $venue->price }}" venue="{{ $venue->venue_name }}" />
+    <x-booking-modal price="{{ $venue->price }}" venue-id="{{ $venue->id }}" />
 
     <x-venue-image-modal galleryId="{{$venue->venue_name}}-gallery" :images="$venue->propertyImages" />
 

@@ -37,7 +37,7 @@ class PaymentController extends Controller
                     'price_data' => [
                         'currency' => 'gbp',
                         'product_data' => [
-                            'name' => $booking->venue . ' Booking - ' . $booking->getDisplayBookingId(),
+                            'name' => $booking->venue->venue_name . ' Booking - ' . $booking->getDisplayBookingId(),
                             'description' => 'Booking from ' . Carbon::parse($booking->check_in)->format('M j, Y') . ' to ' . Carbon::parse($booking->check_out)->format('M j, Y'),
                         ],
                         'unit_amount' => (int) ($booking->total_price * 100), // Convert to pence
@@ -51,7 +51,7 @@ class PaymentController extends Controller
                 'metadata' => [
                     'booking_id' => $booking->id,
                     'booking_reference' => $booking->getDisplayBookingId(),
-                    'venue' => $booking->venue,
+                    'venue' => $booking->venue->venue_name,
                     'guest_name' => $booking->name,
                 ],
             ]);

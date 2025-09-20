@@ -20,7 +20,7 @@ class BookingController extends Controller
             'phone' => 'required|string|max:20',
             'depart' => 'required|date|after_or_equal:today',
             'leave' => 'required|date|after:depart',
-            'venue' => 'required|string|in:The Light House,Saras',
+            'venue_id' => 'required|integer|exists:venues,id',
             'total_price' => 'required|numeric|min:0',
         ]);
 
@@ -51,7 +51,7 @@ class BookingController extends Controller
                 'phone' => $request->phone,
                 'check_in' => $request->depart,
                 'check_out' => $request->leave,
-                'venue' => $request->venue,
+                'venue_id' => $request->venue_id,
                 'nights' => $nights,
                 'total_price' => $request->total_price,
                 'status' => 'pending',
@@ -75,9 +75,10 @@ class BookingController extends Controller
     /**
      * Get all bookings for a specific venue
      */
-    public function getBookingsForVenue($venue)
+    public function getBookingsForVenue($venue_id)
     {
-        $bookings = Booking::forVenue($venue)
+        $bookings = Booking::where('venue_id', $venue_id)
+            ->with('venue')
             ->orderBy('check_in', 'asc')
             ->get();
 
@@ -91,7 +92,8 @@ class BookingController extends Controller
     {
         $bookings = Booking::where('status', '!=', 'cancelled')
             ->where('check_out', '>=', Carbon::today())
-            ->select('check_in', 'check_out', 'venue')
+            ->with('venue')
+            ->select('check_in', 'check_out', 'venue_id')
             ->get();
 
         return response()->json($bookings);
@@ -127,16 +129,17 @@ class BookingController extends Controller
      */
     public function getBookedDates(Request $request)
     {
-        $venue = $request->query('venue'); // Optional venue filter
+        $venueId = $request->query('venue_id'); // Optional venue filter
 
         // Get confirmed and pending bookings (exclude cancelled)
         $bookingsQuery = Booking::where('status', '!=', 'cancelled')
             ->where('check_out', '>=', Carbon::today()) // Only future/current bookings
-            ->select('check_in', 'check_out', 'venue');
+            ->with('venue')
+            ->select('check_in', 'check_out', 'venue_id');
 
         // Filter by venue if specified
-        if ($venue) {
-            $bookingsQuery->where('venue', $venue);
+        if ($venueId) {
+            $bookingsQuery->where('venue_id', $venueId);
         }
 
         $bookings = $bookingsQuery->get();

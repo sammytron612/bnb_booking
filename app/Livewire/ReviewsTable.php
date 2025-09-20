@@ -20,7 +20,7 @@ class ReviewsTable extends Component
 
     public function render()
     {
-        $reviews = Review::with(['booking', 'reply'])
+        $reviews = Review::with(['booking.venue', 'reply'])
             ->latest()
             ->paginate(10);
 

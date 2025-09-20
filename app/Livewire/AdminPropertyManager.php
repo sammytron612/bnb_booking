@@ -21,6 +21,8 @@ class AdminPropertyManager extends Component
     public $venueName = '';
     public $venueDescription = '';
     public $venuePrice = '';
+    public $venueAddress1 = '';
+    public $venueAddress2 = '';
     public $venuePostcode = '';
 
     // Image management
@@ -50,6 +52,8 @@ class AdminPropertyManager extends Component
             $this->venueName = $this->selectedVenue->venue_name;
             $this->venueDescription = $this->selectedVenue->description;
             $this->venuePrice = $this->selectedVenue->price;
+            $this->venueAddress1 = $this->selectedVenue->address1;
+            $this->venueAddress2 = $this->selectedVenue->address2;
             $this->venuePostcode = $this->selectedVenue->postcode;
             $this->existingImages = $this->selectedVenue->propertyImages;
             $this->venueAmenities = $this->selectedVenue->amenities;
@@ -62,6 +66,8 @@ class AdminPropertyManager extends Component
             'venueName' => 'required|string|max:255',
             'venueDescription' => 'nullable|string',
             'venuePrice' => 'required|numeric|min:0',
+            'venueAddress1' => 'required|string|max:255',
+            'venueAddress2' => 'nullable|string|max:255',
             'venuePostcode' => 'required|string|max:20',
         ]);
 
@@ -70,6 +76,8 @@ class AdminPropertyManager extends Component
                 'venue_name' => $this->venueName,
                 'description' => $this->venueDescription,
                 'price' => $this->venuePrice,
+                'address1' => $this->venueAddress1,
+                'address2' => $this->venueAddress2,
                 'postcode' => $this->venuePostcode,
             ]);
 

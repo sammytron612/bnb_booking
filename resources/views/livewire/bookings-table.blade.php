@@ -54,7 +54,7 @@
                                             <div class="flex justify-between items-start">
                                                 <div>
                                                     <div class="font-medium text-white">{{ $booking->name }}</div>
-                                                    <div class="text-gray-300 text-xs">{{ $booking->venue }}</div>
+                                                    <div class="text-gray-300 text-xs">{{ $booking->venue->venue_name }}</div>
                                                 </div>
                                                 <div class="font-mono text-xs text-blue-300">{{ $booking->getDisplayBookingId() }}</div>
                                             </div>
@@ -127,7 +127,7 @@
                                             <div class="flex justify-between items-start">
                                                 <div>
                                                     <div class="font-medium text-white">{{ $booking->name }}</div>
-                                                    <div class="text-gray-300 text-xs">{{ $booking->venue }}</div>
+                                                    <div class="text-gray-300 text-xs">{{ $booking->venue->venue_name }}</div>
                                                 </div>
                                                 <div class="font-mono text-xs text-blue-300">{{ $booking->getDisplayBookingId() }}</div>
                                             </div>
@@ -370,7 +370,7 @@
                             <div class="text-sm font-medium text-gray-900">{{ $booking->name }}</div>
                             <div class="text-sm text-gray-500">{{ $booking->email }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->venue }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->venue->venue_name }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
@@ -427,7 +427,7 @@
 
                     <div>
                         <h4 class="font-semibold text-gray-900 mb-2">Booking Details</h4>
-                        <p><strong>Venue:</strong> {{ $selectedBooking->venue }}</p>
+                        <p><strong>Venue:</strong> {{ $selectedBooking->venue->venue_name }}</p>
                         <p><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_in)->format('d/m/Y') }}</p>
                         <p><strong>Check-out:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_out)->format('d/m/Y') }}</p>
                         <p><strong>Nights:</strong> {{ $selectedBooking->nights }}</p>

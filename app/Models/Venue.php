@@ -18,6 +18,8 @@ class Venue extends Model
         'venue_name',
         'description',
         'price',
+        'address1',
+        'address2',
         'postcode',
     ];
 
@@ -50,5 +52,13 @@ class Venue extends Model
     public function amenities()
     {
         return $this->hasMany(Amenity::class);
+    }
+
+    /**
+     * Get the bookings for the venue.
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
     }
 }

@@ -1,6 +1,11 @@
 <div class="reviews-section">
-    @if($venue)
-        <h3 class="text-xl font-semibold mb-4">Reviews for {{ ucwords(str_replace('-', ' ', $venue)) }}</h3>
+    @if($venueId)
+        @php
+            $venueName = $reviews->count() > 0 && $reviews->first()->booking?->venue ?
+                         $reviews->first()->booking->venue->venue_name :
+                         ($venueId == 1 ? 'The Light House' : 'Saras');
+        @endphp
+        <h3 class="text-xl font-semibold mb-4">Reviews for {{ $venueName }}</h3>
 
         @if($reviews && $reviews->count() > 0)
             <div class="space-y-4">
@@ -91,7 +96,7 @@
                     </svg>
                 </div>
                 <h4 class="text-lg font-medium text-gray-900 mb-1">No reviews yet</h4>
-                <p class="text-gray-500">Be the first to leave a review for {{ ucwords(str_replace('-', ' ', $venue)) }}!</p>
+                <p class="text-gray-500">Be the first to leave a review for {{ $venueName }}!</p>
             </div>
         @endif
     @else
