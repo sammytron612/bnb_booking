@@ -267,7 +267,7 @@ function initializeBookingCalendar() {
             return; // Invalid night selection
         }
 
-        if (!checkIn) { 
+        if (!checkIn) {
             // Start new selection - this date becomes the first night
             console.log('Starting new selection from:', dateKey);
             checkIn = date; // Check-in is this date
@@ -295,7 +295,7 @@ function initializeBookingCalendar() {
         let blocked = false;
         while (cursor < checkOut) { // Check all nights we're staying
             const cursorKey = fmt(cursor);
-            
+
             // Block if any night is fully booked - we can't stay on nights others are staying
             if (fullyBookedDates.has(cursorKey)) {
                 console.log('Selection blocked by fully booked night:', cursorKey);
@@ -316,7 +316,7 @@ function initializeBookingCalendar() {
         if (diffDays(checkIn, checkOut) < minNights) {
             console.log('Enforcing minimum nights:', minNights);
             checkOut = addDays(checkIn, minNights);
-            
+
             // Validate minimum nights doesn't conflict with any fully booked nights
             let minCursor = new Date(checkIn);
             let minBlocked = false;
@@ -329,7 +329,7 @@ function initializeBookingCalendar() {
                 }
                 minCursor = addDays(minCursor, 1);
             }
-            
+
             if (minBlocked) {
                 // Can't meet minimum nights - reset
                 console.log('Cannot meet minimum nights requirement, clearing selection');
