@@ -13,12 +13,52 @@
 
     <!-- 14-Day Calendar -->
     <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"></path>
-            </svg>
-            Next 14 Days Overview
-        </h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"></path>
+                </svg>
+                @if($calendarOffset === 0)
+                    Next 14 Days Overview
+                @elseif($calendarOffset > 0)
+                    Days {{ $calendarOffset + 1 }}-{{ $calendarOffset + 14 }} Overview
+                @else
+                    Days {{ abs($calendarOffset) - 13 }}-{{ abs($calendarOffset) }} Ago
+                @endif
+            </h3>
+
+            <!-- Navigation Buttons -->
+            <div class="flex space-x-2">
+                <button
+                    wire:click="navigateCalendar('prev')"
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Previous
+                </button>
+
+                @if($calendarOffset !== 0)
+                    <button
+                        wire:click="$set('calendarOffset', 0)"
+                        class="inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        Today
+                    </button>
+                @endif
+
+                <button
+                    wire:click="navigateCalendar('next')"
+                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    Next
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
         <!-- First Week (Days 0-6) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
@@ -44,11 +84,27 @@
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
                                 </div>
 
+                                <!-- Check-in indicator -->
+                                @if($day['check_in_count'] > 0)
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↓{{ $day['check_in_count'] }}
+                                    </div>
+                                @endif
+
                                 <!-- Enhanced tooltip with booking details -->
                                 <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
+                                    
+                                    @if($day['check_in_count'] > 0)
+                                        <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
+                                            <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_ins'] as $checkin)
+                                                <div class="text-green-200 text-xs mt-1">{{ $checkin->name }} - {{ $checkin->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                     @foreach($day['bookings'] as $booking)
                                         <div class="mb-2 p-2 bg-gray-800 rounded border-l-2 border-blue-400">
                                             <div class="flex justify-between items-start">
@@ -117,11 +173,34 @@
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
                                 </div>
 
+                                <!-- Check-in indicator -->
+                                @if($day['check_in_count'] > 0)
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↓{{ $day['check_in_count'] }}
+                                    </div>
+                                @endif
+
+                                <!-- Check-in indicator -->
+                                @if($day['check_in_count'] > 0)
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↓{{ $day['check_in_count'] }}
+                                    </div>
+                                @endif
+
                                 <!-- Enhanced tooltip with booking details -->
                                 <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20 pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
+                                    
+                                    @if($day['check_in_count'] > 0)
+                                        <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
+                                            <div class="font-medium text-green-300">✓ {{ $day['check_in_count'] }} Check-in{{ $day['check_in_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_ins'] as $checkin)
+                                                <div class="text-green-200 text-xs mt-1">{{ $checkin->name }} - {{ $checkin->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                     @foreach($day['bookings'] as $booking)
                                         <div class="mb-2 p-2 bg-gray-800 rounded border-l-2 border-blue-400">
                                             <div class="flex justify-between items-start">
@@ -175,6 +254,10 @@
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-yellow-400 rounded-full mr-1"></div>
                 Weekend
+            </div>
+            <div class="flex items-center">
+                <div class="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+                Check-ins
             </div>
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>

@@ -17,6 +17,7 @@ class BookingsTable extends Component
     public $statusFilter = '';
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
+    public $calendarOffset = 0; // Track calendar navigation offset
 
     // Form fields for editing
     public $editStatus = '';
@@ -104,10 +105,19 @@ class BookingsTable extends Component
         session()->flash('success', 'Booking updated successfully.');
     }
 
+    public function navigateCalendar($direction)
+    {
+        if ($direction === 'next') {
+            $this->calendarOffset += 14;
+        } elseif ($direction === 'prev') {
+            $this->calendarOffset -= 14;
+        }
+    }
+
     public function getCalendarData()
     {
         $days = collect();
-        $startDate = now();
+        $startDate = now()->addDays($this->calendarOffset);
 
         for ($i = 0; $i < 14; $i++) {
             $date = $startDate->copy()->addDays($i);
@@ -120,10 +130,18 @@ class BookingsTable extends Component
             ->where('status', '!=', 'cancelled')
             ->get();
 
+            // Get check-ins for this specific date
+            $checkIns = Booking::with('venue')
+                ->whereDate('check_in', $date->format('Y-m-d'))
+                ->where('status', '!=', 'cancelled')
+                ->get();
+
             $days->push([
                 'date' => $date,
                 'bookings' => $dayBookings,
                 'booking_count' => $dayBookings->count(),
+                'check_ins' => $checkIns,
+                'check_in_count' => $checkIns->count(),
                 'is_today' => $date->isToday(),
                 'is_weekend' => $date->isWeekend()
             ]);
