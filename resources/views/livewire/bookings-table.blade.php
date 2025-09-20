@@ -61,7 +61,7 @@
         </div>
 
         <!-- First Week (Days 0-6) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
             @foreach($calendarData->take(7) as $day)
                 <div class="text-center">
                     <!-- Day header -->
@@ -75,7 +75,7 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
                                  title="{{ $day['booking_count'] }} booking(s)">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
@@ -98,8 +98,8 @@
                                     </div>
                                 @endif
 
-                                <!-- Enhanced tooltip with booking details -->
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none shadow-xl">
+                                <!-- Enhanced tooltip with booking details (First week: below card, above second week) -->
+                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
@@ -139,8 +139,8 @@
                                             </div>
                                         </div>
                                     @endforeach
-                                    <!-- Arrow pointing down -->
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                    <!-- Arrow pointing up (connects to card above) -->
+                                    <div class="absolute -top-1 left-1/2 transform -translate-x-1/2">
                                         <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
                                     </div>
                                 </div>
@@ -166,7 +166,7 @@
         </div>
 
         <!-- Second Week (Days 7-13) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
             @foreach($calendarData->skip(7) as $day)
                 <div class="text-center">
                     <!-- Day header -->
@@ -180,7 +180,7 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                            <div class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
                                  title="{{ $day['booking_count'] }} booking(s)">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
@@ -203,15 +203,8 @@
                                     </div>
                                 @endif
 
-                                <!-- Check-in indicator -->
-                                @if($day['check_in_count'] > 0)
-                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
-                                        ↓{{ $day['check_in_count'] }}
-                                    </div>
-                                @endif
-
                                 <!-- Enhanced tooltip with booking details -->
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-50 pointer-events-none shadow-xl">
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
