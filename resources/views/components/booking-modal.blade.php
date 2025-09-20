@@ -52,8 +52,18 @@
                             <div id="daysGrid" class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-600"></div>
                         </div>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                            Select check-in and check-out dates. Minimum stay: 2 nights. Unavailable dates are disabled.
+                            Select the nights you want to stay. Minimum stay: 2 nights. Unavailable nights are disabled.
                         </p>
+                        
+                        <!-- Clear Selection Button -->
+                        <div class="mt-3">
+                            <button 
+                                id="clearSelectionBtn" 
+                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors duration-200"
+                            >
+                                Clear Selection
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Booking Summary Sidebar -->

@@ -144,27 +144,51 @@ class BookingController extends Controller
 
         $bookings = $bookingsQuery->get();
 
-        $bookedDates = [];
+        $checkInDates = [];      // Dates when guests check in (bookings start)
+        $checkOutDates = [];     // Dates when guests check out (bookings end)
+        $fullyBookedDates = [];  // Dates that are completely unavailable
+        $bookedDates = [];       // All booked dates (for backward compatibility)
 
         foreach ($bookings as $booking) {
-            $start = Carbon::parse($booking->check_in);
-            $end = Carbon::parse($booking->check_out);
+            $checkInDate = Carbon::parse($booking->check_in);
+            $checkOutDate = Carbon::parse($booking->check_out);
 
-            // Add each date from check-in to check-out (exclusive of check-out date)
-            while ($start < $end) {
-                $bookedDates[] = $start->format('Y-m-d');
-                $start->addDay();
+            // Add check-in date (guests arrive this day at 3pm)
+            $checkInDates[] = $checkInDate->format('Y-m-d');
+
+            // Add check-out date (guests leave this day at 11am)
+            $checkOutDates[] = $checkOutDate->format('Y-m-d');
+
+            // Add all nights when property is occupied
+            // From check-in date up to (but not including) check-out date
+            // This represents the nights guests are staying
+            $current = $checkInDate->copy();
+            while ($current < $checkOutDate) {
+                $dateStr = $current->format('Y-m-d');
+                $fullyBookedDates[] = $dateStr;
+                $bookedDates[] = $dateStr; // For backward compatibility
+                $current->addDay();
             }
         }
 
-        // Remove duplicates and sort
+        // Remove duplicates and sort all arrays
+        $checkInDates = array_unique($checkInDates);
+        $checkOutDates = array_unique($checkOutDates);
+        $fullyBookedDates = array_unique($fullyBookedDates);
         $bookedDates = array_unique($bookedDates);
+
+        sort($checkInDates);
+        sort($checkOutDates);
+        sort($fullyBookedDates);
         sort($bookedDates);
 
         return response()->json([
             'success' => true,
-            'bookedDates' => $bookedDates,
-            'count' => count($bookedDates)
+            'checkInDates' => $checkInDates,
+            'checkOutDates' => $checkOutDates,
+            'fullyBookedDates' => $fullyBookedDates,
+            'bookedDates' => $bookedDates, // For backward compatibility
+            'count' => count($fullyBookedDates)
         ]);
     }
 }

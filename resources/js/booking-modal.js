@@ -12,7 +12,10 @@ const minNights = 2;
 let today = new Date();
 let viewYear = today.getFullYear();
 let viewMonth = today.getMonth(); // 0-11
-let bookedDates = new Set(); // 'YYYY-MM-DD'
+let bookedDates = new Set(); // 'YYYY-MM-DD' - Backward compatibility
+let checkInDates = new Set(); // Dates when properties are checking in (can end booking here but not start)
+let checkOutDates = new Set(); // Dates when properties are checking out (can start booking here but not end)
+let fullyBookedDates = new Set(); // Dates completely unavailable
 let checkIn = null; // Date
 let checkOut = null; // Date
 
@@ -54,6 +57,45 @@ const addDays = (d, n) => {
 
 const diffDays = (a,b) => Math.round((b - a) / (1000*60*60*24));
 
+// Function to check if a date is orphaned (can't accommodate minimum stay)
+function isOrphanedDate(date) {
+    const dateKey = fmt(date);
+
+    // If already fully booked, not orphaned (it's just unavailable)
+    if (fullyBookedDates.has(dateKey)) {
+        return false;
+    }
+
+    // Check if we can make a 2-night booking starting from this date
+    let canStartBooking = true;
+    for (let i = 0; i < minNights; i++) {
+        const checkDate = addDays(date, i);
+        const checkKey = fmt(checkDate);
+
+        // Can't start a booking if any day in the minimum stay period is fully booked
+        if (fullyBookedDates.has(checkKey)) {
+            canStartBooking = false;
+            break;
+        }
+    }
+
+    // Check if we can make a 2-night booking ending on this date
+    let canEndBooking = true;
+    for (let i = 1; i <= minNights; i++) {
+        const checkDate = addDays(date, -i);
+        const checkKey = fmt(checkDate);
+
+        // Can't end a booking if any day in the minimum stay period is fully booked
+        if (fullyBookedDates.has(checkKey)) {
+            canEndBooking = false;
+            break;
+        }
+    }
+
+    // Date is orphaned if you can neither start nor end a booking there
+    return !canStartBooking && !canEndBooking;
+}
+
 // Wait for DOM to be ready
 function initializeBookingCalendar() {
     // Get elements with null checks
@@ -62,11 +104,11 @@ function initializeBookingCalendar() {
     const bookingModal = document.getElementById('bookingModal');
     const openBookingBtn = document.getElementById('openBookingModal');
     const closeBookingBtn = document.getElementById('closeBookingModal');
-    // Note: proceedBooking and clearSelection elements don't exist - they're Livewire methods
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+    // Note: proceedBooking element doesn't exist - it's a Livewire method
     const proceedBookingBtn = null; // This element doesn't exist in current implementation
     const prevMonthBtn = document.getElementById('prevMonth');
     const nextMonthBtn = document.getElementById('nextMonth');
-    const clearSelectionBtn = null; // This is handled by Livewire, not a DOM element
 
     // Debug logging
     console.log('Booking modal elements:', {
@@ -74,7 +116,8 @@ function initializeBookingCalendar() {
         gridEl: !!gridEl,
         bookingModal: !!bookingModal,
         openBookingBtn: !!openBookingBtn,
-        closeBookingBtn: !!closeBookingBtn
+        closeBookingBtn: !!closeBookingBtn,
+        clearSelectionBtn: !!clearSelectionBtn
     });
 
     // Only proceed if essential elements exist
@@ -96,23 +139,80 @@ function initializeBookingCalendar() {
             // Fix past date comparison to avoid timezone issues
             const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
             const isPast = date < todayStart;
-            const isBooked = bookedDates.has(key);
-            const inRange = checkIn && checkOut && date >= checkIn && date <= addDays(checkOut,-1);
-            const isStart = checkIn && fmt(date)===fmt(checkIn);
-            const isEnd = checkOut && fmt(date)===fmt(addDays(checkOut,-1));
+
+            // Determine availability based on new date categories
+            const isCheckInDay = checkInDates.has(key);
+            const isCheckOutDay = checkOutDates.has(key);
+            const isFullyBooked = fullyBookedDates.has(key);
+            const isBooked = bookedDates.has(key); // For backward compatibility
+            const isOrphaned = isOrphanedDate(date);
+
+            // Calculate selection ranges for visual display
+            // inRange represents nights you're staying (check-in date to day before check-out)
+            const inRange = checkIn && checkOut && date >= checkIn && date < checkOut;
+            const isStart = checkIn && fmt(date)===fmt(checkIn); // First night
+            const isEnd = checkOut && fmt(date)===fmt(addDays(checkOut,-1)); // Last night
+
             const btn = document.createElement('button');
             btn.setAttribute('type','button');
-            btn.className = [
+
+            // Determine styling based on availability
+            let classNames = [
                 'bg-white h-14 w-full text-sm flex items-center justify-center',
                 'focus:outline-none',
-                'hover:bg-gray-50',
-                (isBooked?'line-through text-gray-400 bg-gray-100 cursor-not-allowed':''),
-                (isPast?'opacity-40 cursor-not-allowed':''),
-                (inRange?'bg-pink-50 text-pink-700 font-semibold':''),
-                (isStart||isEnd?'ring-2 ring-pink-500 font-bold':'')
-            ].join(' ');
+                'hover:bg-gray-50'
+            ];
+
+            // Determine if the date is clickable
+            // Fully booked dates are never clickable when selecting nights to stay
+            const isClickable = !isPast && !isOrphaned && !isFullyBooked;
+
+            // Style based on availability, with fully booked taking precedence
+            if (isOrphaned) {
+                classNames.push('line-through text-gray-400 bg-red-50 cursor-not-allowed border border-red-200');
+            } else if (isFullyBooked) {
+                // Fully booked dates are always gray and blocked
+                classNames.push('line-through text-gray-400 bg-gray-100 cursor-not-allowed');
+            } else if (isCheckInDay) {
+                // Check-in days (only if not fully booked)
+                classNames.push('bg-orange-50 text-orange-700 border border-orange-200');
+            } else if (isCheckOutDay) {
+                classNames.push('bg-green-50 text-green-700 border border-green-200');
+            }
+
+            if (isPast) {
+                classNames.push('opacity-40 cursor-not-allowed');
+            }
+
+            // Add cursor-pointer for clickable dates
+            if (isClickable) {
+                classNames.push('cursor-pointer');
+            }
+
+            if (inRange) {
+                classNames.push('bg-pink-50 text-pink-700 font-semibold');
+            }
+
+            if (isStart || isEnd) {
+                classNames.push('ring-2 ring-pink-500 font-bold');
+            }
+
+            btn.className = classNames.join(' ');
             btn.textContent = d;
-            if (!isPast && !isBooked) {
+
+            // Add tooltip for special dates
+            if (isOrphaned) {
+                btn.title = 'Unavailable - Cannot accommodate minimum 2-night stay';
+            } else if (isCheckInDay) {
+                btn.title = 'Check-in day - Available for checkout (11am departure, 3pm arrival)';
+            } else if (isCheckOutDay) {
+                btn.title = 'Check-out day - Available for check-in (11am departure, 3pm arrival)';
+            } else if (isFullyBooked && !isCheckInDay && !isCheckOutDay) {
+                btn.title = 'Fully booked';
+            }
+
+            // Add click handler based on clickability
+            if (isClickable) {
                 btn.addEventListener('click', () => onPick(date));
             }
             const cell = document.createElement('div');
@@ -134,30 +234,115 @@ function initializeBookingCalendar() {
     }
 
     function onPick(date) {
-        if (!checkIn || (checkIn && checkOut)) { // start new selection
-            checkIn = date; checkOut = null; renderCalendar();
+        const dateKey = fmt(date);
+        const isOrphaned = isOrphanedDate(date);
+        const isCheckInDay = checkInDates.has(dateKey);
+
+        console.log('Clicked date:', dateKey, {
+            isOrphaned,
+            isCheckInDay,
+            fullyBookedDates: fullyBookedDates.has(dateKey),
+            currentCheckIn: checkIn ? fmt(checkIn) : null,
+            currentCheckOut: checkOut ? fmt(checkOut) : null,
+            fullyBookedSet: Array.from(fullyBookedDates),
+            dateKeyType: typeof dateKey
+        });
+
+        // Allow clearing orphaned dates if they're currently selected
+        const isCurrentlySelectedStart = checkIn && fmt(date) === fmt(checkIn);
+        const isCurrentlySelectedEnd = checkOut && fmt(date) === fmt(addDays(checkOut, -1));
+
+        // If clicking on an orphaned date that's currently selected, clear the selection
+        if (isOrphaned && (isCurrentlySelectedStart || isCurrentlySelectedEnd)) {
+            clearSelection();
             return;
         }
-        // enforce forward selection and availability
-        if (date <= checkIn) { checkIn = date; renderCalendar(); return; }
-        // ensure dates between are not booked
+
+        // When selecting nights to stay:
+        // - Can't select nights that are fully booked (someone staying that night)
+        // - CAN select on check-out days (previous guest leaves, you can start staying)
+        // - CANNOT select on check-in days (someone else is starting to stay that night)
+        if (fullyBookedDates.has(dateKey) || isOrphaned) {
+            console.log('Blocked selection:', dateKey, 'fullyBooked:', fullyBookedDates.has(dateKey), 'isOrphaned:', isOrphaned);
+            return; // Invalid night selection
+        }
+
+        if (!checkIn) { 
+            // Start new selection - this date becomes the first night
+            console.log('Starting new selection from:', dateKey);
+            checkIn = date; // Check-in is this date
+            checkOut = addDays(date, 1); // Check-out is next day
+            renderCalendar();
+            return;
+        }
+
+        console.log('Extending selection to:', dateKey);
+        // Extend or modify selection
+        if (date < checkIn) {
+            // Extend backwards - new start date
+            checkIn = date;
+        } else if (date >= checkOut) {
+            // Extend forwards - date becomes last night, so checkout is day after
+            checkOut = addDays(date, 1);
+        } else {
+            // Clicking within current range - restart from this date
+            checkIn = date;
+            checkOut = addDays(date, 1);
+        }
+
+        // Validate the selection doesn't span any problematic dates
         let cursor = new Date(checkIn);
         let blocked = false;
-        while (cursor < date) {
-            if (bookedDates.has(fmt(cursor))) { blocked = true; break; }
+        while (cursor < checkOut) { // Check all nights we're staying
+            const cursorKey = fmt(cursor);
+            
+            // Block if any night is fully booked - we can't stay on nights others are staying
+            if (fullyBookedDates.has(cursorKey)) {
+                console.log('Selection blocked by fully booked night:', cursorKey);
+                blocked = true;
+                break;
+            }
             cursor = addDays(cursor, 1);
         }
-        if (blocked) return; // ignore invalid
-        // min nights
-        if (diffDays(checkIn, date) < minNights) {
-            checkOut = addDays(checkIn, minNights);
-        } else {
-            checkOut = date;
-        }
-        renderCalendar();
-    }
 
-    // Navigation (with null checks)
+        if (blocked) {
+            // Reset to just this single night if selection spans problematic dates
+            console.log('Resetting to single night due to conflict');
+            checkIn = date;
+            checkOut = addDays(date, 1);
+        }
+
+        // Ensure minimum nights requirement
+        if (diffDays(checkIn, checkOut) < minNights) {
+            console.log('Enforcing minimum nights:', minNights);
+            checkOut = addDays(checkIn, minNights);
+            
+            // Validate minimum nights doesn't conflict with any fully booked nights
+            let minCursor = new Date(checkIn);
+            let minBlocked = false;
+            while (minCursor < checkOut) {
+                const minKey = fmt(minCursor);
+                if (fullyBookedDates.has(minKey)) {
+                    console.log('Cannot meet minimum nights requirement due to fully booked night:', minKey);
+                    minBlocked = true;
+                    break;
+                }
+                minCursor = addDays(minCursor, 1);
+            }
+            
+            if (minBlocked) {
+                // Can't meet minimum nights - reset
+                console.log('Cannot meet minimum nights requirement, clearing selection');
+                checkIn = null;
+                checkOut = null;
+                renderCalendar();
+                return;
+            }
+        }
+
+        console.log('Final selection:', fmt(checkIn), 'to', fmt(checkOut));
+        renderCalendar();
+    }    // Navigation (with null checks)
     if (prevMonthBtn) {
         prevMonthBtn.addEventListener('click', async () => {
             viewMonth--;
@@ -180,8 +365,12 @@ function initializeBookingCalendar() {
         });
     }
 
-    // clearSelectionBtn is handled by Livewire, not a DOM element
-    // No need to add event listener here
+    // Clear selection button
+    if (clearSelectionBtn) {
+        clearSelectionBtn.addEventListener('click', () => {
+            clearSelection();
+        });
+    }
 
     // Update sidebar and emit Livewire events
     function updateSelectionUI() {
@@ -280,17 +469,58 @@ function initializeBookingCalendar() {
     async function loadBookedDatesFromDatabase(venueId = null) {
         try {
             const url = venueId ? `/api/booked-dates?venue_id=${venueId}` : '/api/booked-dates';
+            console.log('Fetching booked dates from:', url);
+
             const response = await fetch(url);
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const data = await response.json();
+            console.log('API Response:', data);
 
             if (data.success) {
-                // Add dates from database to bookedDates Set
-                data.bookedDates.forEach(dateStr => {
-                    bookedDates.add(dateStr);
-                });
+                // Clear existing data
+                checkInDates.clear();
+                checkOutDates.clear();
+                fullyBookedDates.clear();
+                bookedDates.clear();
 
-                console.log(`Loaded ${data.bookedDates.length} booked dates from database`);
-                return data.bookedDates.length;
+                // Add new date categories
+                if (data.checkInDates) {
+                    console.log('Check-in dates from API:', data.checkInDates);
+                    data.checkInDates.forEach(dateStr => {
+                        checkInDates.add(dateStr);
+                        bookedDates.add(dateStr); // For backward compatibility
+                    });
+                }
+
+                if (data.checkOutDates) {
+                    console.log('Check-out dates from API:', data.checkOutDates);
+                    data.checkOutDates.forEach(dateStr => {
+                        checkOutDates.add(dateStr);
+                    });
+                }
+
+                if (data.fullyBookedDates) {
+                    console.log('Fully booked dates from API:', data.fullyBookedDates);
+                    data.fullyBookedDates.forEach(dateStr => {
+                        fullyBookedDates.add(dateStr);
+                        bookedDates.add(dateStr); // For backward compatibility
+                    });
+                }
+
+                // Fallback for backward compatibility with old API response
+                if (data.bookedDates && !data.checkInDates) {
+                    data.bookedDates.forEach(dateStr => {
+                        bookedDates.add(dateStr);
+                    });
+                }
+
+                console.log(`Loaded booking data - Check-ins: ${checkInDates.size}, Check-outs: ${checkOutDates.size}, Fully booked: ${fullyBookedDates.size}`);
+                return data.count || data.bookedDates?.length || 0;
             } else {
                 console.error('Failed to load booked dates:', data);
                 return 0;
@@ -392,10 +622,10 @@ function initializeBookingCalendar() {
         console.log('Booking functionality is handled through Livewire component');
     }
 
-} else {
-    // Console log when essential elements are missing
-    console.log('Booking calendar elements not found - skipping initialization');
-}
+    } else {
+        // Console log when essential elements are missing
+        console.log('Booking calendar elements not found - skipping initialization');
+    }
 
 } // End of initializeBookingCalendar function
 
