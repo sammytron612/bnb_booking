@@ -107,7 +107,7 @@
             @if ($this->hasValidDates)
                 <button
                     wire:click="submitBooking"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
+                    class="w-full bg-blue-600 hover:cursor-pointer hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
                     wire:loading.attr="disabled"
                 >
                     <span wire:loading.remove>Book {{ $nights }} Night{{ $nights !== 1 ? 's' : '' }}</span>

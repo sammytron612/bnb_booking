@@ -36,9 +36,9 @@
                     <div class="lg:col-span-2">
                         <div class="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 px-4 py-3">
-                                <button id="prevMonth" class="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600" aria-label="Previous month">‹</button>
+                                <button id="prevMonth" class="cursor-pointer px-6 py-3 text-3xl font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 min-w-[60px] min-h-[50px] flex items-center justify-center" aria-label="Previous month">‹</button>
                                 <h3 id="calendarTitle" class="font-semibold text-gray-900 dark:text-white"></h3>
-                                <button id="nextMonth" class="px-3 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600" aria-label="Next month">›</button>
+                                <button id="nextMonth" class="cursor-pointer px-6 py-3 text-3xl font-bold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 min-w-[60px] min-h-[50px] flex items-center justify-center" aria-label="Next month">›</button>
                             </div>
                             <div class="grid grid-cols-7 text-center text-xs font-medium text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
                                 <div class="py-2">Sun</div>
@@ -59,7 +59,7 @@
                         <div class="mt-3">
                             <button
                                 id="clearSelectionBtn"
-                                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium transition-colors duration-200"
+                                class="hover:cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-500  text-white rounded-lg text-sm font-medium transition-colors duration-200"
                             >
                                 Clear Selection
                             </button>
