@@ -31,7 +31,7 @@
             <div class="flex space-x-2">
                 <button
                     wire:click="navigateCalendar('prev')"
-                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
@@ -41,7 +41,7 @@
                 @if($calendarOffset !== 0)
                     <button
                         wire:click="$set('calendarOffset', 0)"
-                        class="inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                        class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
@@ -51,7 +51,7 @@
 
                 <button
                     wire:click="navigateCalendar('next')"
-                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
                     Next
                     <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -146,9 +146,46 @@
                                 </div>
                             </div>
                         @else
-                            <div class="bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
-                                <div class="text-gray-400 text-xs font-medium">No bookings</div>
-                            </div>
+                            @if($day['check_out_count'] > 0)
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
+                                     title="{{ $day['check_out_count'] }} checkout(s)">
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-red-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
+
+                                    <!-- Check-out indicator -->
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↑{{ $day['check_out_count'] }}
+                                    </div>
+
+                                    <!-- Enhanced tooltip with checkout details (First week: below card) -->
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                        <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
+                                            {{ $day['date']->format('l, F j, Y') }}
+                                        </div>
+
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_outs'] as $checkout)
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+
+                                        <!-- Arrow pointing up (connects to card above) -->
+                                        <div class="absolute -top-1 left-1/2 transform -translate-x-1/2">
+                                            <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                </div>
+                            @endif
                         @endif
 
                         <!-- Today indicator -->
@@ -248,9 +285,46 @@
                                 </div>
                             </div>
                         @else
-                            <div class="bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
-                                <div class="text-gray-400 text-xs font-medium">No bookings</div>
-                            </div>
+                            @if($day['check_out_count'] > 0)
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
+                                     title="{{ $day['check_out_count'] }} checkout(s)">
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-red-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
+
+                                    <!-- Check-out indicator -->
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ↑{{ $day['check_out_count'] }}
+                                    </div>
+
+                                    <!-- Enhanced tooltip with checkout details (Second week: above card) -->
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                        <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
+                                            {{ $day['date']->format('l, F j, Y') }}
+                                        </div>
+
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                            @foreach($day['check_outs'] as $checkout)
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                            @endforeach
+                                        </div>
+
+                                        <!-- Arrow pointing down (connects to card below) -->
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                            <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300">
+                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                </div>
+                            @endif
                         @endif
 
                         <!-- Today indicator -->
@@ -509,7 +583,7 @@
 
     <!-- Edit Booking Modal -->
     @if($showEditModal && $selectedBooking)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-9999">
             <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold">Edit Booking - {{ $selectedBooking->getDisplayBookingId() }}</h3>

@@ -48,6 +48,8 @@ class Booking extends Model
         'stripe_currency',
         'payment_completed_at',
         'stripe_metadata',
+        'review_link',
+        'check_in_reminder',
     ];
 
     /**
@@ -62,6 +64,8 @@ class Booking extends Model
         'stripe_amount' => 'decimal:2',
         'payment_completed_at' => 'datetime',
         'stripe_metadata' => 'array',
+        'review_link' => 'date',
+        'check_in_reminder' => 'date',
     ];
 
     /**

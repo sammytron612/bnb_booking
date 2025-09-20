@@ -24,6 +24,8 @@ class AdminPropertyManager extends Component
     public $venueAddress1 = '';
     public $venueAddress2 = '';
     public $venuePostcode = '';
+    public $venueGuestCapacity = '';
+    public $venueInstructions = '';
 
     // Image management
     public $newImages = [];
@@ -55,6 +57,8 @@ class AdminPropertyManager extends Component
             $this->venueAddress1 = $this->selectedVenue->address1;
             $this->venueAddress2 = $this->selectedVenue->address2;
             $this->venuePostcode = $this->selectedVenue->postcode;
+            $this->venueGuestCapacity = $this->selectedVenue->guest_capacity;
+            $this->venueInstructions = $this->selectedVenue->instructions;
             $this->existingImages = $this->selectedVenue->propertyImages;
             $this->venueAmenities = $this->selectedVenue->amenities;
         }
@@ -69,6 +73,8 @@ class AdminPropertyManager extends Component
             'venueAddress1' => 'required|string|max:255',
             'venueAddress2' => 'nullable|string|max:255',
             'venuePostcode' => 'required|string|max:20',
+            'venueGuestCapacity' => 'nullable|integer|min:1|max:20',
+            'venueInstructions' => 'nullable|string',
         ]);
 
         if ($this->selectedVenue) {
@@ -79,6 +85,8 @@ class AdminPropertyManager extends Component
                 'address1' => $this->venueAddress1,
                 'address2' => $this->venueAddress2,
                 'postcode' => $this->venuePostcode,
+                'guest_capacity' => $this->venueGuestCapacity,
+                'instructions' => $this->venueInstructions,
             ]);
 
             session()->flash('message', 'Venue updated successfully!');

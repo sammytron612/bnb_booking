@@ -25,6 +25,8 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->string('pay_method')->nullable();
             $table->boolean('is_paid')->default(false);
+            $table->date('review_link')->nullable();
+            $table->date('check_in_reminder')->nullable();
             $table->timestamps();
         });
     }

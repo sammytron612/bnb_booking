@@ -170,6 +170,13 @@
                     <span class="detail-value">{{ \Carbon\Carbon::parse($booking->check_out)->format('l, F j, Y') }} before 11:00 AM</span>
                 </div>
 
+                @if($booking->venue->instructions)
+                    <div class="detail-row">
+                        <span class="detail-label">Check In Instructions:</span>
+                        <span class="detail-value">{{ $booking->venue->instructions }}</span>
+                    </div>
+                @endif
+
                 <div class="detail-row">
                     <span class="detail-label">Duration:</span>
                     <span class="detail-value">{{ $booking->nights }} {{ $booking->nights === 1 ? 'night' : 'nights' }}</span>
@@ -181,33 +188,17 @@
                 </div>
             </div>
 
-            <div class="highlight">
-                <h3 style="margin-top: 0;">📍 What to Expect</h3>
-                <ul style="margin-bottom: 0;">
-                    <li><strong>Check-in Time:</strong> Check-in is available from 3:00 PM onwards on your arrival date.</li>
-                    <li><strong>Check-out Time:</strong> Please ensure you check out before 11:00 AM on your departure date.</li>
-                    <li><strong>Property Location:</strong>
-                        {{ $booking->venue->address1 }}@if($booking->venue->address2), {{ $booking->venue->address2 }}@endif, {{ $booking->venue->postcode }}
-                    </li>
-                    @if($booking->venue->instructions)
-                        <li><strong>Check-in Instructions:</strong>{{ $booking->venue->instructions }}.</li>
-                    @endif
-                    <li><strong>Contact:</strong> If you have any questions or need assistance, please don't hesitate to reach out to us.</li>
-                </ul>
-            @endif
-
-
             <p>We're looking forward to hosting you and hope you have a wonderful stay at {{ $booking->venue->venue_name }}!</p>
 
             <p>If you have any questions or need to make any changes to your booking, please contact us as soon as possible.</p>
 
             <p>Safe travels,<br>
-            <strong>The Booking Team</strong></p>
+            <strong>{{ config('app.name') }} Team</strong></p>
         </div>
 
         <div class="footer">
             <p>This is an automated reminder email for booking {{ $booking->getDisplayBookingId() }}.</p>
-            <p>If you have any questions, please contact our support team.</p>
+            <p>If you have any questions, please dont hesitate to contact us.</p>
         </div>
     </div>
 </body>
