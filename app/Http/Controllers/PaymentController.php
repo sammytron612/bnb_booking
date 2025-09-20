@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\Booking;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -114,14 +115,8 @@ class PaymentController extends Controller
 
                     $booking->update($updateData);
 
-                    // Send confirmation email
-                    try {
-                        //Mail::to($booking->email)->send(new BookingConfirmation($booking));
-                        //Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
-                        Log::info('Booking confirmation email sent', ['booking_id' => $booking->id]);
-                    } catch (Exception $e) {
-                        Log::error('Failed to send confirmation email: ' . $e->getMessage());
-                    }
+                    // Don't send emails here - webhook will handle it
+                    Log::info('Booking updated from success page', ['booking_id' => $booking->id]);
                 }
             } catch (Exception $e) {
                 // Log error but still show success page
@@ -197,46 +192,69 @@ class PaymentController extends Controller
             $booking = Booking::find($bookingId);
 
             if ($booking) {
-                // Check if booking is already paid to prevent duplicate emails
-                $wasAlreadyPaid = $booking->is_paid;
+                // Use database transaction to prevent race conditions
+                \DB::transaction(function () use ($booking, $session) {
+                    // Re-fetch booking with lock to prevent race conditions
+                    $booking = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
-                $updateData = [
-                    'is_paid' => true,
-                    'status' => 'confirmed',
-                    'payment_completed_at' => now(),
-                    'stripe_payment_intent_id' => $session['payment_intent'],
-                    'stripe_metadata' => $session['metadata'],
-                    'pay_method' => 'stripe',
-                ];
-
-                // Update email if customer provided one in Stripe checkout
-                if (!empty($session['customer_email'])) {
-                    $updateData['email'] = $session['customer_email'];
-                }
-
-                $booking->update($updateData);
-
-                // Only send emails if booking wasn't already paid (prevents duplicates)
-                if (!$wasAlreadyPaid) {
-                    try {
-                        Mail::to($booking->email)->send(new BookingConfirmation($booking));
-                        Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
-                        Log::info('Booking confirmed and emails sent', ['booking_id' => $booking->id]);
-                    } catch (Exception $e) {
-                        Log::error('Failed to send confirmation email: ' . $e->getMessage());
+                    // Check if emails have already been sent
+                    if ($booking->confirmation_email_sent) {
+                        Log::info('Emails already sent for this booking', [
+                            'booking_id' => $booking->id,
+                            'email_sent_at' => $booking->confirmation_email_sent
+                        ]);
+                        return;
                     }
-                } else {
-                    Log::info('Booking already paid, skipped duplicate email', ['booking_id' => $bookingId]);
-                }
+
+                    // Check if booking is already paid to prevent duplicate emails
+                    $wasAlreadyPaid = $booking->is_paid;
+
+                    $updateData = [
+                        'is_paid' => true,
+                        'status' => 'confirmed',
+                        'payment_completed_at' => now(),
+                        'stripe_payment_intent_id' => $session['payment_intent'],
+                        'stripe_metadata' => $session['metadata'],
+                        'pay_method' => 'stripe',
+                    ];
+
+                    // Update email if customer provided one in Stripe checkout
+                    if (!empty($session['customer_email'])) {
+                        $updateData['email'] = $session['customer_email'];
+                    }
+
+                    // Only send emails if booking wasn't already paid
+                    if (!$wasAlreadyPaid) {
+                        try {
+                            // Mark emails as sent FIRST to prevent other webhooks from sending
+                            $updateData['confirmation_email_sent'] = now();
+                            $booking->update($updateData);
+
+                            // Send confirmation email to CUSTOMER only
+                            Mail::to($booking->email)->send(new BookingConfirmation($booking));
+
+                            // Send new booking notification to OWNER only (not customer)
+                            if (config('mail.owner_email')) {
+                                Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
+                            }
+
+                            Log::info('Booking confirmed - customer email sent, owner notified', ['booking_id' => $booking->id]);
+                        } catch (Exception $e) {
+                            Log::error('Failed to send confirmation email: ' . $e->getMessage());
+                        }
+                    } else {
+                        // Just update booking data without sending emails
+                        $booking->update($updateData);
+                        Log::info('Booking already paid, skipped duplicate email', ['booking_id' => $booking->id]);
+                    }
+                });
             } else {
                 Log::error('Booking not found for webhook', ['booking_id' => $bookingId]);
             }
         } else {
             Log::error('No booking_id in webhook metadata');
         }
-    }
-
-    /**
+    }    /**
      * Handle payment intent succeeded webhook
      */
     private function handlePaymentIntentSucceeded($paymentIntent)
@@ -286,7 +304,7 @@ class PaymentController extends Controller
                     'pay_method' => 'stripe',
                 ]);
 
-                Log::info('Booking updated via charge.updated', ['booking_id' => $booking->id]);
+                Log::info('Booking updated via charge.updated (no emails sent)', ['booking_id' => $booking->id]);
             }
         }
     }
@@ -308,7 +326,7 @@ class PaymentController extends Controller
                     'pay_method' => 'stripe',
                 ]);
 
-                Log::info('Booking updated via charge.succeeded', ['booking_id' => $booking->id]);
+                Log::info('Booking updated via charge.succeeded (no emails sent)', ['booking_id' => $booking->id]);
             }
         }
     }
