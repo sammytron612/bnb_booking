@@ -25,7 +25,7 @@
         <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
 
             <!-- The Light House -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
                     title="{{ $venues[0]->venue_name }}"
@@ -35,49 +35,36 @@
                     :venue="$venues[0]"
                 />
 
-                <div class="p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Light House</h2>
-                    <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        {{$venues[0]->description1}}
-                    </p>
-
-                    <!-- Features -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                            </svg>
-                            2 Bedrooms
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Central Location
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
-                            Free Parking
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
-                            </svg>
-                            Full Kitchen
-                        </div>
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex-grow">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Light House</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            {{$venues[0]->description1}}
+                        </p>
                     </div>
 
-                    <a href="{{route('light-house')}}" type="button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                    <!-- Features -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        @foreach($venues[0]->amenities->take(4) as $amenity)
+                            <div class="flex items-center p-3 rounded-lg">
+                                <div class="w-6 h-6 mr-3 text-gray-900 flex items-center justify-center flex-shrink-0">
+                                    {!! $amenity->svg !!}
+                                </div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $amenity->title }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <a href="{{route('light-house')}}" type="button" class="self-start inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
                         View Details & Book
                     </a>
                 </div>
             </div>
 
             <!-- Saras -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
                 <!-- Property Image Gallery -->
                 <x-image-placeholder
                     title="{{ $venues[1]->venue_name }}"
@@ -87,42 +74,29 @@
                     :venue="$venues[1]"
                 />
 
-                <div class="p-6">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
-                    <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        {{$venues[1]->description1}}
-                    </p>
-
-                    <!-- Features -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
-                            </svg>
-                            2 Bedrooms
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            Seaglass Beach
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 21C15.5 17.4 19 14.1764 19 10.2C19 6.22355 15.866 3 12 3C8.13401 3 5 6.22355 5 10.2C5 14.1764 8.5 17.4 12 21Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M12 12C13.1046 12 14 11.1046 14 10C14 8.89543 13.1046 8 12 8C10.8954 8 10 8.89543 10 10C10 11.1046 10.8954 12 12 12Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            Central Location
-                        </div>
-                        <div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                            </svg>
-                            WiFi Included
-                        </div>
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="flex-grow">
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            {{$venues[1]->description1}}
+                        </p>
                     </div>
 
-                    <a href="{{route('saras')}}" type="button" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors">
+                    <!-- Features -->
+                    <div class="grid grid-cols-2 gap-3 mb-6">
+                        @foreach($venues[1]->amenities->take(4) as $amenity)
+                            <div class="flex items-center p-3 rounded-lg">
+                                <div class="w-6 h-6 mr-3 text-gray-900 flex items-center justify-center flex-shrink-0">
+                                    {!! $amenity->svg !!}
+                                </div>
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $amenity->title }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <a href="{{route('saras')}}" type="button" class="self-start inline-block text-center bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
                         View Details & Book
                     </a>
                 </div>

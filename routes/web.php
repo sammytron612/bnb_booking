@@ -9,17 +9,17 @@ use App\Http\Controllers\PaymentController;
 use App\Models\Venue;
 
 Route::get('/', function () {
-    $venues = Venue::with('propertyImages')->get();
+    $venues = Venue::with('propertyImages','amenities')->get();
     return view('home', compact('venues'));
 })->name('home');
 
 Route::get('/light-house', function () {
-    $venue = Venue::with('propertyImages')->find(1);
+    $venue = Venue::with('propertyImages','amenities')->find(1);
     return view('light-house', compact('venue'));
 })->name('light-house');
 
 Route::get('/saras', function () {
-    $venue = Venue::with('propertyImages')->find(2);
+    $venue = Venue::with('propertyImages','amenities')->find(2);
     return view('saras', compact('venue'));
 })->name('saras');
 
