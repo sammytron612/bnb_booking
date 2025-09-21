@@ -10,17 +10,23 @@ use App\Models\Venue;
 
 Route::get('/', function () {
     $venues = Venue::with('propertyImages','amenities')->get();
+    \Log::info('Homepage loaded with ' . $venues->count() . ' venues');
     return view('home', compact('venues'));
 })->name('home');
 
+// Dynamic venue route using the route field from the database
+Route::get('/venue/{route}', function ($route) {
+    $venue = Venue::with('propertyImages','amenities')->where('route', $route)->firstOrFail();
+    return view('venue', compact('venue'));
+})->name('venue.show');
+
+// Backward compatibility routes - redirect to dynamic route
 Route::get('/light-house', function () {
-    $venue = Venue::with('propertyImages','amenities')->find(1);
-    return view('light-house', compact('venue'));
+    return redirect()->route('venue.show', ['route' => 'light-house']);
 })->name('light-house');
 
 Route::get('/saras', function () {
-    $venue = Venue::with('propertyImages','amenities')->find(2);
-    return view('saras', compact('venue'));
+    return redirect()->route('venue.show', ['route' => 'saras']);
 })->name('saras');
 
 // Booking routes

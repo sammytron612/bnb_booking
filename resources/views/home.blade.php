@@ -1,7 +1,7 @@
 <x-layouts.app>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto md:px-4 sm:px-2 lg:px-8 py-12">
+    <div class="max-w-7xl mx-auto md:px-4 sm:px-2 lg:px-4 py-12">
         <!-- Hero Section -->
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
@@ -22,7 +22,7 @@
         </h2>
 
         <!-- Properties Grid -->
-        <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8 lg:px-4">
             @foreach($venues as $venue)
 
                 <x-venue-card

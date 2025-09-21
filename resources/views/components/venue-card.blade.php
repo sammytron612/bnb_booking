@@ -10,7 +10,7 @@
         :venue="$venue"
     />
 
-    <div class="p-6 flex-grow flex flex-col">
+    <div class="p-6 md:p-8 flex-grow flex flex-col">
         <div class="flex-grow">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">{{ $venue->venue_name }}</h2>
             <p class="text-gray-600 dark:text-gray-300 mb-4">
@@ -32,7 +32,7 @@
             @endforeach
         </div>
 
-        <a href="{{ route($route) }}" type="button" class="self-start inline-block text-center bg-{{ $buttonColor }}-600 hover:bg-{{ $buttonColor }}-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+        <a href="{{ route('venue.show', $route) }}" type="button" class="self-start inline-block text-center bg-{{ $buttonColor }}-600 hover:bg-{{ $buttonColor }}-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
             View Details & Book
         </a>
     </div>

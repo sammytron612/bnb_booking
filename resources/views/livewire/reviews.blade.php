@@ -5,7 +5,7 @@
                          $reviews->first()->booking->venue->venue_name :
                          ($venueId == 1 ? 'The Light House' : 'Saras');
         @endphp
-        <h3 class="text-xl font-semibold mb-4">Reviews for {{ $venueName }}</h3>
+        <h3 class="text-xl font-semibold mb-4 text-center">Reviews for {{ $venueName }}</h3>
 
         @if($reviews && $reviews->count() > 0)
             <div class="space-y-4">

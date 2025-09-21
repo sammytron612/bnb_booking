@@ -27,7 +27,14 @@ class Reviews extends Component
     {
         $path = request()->path();
 
-        // Map URL paths to venue IDs
+        // Extract route parameter from dynamic venue URL
+        if (preg_match('/^venue\/(.+)$/', $path, $matches)) {
+            $routeParam = $matches[1];
+            $venue = \App\Models\Venue::where('route', $routeParam)->first();
+            return $venue ? $venue->id : null;
+        }
+
+        // Backward compatibility for old routes
         if ($path === 'light-house') {
             return 1; // The Light House
         } elseif ($path === 'saras') {
