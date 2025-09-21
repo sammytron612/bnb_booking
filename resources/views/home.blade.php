@@ -8,7 +8,7 @@
                 Seaham Coastal Retreats
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Discover luxury coastal apartments in Seaham County Durham. Two stunning apartments overlooking the dramatic Seaham coastline,
+                Discover luxury coastal apartments in Seaham County Durham. Two stunning apartments minutes from the dramatic Seaham coastline,
                 where industrial heritage meets natural beauty and seaglass treasures wash ashore daily.
             </p>
         </div>
