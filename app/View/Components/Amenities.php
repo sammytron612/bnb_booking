@@ -12,14 +12,16 @@ class Amenities extends Component
     public $venueId;
     public $amenities;
     public $displayAmenities;
+    public $theme_color;
     public $hasMore;
 
     /**
      * Create a new component instance.
      */
-    public function __construct($venueId = null)
+    public function __construct($venueId = null, $theme_color = 'blue')
     {
         $this->venueId = $venueId;
+        $this->theme_color = $theme_color;
 
         if ($venueId) {
             $this->amenities = Amenity::where('venue_id', $venueId)->get();

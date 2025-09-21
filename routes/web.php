@@ -21,14 +21,14 @@ Route::get('/venue/{route}', function ($route) {
 })->name('venue.show');
 
 // Backward compatibility routes - redirect to dynamic route
-Route::get('/light-house', function () {
+/*Route::get('/light-house', function () {
     return redirect()->route('venue.show', ['route' => 'light-house']);
 })->name('light-house');
 
 Route::get('/saras', function () {
     return redirect()->route('venue.show', ['route' => 'saras']);
 })->name('saras');
-
+*/
 // Booking routes
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::get('/bookings/venue/{venue_id}', [BookingController::class, 'getBookingsForVenue'])->name('bookings.venue');

@@ -30,7 +30,7 @@
             @if($hasMore)
                 <button
                     onclick="openAmenitiesModal()"
-                    class="p-2 bg-blue-700 hover:bg-blue-600 rounded text-white hover:cursor-pointer font-medium text-sm"
+                    class="p-2 bg-{{$theme_color}}-700 hover:bg-{{$theme_color}}-600 rounded text-white hover:cursor-pointer font-medium text-sm"
                 >
                     Show all {{ $amenities->count() }} amenities
                 </button>

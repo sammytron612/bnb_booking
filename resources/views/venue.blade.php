@@ -81,7 +81,7 @@
 
                     <!-- Features Grid -->
                     <!-- Amenities Section -->
-                    <x-amenities :venueId="$venue->id" />
+                    <x-amenities :venueId="$venue->id" :theme_color="$venue->theme_color" />
                 </div>
 
                 <div>
