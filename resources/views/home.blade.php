@@ -25,82 +25,22 @@
         <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
 
             <!-- The Light House -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
-                <!-- Property Image Gallery -->
-                <x-image-placeholder
-                    title="{{ $venues[0]->venue_name }}"
-                    badge="Premium Property"
-                    badge-color="blue"
-                    price="£{{ $venues[0]->price }}/night"
-                    :venue="$venues[0]"
-                />
-
-                <div class="p-6 flex-grow flex flex-col">
-                    <div class="flex-grow">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Light House</h2>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4">
-                            {{$venues[0]->description1}}
-                        </p>
-                    </div>
-
-                    <!-- Features -->
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        @foreach($venues[0]->amenities->take(4) as $amenity)
-                            <div class="flex items-center p-3 rounded-lg">
-                                <div class="w-6 h-6 mr-3 text-gray-900 flex items-center justify-center flex-shrink-0">
-                                    {!! $amenity->svg !!}
-                                </div>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $amenity->title }}
-                                </span>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <a href="{{route('light-house')}}" type="button" class="self-start inline-block text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
-                        View Details & Book
-                    </a>
-                </div>
-            </div>
+            <x-venue-card
+                :venue="$venues[0]"
+                badge-text="Premium Property"
+                badge-color="blue"
+                button-color="blue"
+                route="light-house"
+            />
 
             <!-- Saras -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden h-full flex flex-col">
-                <!-- Property Image Gallery -->
-                <x-image-placeholder
-                    title="{{ $venues[1]->venue_name }}"
-                    badge="Family Friendly"
-                    badge-color="green"
-                    price="£{{ $venues[1]->price }}/night"
-                    :venue="$venues[1]"
-                />
-
-                <div class="p-6 flex-grow flex flex-col">
-                    <div class="flex-grow">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4">
-                            {{$venues[1]->description1}}
-                        </p>
-                    </div>
-
-                    <!-- Features -->
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        @foreach($venues[1]->amenities->take(4) as $amenity)
-                            <div class="flex items-center p-3 rounded-lg">
-                                <div class="w-6 h-6 mr-3 text-gray-900 flex items-center justify-center flex-shrink-0">
-                                    {!! $amenity->svg !!}
-                                </div>
-                                <span class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ $amenity->title }}
-                                </span>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <a href="{{route('saras')}}" type="button" class="self-start inline-block text-center bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
-                        View Details & Book
-                    </a>
-                </div>
-            </div>
+            <x-venue-card
+                :venue="$venues[1]"
+                badge-text="Family Friendly"
+                badge-color="green"
+                button-color="green"
+                route="saras"
+            />
         </div>
 
         <!-- About Seaham Section -->
