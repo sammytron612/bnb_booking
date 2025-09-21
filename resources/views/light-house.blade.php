@@ -7,13 +7,12 @@
                 The Light House
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Explore every corner of our stunning coastal retreat. With a modern feel and elegant interiors,
-                discover the luxury and comfort that awaits you at The Light House.
+                {{$venue->description2}}
             </p>
         </div>
 
         <!-- Image Gallery Layout -->
-        <div class="flex flex-col lg:flex-row gap-6">
+        <div class="flex flex-col lg:flex-row gap-6 h-64 md:h-80 lg:h-96">
             @php
                 $featuredImage = $venue->propertyImages->where('featured', true)->first();
                 $otherImages = $venue->propertyImages->where('featured', false);
@@ -21,9 +20,9 @@
             @endphp
 
             <!-- Main Featured Image (50% width) -->
-            <div class="w-full lg:w-1/2">
+            <div class="w-full lg:w-1/2 h-full">
                 @if($featuredImage)
-                <div class="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                <div class="relative w-full h-full rounded-xl overflow-hidden shadow-xl cursor-pointer"
                      data-modal-trigger="{{$venue->venue_name}}-gallery"
                      data-image-index="{{ $allImages->search($featuredImage) }}">
                     <img
@@ -44,14 +43,14 @@
             </div>
 
             <!-- Thumbnail Grid (50% width) -->
-            <div class="w-full lg:w-1/2">
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div class="w-full lg:w-1/2 h-full">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3 h-full">
                     @foreach($otherImages as $image)
-                        <div class="relative cursor-pointer rounded-lg overflow-hidden shadow-md">
+                        <div class="relative cursor-pointer rounded-lg overflow-hidden shadow-md h-full">
                             <img
                                 src="{{ $image->location }}"
                                 alt="{{ $image->desc }}"
-                                class="w-full h-32 object-cover"
+                                class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                                 data-modal-trigger="{{$venue->venue_name}}-gallery"
                                 data-image-index="{{ $allImages->search($image) }}"
                                 loading="lazy"
@@ -70,10 +69,7 @@
                         About The Light House
                     </h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        A luxury apartment overlooking in the heart of Seaham. This stunning coastal apartment features
-                        modern amenities, and a sort walk to the famous seaglass beaches of the Heritage Coast.
-                        Perfect for couples seeking a romantic getaway or anyone wanting to experience the magic of Durham's coastline.
-                        Free breakfast included and afternoon tea provided on arrival.
+                        {{$venue->description3}}
                     </p>
 
                     <!-- Features Grid -->

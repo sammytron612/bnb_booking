@@ -19,7 +19,9 @@ class AdminPropertyManager extends Component
 
     // Property editing
     public $venueName = '';
-    public $venueDescription = '';
+    public $venueDescription1 = '';
+    public $venueDescription2 = '';
+    public $venueDescription3 = '';
     public $venuePrice = '';
     public $venueAddress1 = '';
     public $venueAddress2 = '';
@@ -52,7 +54,9 @@ class AdminPropertyManager extends Component
 
         if ($this->selectedVenue) {
             $this->venueName = $this->selectedVenue->venue_name;
-            $this->venueDescription = $this->selectedVenue->description;
+            $this->venueDescription1 = $this->selectedVenue->description1;
+            $this->venueDescription2 = $this->selectedVenue->description2;
+            $this->venueDescription3 = $this->selectedVenue->description3;
             $this->venuePrice = $this->selectedVenue->price;
             $this->venueAddress1 = $this->selectedVenue->address1;
             $this->venueAddress2 = $this->selectedVenue->address2;
@@ -68,7 +72,9 @@ class AdminPropertyManager extends Component
     {
         $this->validate([
             'venueName' => 'required|string|max:255',
-            'venueDescription' => 'nullable|string',
+            'venueDescription1' => 'nullable|string',
+            'venueDescription2' => 'nullable|string',
+            'venueDescription3' => 'nullable|string',
             'venuePrice' => 'required|numeric|min:0',
             'venueAddress1' => 'required|string|max:255',
             'venueAddress2' => 'nullable|string|max:255',
@@ -80,7 +86,9 @@ class AdminPropertyManager extends Component
         if ($this->selectedVenue) {
             $this->selectedVenue->update([
                 'venue_name' => $this->venueName,
-                'description' => $this->venueDescription,
+                'description1' => $this->venueDescription1,
+                'description2' => $this->venueDescription2,
+                'description3' => $this->venueDescription3,
                 'price' => $this->venuePrice,
                 'address1' => $this->venueAddress1,
                 'address2' => $this->venueAddress2,

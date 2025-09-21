@@ -34,7 +34,7 @@
                     @foreach($venues as $venue)
                         <button
                             wire:click="selectVenue({{ $venue->id }})"
-                            class="w-full text-left p-4 rounded-lg border transition-colors {{ $selectedVenue && $selectedVenue->id === $venue->id ? 'bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-600' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600' }}"
+                            class="hover:cursor-pointer w-full text-left p-4 rounded-lg border transition-colors {{ $selectedVenue && $selectedVenue->id === $venue->id ? 'bg-indigo-50 dark:bg-indigo-900 border-indigo-200 dark:border-indigo-600' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600' }}"
                         >
                             <div class="flex justify-between items-center">
                                 <div>
@@ -134,14 +134,38 @@
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Description
+                                Description 1
                             </label>
                             <textarea
-                                wire:model="venueDescription"
+                                wire:model="venueDescription1"
                                 rows="4"
                                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
                             ></textarea>
-                            @error('venueDescription') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('venueDescription1') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Description 2
+                            </label>
+                            <textarea
+                                wire:model="venueDescription2"
+                                rows="4"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                            ></textarea>
+                            @error('venueDescription2') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Description 3
+                            </label>
+                            <textarea
+                                wire:model="venueDescription3"
+                                rows="4"
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                            ></textarea>
+                            @error('venueDescription3') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -175,7 +199,7 @@
                         <div class="mt-6">
                             <button
                                 type="submit"
-                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 hover:cursor-pointer text-white font-medium py-2 px-4 rounded-lg transition-colors"
                             >
                                 Update Property
                             </button>
@@ -348,7 +372,7 @@
                         </div>
                         <button
                             wire:click="addAmenity"
-                            class="mt-3 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                            class="mt-3 bg-green-600 hover:cursor-pointer hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                         >
                             Add Amenity
                         </button>
@@ -392,13 +416,13 @@
                                             <div class="flex space-x-2">
                                                 <button
                                                     wire:click="updateAmenity"
-                                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                                                    class="bg-green-600 hover:bg-green-700 hover:cursor-pointer text-white px-3 py-1 rounded text-sm"
                                                 >
                                                     Save
                                                 </button>
                                                 <button
                                                     wire:click="cancelEditingAmenity"
-                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
+                                                    class="bg-gray-500 hover:cursor-pointer hover:bg-gray-600 text-white px-3 py-1 rounded text-sm"
                                                 >
                                                     Cancel
                                                 </button>
@@ -431,13 +455,13 @@
                                             <div class="flex space-x-2">
                                                 <button
                                                     wire:click="startEditingAmenity({{ $amenity->id }}, {{ json_encode($amenity->title) }}, {{ json_encode($amenity->svg) }})"
-                                                    class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm"
+                                                    class="hover:cursor-pointer text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm"
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
                                                     wire:click="deleteAmenity({{ $amenity->id }})"
-                                                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm"
+                                                    class="hover:cursor-pointer text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm"
                                                     onclick="return confirm('Are you sure you want to delete this amenity?')"
                                                 >
                                                     Delete

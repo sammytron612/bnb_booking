@@ -38,8 +38,7 @@
                 <div class="p-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">The Light House</h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        A beacon of luxury overlooking Seaham's iconic lighthouse. This stunning coastal apartment features
-                         modern amenities, and a walk to the famous seaglass beaches of the Heritage Coast.
+                        {{$venues[0]->description1}}
                     </p>
 
                     <!-- Features -->
@@ -91,8 +90,7 @@
                 <div class="p-6">
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Saras</h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-4">
-                        Named after a family member, Saras offers a perfect blend of comfort and coastal charm.
-                        Just a 2 minute drive from the famous seaglass beach and Tommy statue, ideal for families and couples alike.
+                        {{$venues[1]->description1}}
                     </p>
 
                     <!-- Features -->
