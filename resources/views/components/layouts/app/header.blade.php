@@ -25,10 +25,10 @@
                 <flux:navbar.item :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
                     Home
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('light-house')" :current="request()->routeIs('light-house')"  class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
+                <flux:navbar.item :href="route('venue.show', ['route' => 'light-house'])" :current="request()->routeIs('venue.show') && request()->route('route') === 'light-house'"  class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
                     The Light House
                 </flux:navbar.item>
-                <flux:navbar.item :href="route('saras')" :current="request()->routeIs('saras')" class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
+                <flux:navbar.item :href="route('venue.show', ['route' => 'saras'])" :current="request()->routeIs('venue.show') && request()->route('route') === 'saras'" class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
                     Saras
                 </flux:navbar.item>
                 <flux:navbar.item href="{{ route('home') }}#about" :current="request()->routeIs('about-seaham')" class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
@@ -69,10 +69,10 @@
                         <flux:navlist.item :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
                             Home
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('light-house')" :current="request()->routeIs('light-house')" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
+                        <flux:navlist.item :href="route('venue.show', ['route' => 'light-house'])" :current="request()->routeIs('venue.show') && request()->route('route') === 'light-house'" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
                             The Light House
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('saras')" :current="request()->routeIs('saras')" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
+                        <flux:navlist.item :href="route('venue.show', ['route' => 'saras'])" :current="request()->routeIs('venue.show') && request()->route('route') === 'saras'" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
                             Saras
                         </flux:navlist.item>
                         <flux:navlist.item href="{{ route('home') }}#about" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
