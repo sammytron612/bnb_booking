@@ -23,24 +23,36 @@
 
         <!-- Properties Grid -->
         <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
+            @foreach($venues as $venue)
+                @php
+                    // Determine badge text, badge color, button color, and route based on venue characteristics
+                    if($venue->id == 1 || stripos($venue->venue_name, 'light') !== false) {
+                        $badgeText = 'Premium Property';
+                        $badgeColor = 'blue';
+                        $buttonColor = 'blue';
+                        $route = 'light-house';
+                    } elseif($venue->id == 2 || stripos($venue->venue_name, 'sara') !== false) {
+                        $badgeText = 'Family Friendly';
+                        $badgeColor = 'green';
+                        $buttonColor = 'green';
+                        $route = 'saras';
+                    } else {
+                        // Default values for any additional venues
+                        $badgeText = 'Available Property';
+                        $badgeColor = 'gray';
+                        $buttonColor = 'gray';
+                        $route = 'home'; // fallback route
+                    }
+                @endphp
 
-            <!-- The Light House -->
-            <x-venue-card
-                :venue="$venues[0]"
-                badge-text="Premium Property"
-                badge-color="blue"
-                button-color="blue"
-                route="light-house"
-            />
-
-            <!-- Saras -->
-            <x-venue-card
-                :venue="$venues[1]"
-                badge-text="Family Friendly"
-                badge-color="green"
-                button-color="green"
-                route="saras"
-            />
+                <x-venue-card
+                    :venue="$venue"
+                    :badge-text="$badgeText"
+                    :badge-color="$badgeColor"
+                    :button-color="$buttonColor"
+                    :route="$route"
+                />
+            @endforeach
         </div>
 
         <!-- About Seaham Section -->

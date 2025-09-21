@@ -66,7 +66,7 @@
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                        About Sara's
+                        {{$venue->venue_name}}
                     </h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-6">
                             {{$venue->description3}}
