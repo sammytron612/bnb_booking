@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('address1');
             $table->string('address2')->nullable();
             $table->string('postcode');
+            $table->string('theme_color')->default('blue');
+            $table->string('route')->nullable();
+            $table->string('badge_text')->nullable();
         });
     }
 

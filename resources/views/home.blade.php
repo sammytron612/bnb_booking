@@ -24,33 +24,13 @@
         <!-- Properties Grid -->
         <div class="grid md:grid-cols-2 gap-12 lg:gap-16 mt-8">
             @foreach($venues as $venue)
-                @php
-                    // Determine badge text, badge color, button color, and route based on venue characteristics
-                    if($venue->id == 1 || stripos($venue->venue_name, 'light') !== false) {
-                        $badgeText = 'Premium Property';
-                        $badgeColor = 'blue';
-                        $buttonColor = 'blue';
-                        $route = 'light-house';
-                    } elseif($venue->id == 2 || stripos($venue->venue_name, 'sara') !== false) {
-                        $badgeText = 'Family Friendly';
-                        $badgeColor = 'green';
-                        $buttonColor = 'green';
-                        $route = 'saras';
-                    } else {
-                        // Default values for any additional venues
-                        $badgeText = 'Available Property';
-                        $badgeColor = 'gray';
-                        $buttonColor = 'gray';
-                        $route = 'home'; // fallback route
-                    }
-                @endphp
 
                 <x-venue-card
                     :venue="$venue"
-                    :badge-text="$badgeText"
-                    :badge-color="$badgeColor"
-                    :button-color="$buttonColor"
-                    :route="$route"
+                    :badge-text="$venue->badge_text"
+                    :badge-color="$venue->theme_color"
+                    :button-color="$venue->button_color ?? $venue->theme_color"
+                    :route="$venue->route"
                 />
             @endforeach
         </div>

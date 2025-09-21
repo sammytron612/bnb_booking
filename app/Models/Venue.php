@@ -25,6 +25,9 @@ class Venue extends Model
         'address1',
         'address2',
         'postcode',
+        'theme_color',
+        'route',
+        'badge_text',
     ];
 
     /**
