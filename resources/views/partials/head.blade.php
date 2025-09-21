@@ -16,5 +16,5 @@
 <noscript><link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet"></noscript>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
-@livewireStyles
-@fluxAppearance
+{{-- @livewireStyles --}}
+{{-- @fluxAppearance --}}
