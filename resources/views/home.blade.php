@@ -29,7 +29,7 @@
                     :venue="$venue"
                     :badge-text="$venue->badge_text"
                     :badge-color="$venue->theme_color"
-                    :button-color="$venue->button_color ?? $venue->theme_color"
+                    :button-color="$venue->theme_color"
                     :route="$venue->route"
                 />
             @endforeach
