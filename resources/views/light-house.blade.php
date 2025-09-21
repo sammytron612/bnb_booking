@@ -7,7 +7,7 @@
                 The Light House
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-                Explore every corner of our stunning coastal retreat. From panoramic sea views to elegant interiors,
+                Explore every corner of our stunning coastal retreat. With a modern feel and elegant interiors,
                 discover the luxury and comfort that awaits you at The Light House.
             </p>
         </div>
@@ -69,9 +69,10 @@
                         About The Light House
                     </h2>
                     <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        A beacon of luxury overlooking Seaham's iconic lighthouse. This stunning coastal apartment features
-                        panoramic sea views, modern amenities, and direct access to the famous seaglass beaches of the Heritage Coast.
+                        A luxury apartment overlooking in the heart of Seaham. This stunning coastal apartment features
+                        modern amenities, and a sort walk to the famous seaglass beaches of the Heritage Coast.
                         Perfect for couples seeking a romantic getaway or anyone wanting to experience the magic of Durham's coastline.
+                        Free breakfast included and afternoon tea provided on arrival.
                     </p>
 
                     <!-- Features Grid -->
