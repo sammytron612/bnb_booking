@@ -23,20 +23,20 @@
             <!-- Main Featured Image (50% width) -->
             <div class="w-full lg:w-1/2">
                 @if($featuredImage)
-                <div class="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-xl">
+                <div class="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-xl cursor-pointer"
+                     data-modal-trigger="{{$venue->venue_name}}-gallery"
+                     data-image-index="{{ $allImages->search($featuredImage) }}">
                     <img
                         src="{{ $featuredImage->location }}"
                         alt="{{ $featuredImage->desc }}"
-                        class="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-500"
-                        data-modal-trigger="{{$venue->venue_name}}-gallery"
-                        data-image-index="0"
+                        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     >
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                    <div class="absolute bottom-4 left-4 text-white">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+                    <div class="absolute bottom-4 left-4 text-white pointer-events-none">
                         <h3 class="text-xl font-bold mb-1">{{ $featuredImage->desc }}</h3>
                         <p class="text-sm opacity-90">Click to view gallery</p>
                     </div>
-                    <div class="absolute top-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
+                    <div class="absolute top-4 right-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm pointer-events-none">
                         {{ count($allImages) }} Photos
                     </div>
                 </div>
@@ -46,14 +46,15 @@
             <!-- Thumbnail Grid (50% width) -->
             <div class="w-full lg:w-1/2">
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                    @foreach($otherImages as $index => $image)
+                    @foreach($otherImages as $image)
                         <div class="relative cursor-pointer rounded-lg overflow-hidden shadow-md">
                             <img
                                 src="{{ $image->location }}"
                                 alt="{{ $image->desc }}"
                                 class="w-full h-32 object-cover"
                                 data-modal-trigger="{{$venue->venue_name}}-gallery"
-                                data-image-index="{{ $index + 1 }}" loading="lazy"
+                                data-image-index="{{ $allImages->search($image) }}"
+                                loading="lazy"
                             >
                         </div>
                     @endforeach

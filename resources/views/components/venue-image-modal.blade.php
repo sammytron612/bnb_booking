@@ -3,7 +3,7 @@
     <!-- Modal -->
     <div
         id="modal-{{ $galleryId }}"
-        class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden items-center justify-center p-4"
+        class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4"
         data-modal="{{ $galleryId }}"
     >
         <div class="relative max-w-6xl max-h-full w-full h-full flex items-center justify-center">
@@ -83,42 +83,128 @@
         @endif
 
         <script>
-            // Image modal module - wrapped in IIFE to prevent conflicts
-            (function() {
-                'use strict';
+            // Venue Image Modal Gallery - Initialize on DOM ready
+            document.addEventListener('DOMContentLoaded', function() {
+                const galleryId = '{{ $galleryId }}';
+                const modal = document.querySelector(`[data-modal="${galleryId}"]`);
+                const modalImage = document.getElementById(`modal-image-${galleryId}`);
+                const modalCounter = document.getElementById(`modal-counter-${galleryId}`);
+                const prevBtn = document.querySelector(`[data-modal-prev="${galleryId}"]`);
+                const nextBtn = document.querySelector(`[data-modal-next="${galleryId}"]`);
+                const closeBtn = document.querySelector(`[data-modal-close="${galleryId}"]`);
+                const thumbnails = document.querySelectorAll(`[data-modal-thumb="${galleryId}"]`);
 
-                // Prevent multiple initializations
-                if (window.imageModalInitialized) {
-                    return;
+                // Debug: Check if elements are found
+                console.log('Modal initialization:', {
+                    galleryId: galleryId,
+                    modal: modal,
+                    modalImage: modalImage,
+                    modalCounter: modalCounter,
+                    triggers: document.querySelectorAll(`[data-modal-trigger="${galleryId}"]`).length
+                });
+
+                // Get images data
+                const imagesDataScript = document.querySelector(`[data-gallery-images="${galleryId}"]`);
+                const images = imagesDataScript ? JSON.parse(imagesDataScript.textContent) : [];
+
+                console.log('Images loaded:', images.length);
+
+                let currentIndex = 0;                // Function to update modal content
+                function updateModal(index) {
+                    if (index < 0) index = images.length - 1;
+                    if (index >= images.length) index = 0;
+
+                    currentIndex = index;
+
+                    if (modalImage && images[index]) {
+                        modalImage.src = images[index].src;
+                        modalImage.alt = images[index].alt;
+                    }
+
+                    if (modalCounter) {
+                        modalCounter.textContent = `${index + 1} / ${images.length}`;
+                    }
+
+                    // Update thumbnail highlighting
+                    thumbnails.forEach((thumb, i) => {
+                        if (i === index) {
+                            thumb.classList.add('ring-2', 'ring-white', 'opacity-100');
+                            thumb.classList.remove('opacity-60');
+                        } else {
+                            thumb.classList.remove('ring-2', 'ring-white', 'opacity-100');
+                            thumb.classList.add('opacity-60');
+                        }
+                    });
                 }
-                window.imageModalInitialized = true;
 
-                // Image modal
-                const imageModal = document.getElementById('imageModal');
-                const modalImg = document.getElementById('modalImg');
-                const closeImageBtn = document.getElementById('closeImageBtn');
+                // Open modal when any image is clicked
+                document.addEventListener('click', function(e) {
+                    const trigger = e.target.closest(`[data-modal-trigger="${galleryId}"]`);
+                    if (trigger) {
+                        console.log('Image clicked - opening modal');
+                        e.preventDefault();
+                        const imageIndex = parseInt(trigger.getAttribute('data-image-index')) || 0;
+                        currentIndex = imageIndex;
+                        updateModal(currentIndex);
 
-                if (!imageModal || !modalImg || !closeImageBtn) {
-                    console.log('Image modal elements not found - skipping initialization');
-                    return;
+                        if (modal) {
+                            modal.classList.remove('hidden');
+                            document.body.style.overflow = 'hidden';
+                            console.log('Modal opened at image index:', currentIndex);
+                        } else {
+                            console.error('Modal element not found for galleryId:', galleryId);
+                        }
+                    }
+                });                // Close modal
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    });
                 }
 
-                document.querySelectorAll('.enlargeable').forEach(img => {
-                    img.addEventListener('click', () => {
-                        modalImg.src = img.getAttribute('data-img') || img.src;
-                        imageModal.classList.remove('hidden');
+                // Previous image
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function() {
+                        updateModal(currentIndex - 1);
+                    });
+                }
+
+                // Next image
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function() {
+                        updateModal(currentIndex + 1);
+                    });
+                }
+
+                // Thumbnail clicks
+                thumbnails.forEach((thumb, index) => {
+                    thumb.addEventListener('click', function() {
+                        updateModal(index);
                     });
                 });
-                closeImageBtn.addEventListener('click', () => {
-                    imageModal.classList.add('hidden');
-                    modalImg.src = '';
-                });
-                window.addEventListener('click', (e) => {
-                    if (e.target === imageModal) {
-                        imageModal.classList.add('hidden');
-                        modalImg.src = '';
+
+                // Keyboard navigation
+                document.addEventListener('keydown', function(e) {
+                    if (!modal.classList.contains('hidden')) {
+                        if (e.key === 'ArrowLeft') {
+                            updateModal(currentIndex - 1);
+                        } else if (e.key === 'ArrowRight') {
+                            updateModal(currentIndex + 1);
+                        } else if (e.key === 'Escape') {
+                            modal.classList.add('hidden');
+                            document.body.style.overflow = '';
+                        }
                     }
                 });
-            })();
+
+                // Close modal when clicking outside
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
         </script>
     </div>
