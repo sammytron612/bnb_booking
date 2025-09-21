@@ -92,8 +92,8 @@
                             <h3 class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4 flex items-center justify-center">
                                 Discover Seaham's Rich Heritage
                             </h3>
-                            <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed text-left">
-                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/knackpit.jpg') }}" alt="The knackpit in Seaham" loading="lazy" width="256" height="256" decoding="async">
+                            <div class="text-gray-700 dark:text-gray-300 space-y-4 leading-relaxed text-center md:text-left">
+                                <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/knackpit.jpg') }}" alt="The knackpit in Seaham" loading="lazy" width="256" height="256" decoding="async">
                                 <p>Nestled on the rugged Durham coastline, Seaham is a town steeped in history and resilience. Originally a quiet agricultural village, Seaham's transformation began in the early 19th century when the 3rd Marquess of Londonderry developed its harbour to support the booming coal industry. By 1845, coal mining had become the lifeblood of the town, shaping its identity and community spirit for generations.</p>
 
                                 <p>Seaham also holds literary significance—<a class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" href="https://en.wikipedia.org/wiki/Lord_Byron" target="_blank " rel="nofollow">Lord Byron</a> married Anne Isabella Milbanke at Seaham Hall in 1815, and their daughter Ada Lovelace, a pioneer of computing, was born from this union.</p>
@@ -103,13 +103,13 @@
                         </div>
 
                         <!-- Modern Seaham Section -->
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-6 shadow-md">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-md">
                             <h3 class="text-2xl font-bold text-green-600 dark:text-green-400 mb-4 flex items-center justify-center">
                                 Modern Seaham: Where Heritage Meets Coastal Beauty
                             </h3>
-                            <p class="text-gray-700 text-left dark:text-gray-300 leading-relaxed">
-                                <img class="float-left mt-1 w-64 h-64 object-cover rounded-lg shadow-md mr-6 mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
-                                The town’s coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town’s glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham’s maritime legacy.
+                            <p class="text-gray-700 text-center md:text-left dark:text-gray-300 leading-relaxed">
+                                <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
+                                The town's coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town's glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham's maritime legacy.
                                 Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like <a href="https://www.nationalchurchestrust.org/church/st-mary-virgin-seaham" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow">St Mary the Virgin Church</a>, one of the oldest in the region, offering a glimpse into centuries of local history.
                             </p>
                         </div>
