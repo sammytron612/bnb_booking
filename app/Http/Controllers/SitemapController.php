@@ -22,7 +22,9 @@ class SitemapController extends Controller
             ]
         ];
 
-        return response()->view('sitemaps.sitemap-index', compact('sitemaps'))
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.sitemap-index', compact('sitemaps'))->render();
+
+        return response($content)
             ->header('Content-Type', 'application/xml');
     }
 
@@ -37,7 +39,9 @@ class SitemapController extends Controller
             ]
         ];
 
-        return response()->view('sitemaps.urlset', compact('urls'))
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.urlset', compact('urls'))->render();
+
+        return response($content)
             ->header('Content-Type', 'application/xml');
     }
 
@@ -64,7 +68,9 @@ class SitemapController extends Controller
             ];
         }
 
-        return response()->view('sitemaps.urlset', compact('urls'))
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.urlset', compact('urls'))->render();
+
+        return response($content)
             ->header('Content-Type', 'application/xml');
     }
 }
