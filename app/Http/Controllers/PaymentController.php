@@ -52,36 +52,31 @@ class PaymentController extends Controller
             return false;
         }
 
-        // For success/cancel routes without signatures, add additional validation
+        // For success/cancel routes without signatures, require valid Stripe session ID
         if (!$requireSignature) {
-            // Must have valid session_id parameter (for success) or valid Stripe referrer
             $sessionId = $request->get('session_id');
-            $referrer = $request->headers->get('referer');
 
-            // Validate the request is coming from Stripe or has valid session
-            if (!$sessionId && (!$referrer || !str_contains($referrer, 'checkout.stripe.com'))) {
-                Log::warning('Suspicious access to payment endpoint without proper validation', [
+            // Must have session_id parameter that matches the booking's Stripe session
+            if (!$sessionId || !$booking->stripe_session_id || $sessionId !== $booking->stripe_session_id) {
+                Log::warning('Invalid or missing session_id for payment page access', [
                     'booking_id' => $booking->id,
                     'ip' => $request->ip(),
-                    'referrer' => $referrer,
-                    'has_session_id' => !empty($sessionId)
+                    'provided_session_id' => $sessionId,
+                    'expected_session_id' => $booking->stripe_session_id,
+                    'user_agent' => $request->userAgent()
                 ]);
                 return false;
             }
 
-            // Rate limiting per IP for unsigned routes
-            $key = 'payment_access:' . $request->ip();
-            if (Cache::increment($key, 1) > 10) {
-                if (Cache::get($key) === 10) {
-                    Cache::put($key, 11, now()->addMinutes(60)); // Lock for 1 hour
-                }
-                Log::warning('Rate limit exceeded for payment access', [
+            // Optional: Verify session ID format (Stripe session IDs start with 'cs_')
+            if (!str_starts_with($sessionId, 'cs_')) {
+                Log::warning('Invalid session_id format for payment page access', [
+                    'booking_id' => $booking->id,
                     'ip' => $request->ip(),
-                    'booking_id' => $booking->id
+                    'provided_session_id' => $sessionId
                 ]);
                 return false;
             }
-            Cache::put($key, Cache::get($key, 0), now()->addMinutes(10));
         }
 
         return true;
@@ -184,7 +179,7 @@ class PaymentController extends Controller
                 'mode' => 'payment',
                 'customer_email' => $booking->email, // Pre-fill email from booking
                 'success_url' => route('payment.success', ['booking' => $booking->id]) . '?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('payment.cancel', ['booking' => $booking->id]),
+                'cancel_url' => route('payment.cancel', ['booking' => $booking->id]) . '?session_id={CHECKOUT_SESSION_ID}',
                 'metadata' => [
                     'booking_id' => $booking->id,
                     'booking_reference' => $booking->getDisplayBookingId(),
