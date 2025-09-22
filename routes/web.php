@@ -39,12 +39,15 @@ Route::get('/saras', function () {
     return redirect()->route('venue.show', ['route' => 'saras']);
 })->name('saras');
 */
-// Booking routes
+// Booking routes - Protected with authentication for admin access
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-Route::get('/bookings/venue/{venue_id}', [BookingController::class, 'getBookingsForVenue'])->name('bookings.venue');
-Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/bookings/venue/{venue_id}', [BookingController::class, 'getBookingsForVenue'])->name('bookings.venue');
+    Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
+    Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
+});
+// Public API for calendar dates (no sensitive data)
 Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
-Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
@@ -65,12 +68,6 @@ Route::get('/reviews/create/{booking}', function (Request $request, $booking) {
     return view('create-review', ['booking' => $booking]);
 })->name('reviews.create')->middleware('signed');
 
-// Test route for review link generation
-Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
-
-// Test route for email jobs
-Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
-
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
@@ -86,6 +83,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/properties', [AdminController::class, 'properties'])->name('properties');
+    
+    // Test/debug routes for admin use only
+    Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
+    Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
 
 // Sitemap routes
