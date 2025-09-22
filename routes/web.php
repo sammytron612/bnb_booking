@@ -56,9 +56,9 @@ Route::post('/payment/checkout/{booking}', [PaymentController::class, 'createChe
     ->middleware('signed')->name('payment.checkout.post');
 // Success and cancel routes accessible by Stripe redirects (no signed middleware)
 Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSuccess'])
-    ->name('payment.success');
+    ->middleware('throttle:10,1')->name('payment.success');
 Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])
-    ->name('payment.cancel');
+    ->middleware('throttle:10,1')->name('payment.cancel');
 // Webhook endpoint - No signed middleware as Stripe needs direct access
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])
     ->middleware('throttle:60,1')->name('stripe.webhook');
