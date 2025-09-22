@@ -7,6 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Booking;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -23,7 +25,129 @@ class PaymentController extends Controller
 {
     public function __construct()
     {
+        // Stripe API key will be set per-method for better security
+    }
+
+    /**
+     * Validate that the request has proper access to the booking
+     */
+    private function validateBookingAccess(Request $request, Booking $booking, bool $requireSignature = true): bool
+    {
+        // Check signed URL signature only if required (checkout needs it, success/cancel don't)
+        if ($requireSignature && !$request->hasValidSignature()) {
+            Log::warning('Invalid signature for booking access', [
+                'booking_id' => $booking->id,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
+            return false;
+        }
+
+        // Additional basic validation - booking must exist and be recent
+        if (!$booking || $booking->created_at < now()->subHours(48)) {
+            Log::warning('Booking access validation failed - booking too old or missing', [
+                'booking_id' => $booking?->id,
+                'ip' => $request->ip()
+            ]);
+            return false;
+        }
+
+        // For success/cancel routes without signatures, add additional validation
+        if (!$requireSignature) {
+            // Must have valid session_id parameter (for success) or valid Stripe referrer
+            $sessionId = $request->get('session_id');
+            $referrer = $request->headers->get('referer');
+
+            // Validate the request is coming from Stripe or has valid session
+            if (!$sessionId && (!$referrer || !str_contains($referrer, 'checkout.stripe.com'))) {
+                Log::warning('Suspicious access to payment endpoint without proper validation', [
+                    'booking_id' => $booking->id,
+                    'ip' => $request->ip(),
+                    'referrer' => $referrer,
+                    'has_session_id' => !empty($sessionId)
+                ]);
+                return false;
+            }
+
+            // Rate limiting per IP for unsigned routes
+            $key = 'payment_access:' . $request->ip();
+            if (Cache::increment($key, 1) > 10) {
+                if (Cache::get($key) === 10) {
+                    Cache::put($key, 11, now()->addMinutes(60)); // Lock for 1 hour
+                }
+                Log::warning('Rate limit exceeded for payment access', [
+                    'ip' => $request->ip(),
+                    'booking_id' => $booking->id
+                ]);
+                return false;
+            }
+            Cache::put($key, Cache::get($key, 0), now()->addMinutes(10));
+        }
+
+        return true;
+    }
+
+    /**
+     * Set Stripe API key securely for individual operations
+     */
+    private function setStripeKey(): void
+    {
         Stripe::setApiKey(config('services.stripe.secret_key'));
+    }
+
+    /**
+     * Enhanced Stripe payment verification
+     */
+    private function verifyStripePayment($session, Booking $booking): bool
+    {
+        // Verify payment status
+        if ($session->payment_status !== 'paid') {
+            return false;
+        }
+
+        // Verify booking ID in metadata
+        if (!isset($session->metadata['booking_id']) || $session->metadata['booking_id'] != $booking->id) {
+            return false;
+        }
+
+        // Verify payment amount matches booking total
+        $expectedAmount = (int) ($booking->total_price * 100); // Convert to cents
+        if ($session->amount_total !== $expectedAmount) {
+            return false;
+        }
+
+        // Verify currency
+        if ($session->currency !== 'gbp') {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate email change to prevent email hijacking
+     */
+    private function validateEmailChange(string $originalEmail, string $newEmail): bool
+    {
+        // If emails are the same, allow
+        if ($originalEmail === $newEmail) {
+            return true;
+        }
+
+        // Extract domains
+        $originalDomain = substr(strrchr($originalEmail, "@"), 1);
+        $newDomain = substr(strrchr($newEmail, "@"), 1);
+
+        // Allow if same domain (user might have corrected their email)
+        if ($originalDomain === $newDomain) {
+            return true;
+        }
+
+        // For different domains, be more restrictive
+        // Only allow common email providers to prevent domain hijacking
+        $trustedDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com'];
+
+        return in_array($newDomain, $trustedDomains) && in_array($originalDomain, $trustedDomains);
     }
 
     /**
@@ -31,7 +155,19 @@ class PaymentController extends Controller
      */
     public function createCheckoutSession(Request $request, Booking $booking)
     {
+        // Validate booking access (requires signature for checkout)
+        if (!$this->validateBookingAccess($request, $booking, true)) {
+            return redirect()->route('home')->with('error', 'Invalid or expired booking link.');
+        }
+
+        $this->setStripeKey();
+
         try {
+            // Enhanced validation - ensure booking is in valid state
+            if ($booking->is_paid) {
+                return redirect()->route('home')->with('error', 'This booking has already been paid.');
+            }
+
             $session = Session::create([
                 'payment_method_types' => ['card'],
                 'line_items' => [[
@@ -91,16 +227,38 @@ class PaymentController extends Controller
      */
     public function paymentSuccess(Request $request, Booking $booking)
     {
+        // Validate booking access (no signature required for Stripe redirects)
+        if (!$this->validateBookingAccess($request, $booking, false)) {
+            return redirect()->route('home')->with('error', 'Invalid or expired payment link.');
+        }
+
+        $this->setStripeKey();
+
         $sessionId = $request->get('session_id');
 
-        // Security check: Ensure session_id matches the booking's stored session_id
+        // Enhanced security check: Ensure session_id matches and verify payment details
         if (!$sessionId || $booking->stripe_session_id !== $sessionId) {
-            // If no session_id or it doesn't match, redirect to home with error
+            Log::warning('Payment success accessed with invalid session', [
+                'booking_id' => $booking->id,
+                'provided_session_id' => $sessionId,
+                'stored_session_id' => $booking->stripe_session_id,
+                'ip' => $request->ip()
+            ]);
             return redirect()->route('home')->with('error', 'Invalid payment session.');
         }
 
         try {
             $session = Session::retrieve($sessionId);
+
+            // Enhanced payment verification
+            if (!$this->verifyStripePayment($session, $booking)) {
+                Log::warning('Payment verification failed', [
+                    'booking_id' => $booking->id,
+                    'session_id' => $sessionId,
+                    'ip' => $request->ip()
+                ]);
+                return redirect()->route('home')->with('error', 'Payment verification failed.');
+            }
 
             if ($session->payment_status === 'paid') {
                 $updateData = [
@@ -112,9 +270,17 @@ class PaymentController extends Controller
                     'pay_method' => 'stripe',
                 ];
 
-                // Update email if customer provided one in Stripe checkout
+                // Update email if customer provided one in Stripe checkout - with validation
                 if (!empty($session->customer_email)) {
-                    $updateData['email'] = $session->customer_email;
+                    $newEmail = filter_var($session->customer_email, FILTER_VALIDATE_EMAIL);
+                    if ($newEmail && $this->validateEmailChange($booking->email, $newEmail)) {
+                        $updateData['email'] = $newEmail;
+                        Log::info('Email updated for booking via success page', [
+                            'booking_id' => $booking->id,
+                            'old_email' => $booking->email,
+                            'new_email' => $newEmail
+                        ]);
+                    }
                 }
 
                 $booking->update($updateData);
@@ -174,16 +340,18 @@ class PaymentController extends Controller
      */
     public function paymentCancel(Request $request, Booking $booking)
     {
-        // Validate that this is a legitimate cancel request
-        // Either from Stripe (no additional validation needed) or direct access (basic security check)
+        // Validate booking access (no signature required for Stripe redirects)
+        if (!$this->validateBookingAccess($request, $booking, false)) {
+            return redirect()->route('home')->with('error', 'Invalid or expired booking link.');
+        }
 
         // Additional security: Check if booking exists and is in valid state for cancel
         if (!$booking || $booking->is_paid) {
             return redirect()->route('home')->with('error', 'Invalid payment session or booking already completed.');
         }
 
-        // Generate URL for retry payment
-        $retryPaymentUrl = route('payment.checkout', ['booking' => $booking->id]);
+        // Generate signed URL for retry payment (valid for 24 hours)
+        $retryPaymentUrl = URL::temporarySignedRoute('payment.checkout', now()->addHours(24), ['booking' => $booking->id]);
 
         return view('payment.cancel', compact('booking', 'retryPaymentUrl'));
     }
@@ -193,9 +361,18 @@ class PaymentController extends Controller
      */
     public function webhook(Request $request): Response
     {
+        $this->setStripeKey();
+
         $payload = $request->getContent();
         $sigHeader = $request->header('Stripe-Signature');
         $endpointSecret = config('services.stripe.webhook_secret');
+
+        // Enhanced logging for security monitoring
+        Log::info('Webhook received', [
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'content_length' => strlen($payload)
+        ]);
 
         try {
             $event = Webhook::constructEvent($payload, $sigHeader, $endpointSecret);
@@ -269,9 +446,24 @@ class PaymentController extends Controller
                         'pay_method' => 'stripe',
                     ];
 
-                    // Update email if customer provided one in Stripe checkout
+                    // Update email if customer provided one in Stripe checkout - with validation
                     if (!empty($session['customer_email'])) {
-                        $updateData['email'] = $session['customer_email'];
+                        // Validate email format and ensure it's not too different from original
+                        $newEmail = filter_var($session['customer_email'], FILTER_VALIDATE_EMAIL);
+                        if ($newEmail && $this->validateEmailChange($booking->email, $newEmail)) {
+                            $updateData['email'] = $newEmail;
+                            Log::info('Email updated for booking via webhook', [
+                                'booking_id' => $booking->id,
+                                'old_email' => $booking->email,
+                                'new_email' => $newEmail
+                            ]);
+                        } else {
+                            Log::warning('Suspicious email change attempt blocked', [
+                                'booking_id' => $booking->id,
+                                'original_email' => $booking->email,
+                                'attempted_email' => $session['customer_email']
+                            ]);
+                        }
                     }
 
                     // Send emails if they haven't been sent yet (regardless of payment status)

@@ -46,12 +46,19 @@ Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings
 Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
 Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 
-// Payment routes
-Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])->name('payment.checkout');
-Route::post('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])->name('payment.checkout.post');
-Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSuccess'])->name('payment.success');
-Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])->name('payment.cancel');
-Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])->name('stripe.webhook');
+// Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
+Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
+    ->middleware('signed')->name('payment.checkout');
+Route::post('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
+    ->middleware('signed')->name('payment.checkout.post');
+// Success and cancel routes accessible by Stripe redirects (no signed middleware)
+Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSuccess'])
+    ->name('payment.success');
+Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])
+    ->name('payment.cancel');
+// Webhook endpoint - No signed middleware as Stripe needs direct access
+Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])
+    ->middleware('throttle:60,1')->name('stripe.webhook');
 
 // Review routes
 Route::get('/reviews/create/{booking}', function (Request $request, $booking) {

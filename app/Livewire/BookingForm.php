@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Booking;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 
 class BookingForm extends Component
 {
@@ -110,8 +111,8 @@ class BookingForm extends Component
                 'status' => 'pending',
             ]);
 
-            // Generate URL for payment checkout
-            $checkoutUrl = route('payment.checkout', ['booking' => $booking->id]);
+            // Generate signed URL for payment checkout (valid for 24 hours)
+            $checkoutUrl = URL::temporarySignedRoute('payment.checkout', now()->addHours(24), ['booking' => $booking->id]);
 
             // Redirect to Stripe checkout
             return redirect($checkoutUrl);
