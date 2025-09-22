@@ -1,0 +1,22 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-GvQCLeWk.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-qkKsOI79.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/booking-modal.js": {
+    "file": "assets/booking-modal-OWKhdoI2.js",
+    "name": "booking-modal",
+    "src": "resources/js/booking-modal.js",
+    "isEntry": true
+  }
+}
