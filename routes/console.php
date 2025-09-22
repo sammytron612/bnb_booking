@@ -9,7 +9,6 @@ use App\Jobs\SendReviewLinkEmails;
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
-
 // Manual job runners
 Artisan::command('test:checkin', function () {
     SendCheckinReminders::dispatch();
