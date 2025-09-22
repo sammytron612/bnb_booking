@@ -185,8 +185,8 @@ One of the most outstanding features in Seaham is St. Mary the Virgin Church. Lo
                     </div>
                     <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Email Us</h4>
                     <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Send us a message anytime</p>
-                    <a href="mailto:booking@seahamretreats.com" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors">
-                        booking@seahamretreats.com
+                    <a href="mailto:{{ config('app.owner_email') }}" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-sm transition-colors">
+                        {{ config('app.owner_email') }}
                     </a>
                 </div>
 
@@ -199,8 +199,8 @@ One of the most outstanding features in Seaham is St. Mary the Virgin Church. Lo
                     </div>
                     <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">Call Us</h4>
                     <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Available 9 AM - 8 PM daily</p>
-                    <a href="tel:+441915270123" class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium text-sm transition-colors">
-                        +44 191 527 0123
+                    <a href="tel:{{ config('app.owner_phone_no') }} " class="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 font-medium text-sm transition-colors">
+                        {{ config('app.owner_phone_no') }}
                     </a>
                 </div>
 
@@ -213,7 +213,7 @@ One of the most outstanding features in Seaham is St. Mary the Virgin Church. Lo
                     </div>
                     <h4 class="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2">WhatsApp</h4>
                     <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">Quick responses & booking help</p>
-                    <a href="https://wa.me/441915270123" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium text-sm transition-colors">
+                    <a href="https://wa.me/{{ config('app.owner_phone_no') }}" class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 font-medium text-sm transition-colors">
                         Message us on WhatsApp
                     </a>
                 </div>
