@@ -1,4 +1,5 @@
-<IfModule mod_rewrite.c>
+sudo a2enmod rewrite
+sudo systemctl restart apache2<IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
     </IfModule>
