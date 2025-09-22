@@ -13,32 +13,38 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // First, add the new venue_id column
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->foreignId('venue_id')->nullable()->after('check_out')->constrained('venues')->onDelete('cascade');
-        });
-
-        // Update existing bookings to use venue_id based on venue name
-        $bookings = Booking::all();
-        foreach ($bookings as $booking) {
-            if ($booking->venue) {
-                $venue = Venue::where('venue_name', $booking->venue)->first();
-                if ($venue) {
-                    $booking->venue_id = $venue->id;
-                    $booking->save();
-                }
-            }
+        // First, add the new venue_id column if it doesn't exist
+        if (!Schema::hasColumn('bookings', 'venue_id')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->foreignId('venue_id')->nullable()->after('check_out')->constrained('venues')->onDelete('cascade');
+            });
         }
 
-        // Remove the old venue column
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->dropColumn('venue');
-        });
+        // Update existing bookings to use venue_id based on venue name
+        if (Schema::hasColumn('bookings', 'venue')) {
+            $bookings = Booking::all();
+            foreach ($bookings as $booking) {
+                if ($booking->venue) {
+                    $venue = Venue::where('venue_name', $booking->venue)->first();
+                    if ($venue) {
+                        $booking->venue_id = $venue->id;
+                        $booking->save();
+                    }
+                }
+            }
 
-        // Make venue_id not nullable
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->foreignId('venue_id')->nullable(false)->change();
-        });
+            // Remove the old venue column
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->dropColumn('venue');
+            });
+        }
+
+        // Make venue_id not nullable if it exists and is nullable
+        if (Schema::hasColumn('bookings', 'venue_id')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->foreignId('venue_id')->nullable(false)->change();
+            });
+        }
     }
 
     /**
