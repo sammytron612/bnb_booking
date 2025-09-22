@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+    <!-- Background with rounded corners for iOS -->
+    <rect width="180" height="180" rx="40" ry="40" fill="#2563eb"/>
+
+    <!-- Building/house icon centered and scaled -->
+    <g transform="translate(30, 30) scale(5, 5)">
+        <path fill="white" d="M12 2L8 6v16h8V6l-4-4zm0 2.5L14 6.5V20h-4V6.5L12 4.5z"/>
+        <circle cx="12" cy="8" r="1.5" fill="#FBBF24"/>
+        <path fill="white" d="M4 20h16v2H4z"/>
+    </g>
+</svg>

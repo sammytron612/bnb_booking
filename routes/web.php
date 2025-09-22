@@ -6,6 +6,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SitemapController;
 use App\Models\Venue;
 
 // Load auth routes first to prevent conflicts
@@ -20,7 +21,13 @@ Route::get('/', function () {
 // Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {
     $venue = Venue::with('propertyImages','amenities')->where('route', $route)->firstOrFail();
-    return view('venue', compact('venue'));
+
+    // Get reviews for SEO - reviews are connected through bookings
+    $reviews = \App\Models\Review::whereHas('booking', function($query) use ($venue) {
+        $query->where('venue_id', $venue->id);
+    })->with(['booking.venue'])->get();
+
+    return view('venue', compact('venue', 'reviews'));
 })->name('venue.show');
 
 // Backward compatibility routes - redirect to dynamic route
@@ -73,3 +80,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/properties', [AdminController::class, 'properties'])->name('properties');
 });
+
+// Sitemap routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
+
+// Dynamic robots.txt
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
+
+    return response($content)
+        ->header('Content-Type', 'text/plain');
+})->name('robots');

@@ -1,6 +1,27 @@
-<x-layouts.app>
+@php
+    $featuredImage = $venue->propertyImages->where('featured', true)->first();
+    $seoData = [
+        'title' => $venue->venue_name . ' - Luxury Holiday Rental in Seaham',
+        'description' => $venue->description2 ?? $venue->description1,
+        'keywords' => 'Seaham holiday rental, ' . $venue->venue_name . ', coastal accommodation, seaside holiday, luxury apartment, Durham coast, sea views, vacation rental',
+        'type' => 'website',
+        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : null,
+        'imageAlt' => $venue->venue_name . ' - Holiday Rental in Seaham',
+        'venue' => $venue,
+        'reviews' => $reviews ?? collect(),
+        'price' => $venue->price,
+    ];
+@endphp
+
+<x-layouts.app :seoData="$seoData">
 
     <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-24 py-12">
+        <!-- Breadcrumbs -->
+        <x-breadcrumbs :items="[
+            ['title' => 'Home', 'url' => route('home')],
+            ['title' => $venue->venue_name]
+        ]" />
+
         <!-- Page Header -->
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">

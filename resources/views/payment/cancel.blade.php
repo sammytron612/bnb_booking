@@ -84,28 +84,12 @@
     </div>
 
     <script>
+        <script>
         function retryPayment() {
-            // Redirect to payment checkout for this booking
-            fetch('{{ route("payment.checkout", $booking) }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.checkout_url;
-                } else {
-                    alert('Error creating payment session. Please try again or contact us.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error creating payment session. Please try again or contact us.');
-            });
+            // Redirect to signed payment checkout URL
+            window.location.href = '{{ $retryPaymentUrl }}';
         }
+    </script>
     </script>
 </body>
 </html>

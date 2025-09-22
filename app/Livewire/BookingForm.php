@@ -110,8 +110,11 @@ class BookingForm extends Component
                 'status' => 'pending',
             ]);
 
+            // Generate URL for payment checkout
+            $checkoutUrl = route('payment.checkout', ['booking' => $booking->id]);
+
             // Redirect to Stripe checkout
-            return redirect()->route('payment.checkout', ['booking' => $booking->id]);
+            return redirect($checkoutUrl);
 
         } catch (\Exception $e) {
             session()->flash('booking_error', 'Sorry, there was an error processing your booking. Please try again.');

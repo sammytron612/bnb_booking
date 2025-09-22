@@ -1,4 +1,16 @@
-<x-layouts.app>
+@php
+    $featuredImage = $venues->first()?->propertyImages?->where('featured', true)?->first();
+    $seoData = [
+        'title' => 'Luxury Coastal Holiday Rentals in Seaham',
+        'description' => 'Discover luxury coastal apartments in Seaham County Durham. Two stunning apartments minutes from the dramatic Seaham coastline, where industrial heritage meets natural beauty and seaglass treasures wash ashore daily.',
+        'keywords' => 'Seaham holiday rentals, coastal accommodation, seaside holidays, luxury holiday homes, Durham coast, sea views, vacation rentals, The Light House apartment, Saras apartment, Seaglass, Sea Glass',
+        'type' => 'website',
+        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : null,
+        'imageAlt' => 'Seaham Coastal Retreats - Luxury Holiday Accommodation'
+    ];
+@endphp
+
+<x-layouts.app :seoData="$seoData">
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto md:px-4 sm:px-2 lg:px-4 py-12">

@@ -1,2 +1,19 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /api/
+
+# Allow important pages
+Allow: /venue/
+Allow: /storage/
+
+# Sitemap location
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Crawl-delay to be respectful
+Crawl-delay: 1
