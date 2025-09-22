@@ -69,6 +69,7 @@
                         <h3 class="text-sm font-medium text-blue-800">What's Next?</h3>
                         <div class="mt-2 text-sm text-blue-700">
                             <p>A confirmation email has been sent to {{ $booking->email }}. We'll contact you soon with check-in details and any additional information.</p>
+                            <p class="mt-2">If you need assistance, call us at {{ config('app.owner_phone_no') }} or email <a href="mailto:{{ config('app.owner_email') }}">{{ config('app.owner_email') }}</a>.</p>
                         </div>
                     </div>
                 </div>

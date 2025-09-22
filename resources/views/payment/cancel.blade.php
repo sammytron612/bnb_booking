@@ -65,6 +65,7 @@
                         <h3 class="text-sm font-medium text-yellow-800">Booking Status</h3>
                         <div class="mt-2 text-sm text-yellow-700">
                             <p>Your booking is still reserved but requires payment to be confirmed. You can try paying again or contact us for alternative payment methods.</p>
+                            <p class="mt-2">For assistance, call {{ config('app.owner_phone_no') }} or email <a href="mailto:{{ config('app.owner_email') }}">{{ config('app.owner_email') }}</a>.</p>
                         </div>
                     </div>
                 </div>
