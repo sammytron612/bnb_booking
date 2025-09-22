@@ -8,6 +8,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
 use App\Models\Venue;
 
+// Load auth routes first to prevent conflicts
+require __DIR__.'/auth.php';
+
 Route::get('/', function () {
     $venues = Venue::with('propertyImages','amenities')->get();
     \Log::info('Homepage loaded with ' . $venues->count() . ' venues');
@@ -70,6 +73,3 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/properties', [AdminController::class, 'properties'])->name('properties');
 });
-
-
-require __DIR__.'/auth.php';
