@@ -230,20 +230,20 @@ SSLCompression off
 
 ```bash
 # Set correct ownership
-sudo chown -R www-data:www-data /var/www/bnb
+sudo chown -R www-data:www-data /var/www/html/eileen_bnb
 
 # Set secure permissions
-sudo find /var/www/bnb -type f -exec chmod 644 {} \;
-sudo find /var/www/bnb -type d -exec chmod 755 {} \;
+sudo find /var/www/html/eileen_bnb -type f -exec chmod 644 {} \;
+sudo find /var/www/html/eileen_bnb -type d -exec chmod 755 {} \;
 
 # Laravel specific permissions
-sudo chmod -R 775 /var/www/bnb/storage
-sudo chmod -R 775 /var/www/bnb/bootstrap/cache
-sudo chmod 600 /var/www/bnb/.env
+sudo chmod -R 775 /var/www/html/eileen_bnb/storage
+sudo chmod -R 775 /var/www/html/eileen_bnb/bootstrap/cache
+sudo chmod 600 /var/www/html/eileen_bnb/.env
 
 # Secure sensitive files
-sudo chmod 600 /var/www/bnb/config/database.php
-sudo chmod 600 /var/www/bnb/config/services.php
+sudo chmod 600 /var/www/html/eileen_bnb/config/database.php
+sudo chmod 600 /var/www/html/eileen_bnb/services.php
 ```
 
 ### 8. Firewall Configuration (UFW)

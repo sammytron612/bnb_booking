@@ -130,8 +130,8 @@
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
             Contact us directly for special requests or group bookings.
         </p>
-        <a href="mailto:booking@seahamretreats.com" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-            booking@seahamretreats.com
+        <a href="mailto:{{config('app.owner_email')}}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            {{config('app.owner_email')}}
         </a>
     </div>
 </div>
