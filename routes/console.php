@@ -10,6 +10,17 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Manual job runners
+Artisan::command('test:checkin', function () {
+    SendCheckinReminders::dispatch();
+    $this->info('Check-in reminders dispatched!');
+})->purpose('Run check-in reminders manually');
+
+Artisan::command('test:reviews', function () {
+    SendReviewLinkEmails::dispatch();
+    $this->info('Review emails dispatched!');
+})->purpose('Run review emails manually');
+
 // Schedule the email jobs to run daily
 Schedule::job(new SendCheckinReminders())->dailyAt('09:00')->name('send-checkin-reminders');
 Schedule::job(new SendReviewLinkEmails())->dailyAt('10:00')->name('send-review-link-emails');

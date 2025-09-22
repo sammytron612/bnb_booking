@@ -29,9 +29,10 @@ class SendCheckinReminders implements ShouldQueue
      */
     public function handle(): void
     {
-        // Get bookings with check-in 2 days from now that haven't had reminders sent
+        // Get bookings with check-in from 2 days ago to today that haven't had reminders sent
         $bookings = Booking::with('venue')
-            ->where('check_in', '=', now()->addDays(2)->format('Y-m-d'))
+            ->where('check_in', '>=', now()->subDays(3)->format('Y-m-d'))
+            ->where('check_in', '<=', now()->format('Y-m-d'))
             ->whereNull('check_in_reminder')
             ->get();
 
