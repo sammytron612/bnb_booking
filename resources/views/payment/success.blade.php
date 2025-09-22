@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful - Eileen's B&B</title>
+    <title>Payment Successful - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
@@ -21,7 +21,7 @@
                     Payment Successful!
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    Your booking has been confirmed and payment processed successfully.
+                    Your booking with {{ config('app.name') }} has been confirmed and payment processed successfully.
                 </p>
             </div>
 

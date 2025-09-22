@@ -31,8 +31,8 @@
             </div>
 
         <div class="footer">
-            <p>Seaham Coastal Retreats</p>
-            <p>📞 +44 191 527 0123 | 📧 booking@seahamretreats.com</p>
+            <p>{{ config('app.name') }}</p>
+            <p>📞 {{ config('app.owner_phone_no') }} | 📧 {{ config('app.owner_email') }}</p>
         </div>
     </div>
 </body>

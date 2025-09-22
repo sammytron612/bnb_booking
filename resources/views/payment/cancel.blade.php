@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Cancelled - Eileen's B&B</title>
+    <title>Payment Cancelled - {{ config('app.name') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50">
@@ -21,7 +21,7 @@
                     Payment Cancelled
                 </h2>
                 <p class="mt-2 text-sm text-gray-600">
-                    Your payment was cancelled. Your booking is still pending payment.
+                    Your payment with {{ config('app.name') }} was cancelled. Your booking is still pending payment.
                 </p>
             </div>
 

@@ -60,7 +60,7 @@
     <div class="content">
         <p>Hello! {{ $data['name'] }}</p>
 
-        <p>Thank you for choosing Seaham Coastal Retreats for your recent stay at {{ $data['venue'] }}. We hope you had a wonderful time at our coastal accommodation!</p>
+    <p>Thank you for choosing {{ config('app.name') }} for your recent stay at {{ $data['venue'] }}. We hope you had a wonderful time at our coastal accommodation!</p>
 
         <p>Your feedback is incredibly valuable to us and helps future guests make informed decisions about their stay. If you enjoyed your experience, we would be delighted if you could take a few minutes to share a review.</p>
 
@@ -79,13 +79,13 @@
 
         <p>Thank you once again for staying with us. We hope to welcome you back to the beautiful Seaham coast soon!</p>
 
-        <p>Warm regards,<br>
-        <strong>The Seaham Coastal Retreats Team</strong></p>
+    <p>Warm regards,<br>
+    <strong>The {{ config('app.name') }} Team</strong></p>
     </div>
 
     <div class="footer">
-        <p>Seaham Coastal Retreats | Discovering luxury coastal living in County Durham</p>
-        <p>If you have any questions, please don't hesitate to contact us.</p>
+        <p>{{ config('app.name') }} | Discovering luxury coastal living in County Durham</p>
+        <p>If you have any questions, please contact us at {{ config('app.owner_phone_no') }} or <a href="mailto:{{ config('app.owner_email') }}">{{ config('app.owner_email') }}</a>.</p>
     </div>
 </body>
 </html>

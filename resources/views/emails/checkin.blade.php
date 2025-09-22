@@ -190,7 +190,7 @@
 
             <p>We're looking forward to hosting you and hope you have a wonderful stay at {{ $booking->venue->venue_name }}!</p>
 
-            <p>If you have any questions or need to make any changes to your booking, please contact us as soon as possible.</p>
+            <p>If you have any questions or need to make any changes to your booking, please contact us as soon as possible at {{ config('app.owner_phone_no') }} or <a href="mailto:{{ config('app.owner_email') }}">{{ config('app.owner_email') }}</a>.</p>
 
             <p>Safe travels,<br>
             <strong>{{ config('app.name') }} Team</strong></p>
@@ -198,7 +198,7 @@
 
         <div class="footer">
             <p>This is an automated reminder email for booking {{ $booking->getDisplayBookingId() }}.</p>
-            <p>If you have any questions, please dont hesitate to contact us.</p>
+            <p>If you have any questions, please don't hesitate to contact us at {{ config('app.owner_phone_no') }} or <a href="mailto:{{ config('app.owner_email') }}">{{ config('app.owner_email') }}</a>.</p>
         </div>
     </div>
 </body>

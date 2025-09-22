@@ -56,6 +56,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Owner Phone Number
+    |--------------------------------------------------------------------------
+    |
+    | This value is the phone number of the business owner, which can be used
+    | for contact information in emails, notifications, or other parts of
+    | the application where the owner's contact details are needed.
+    |
+    */
+
+    'owner_phone_no' => env('OWNER_PHONE_NO'),
+    'owner_email' => env('OWNER_EMAIL'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

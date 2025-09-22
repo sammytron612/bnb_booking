@@ -18,7 +18,7 @@
     <div class="container">
         <div class="header">
             <h1>🏠 Booking Confirmed!</h1>
-            <p>Thank you for choosing Seaham Coastal Retreats</p>
+            <p>Thank you for choosing {{ config('app.name') }}</p>
         </div>
 
         <div class="content">
@@ -59,12 +59,12 @@
 
             <p>If you have any questions, please don't hesitate to contact us!</p>
 
-            <a href="mailto:booking@seahamretreats.com" class="button">Contact Us</a>
+            <a href="mailto:{{ config('app.owner_email') }}" class="button">Contact Us</a>
         </div>
 
         <div class="footer">
-            <p>Seaham Coastal Retreats</p>
-            <p>📞 +44 191 527 0123 | 📧 booking@seahamretreats.com</p>
+            <p>{{ config('app.name') }}</p>
+            <p>📞 {{ config('app.owner_phone_no') }} | 📧 {{ config('app.owner_email') }}</p>
         </div>
     </div>
 </body>
