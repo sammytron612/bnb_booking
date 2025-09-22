@@ -83,7 +83,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/properties', [AdminController::class, 'properties'])->name('properties');
-    
+
     // Test/debug routes for admin use only
     Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
