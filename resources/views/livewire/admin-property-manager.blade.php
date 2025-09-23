@@ -250,8 +250,32 @@
                                             class="w-full h-48 object-cover rounded-lg {{ $image->featured ? 'ring-4 ring-yellow-400' : '' }}"
                                         >
 
-                                        <!-- Image Controls -->
-                                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
+                                        <!-- Image Controls - Mobile: Corner buttons, Desktop: Hover overlay -->
+                                        <!-- Mobile controls (always visible in corners) -->
+                                        <div class="md:hidden">
+                                            <button
+                                                wire:click="toggleFeatured({{ $image->id }})"
+                                                class="absolute top-2 right-2 bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg text-xs shadow-lg z-10"
+                                                title="{{ $image->featured ? 'Remove Featured' : 'Set as Featured' }}"
+                                            >
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                            <button
+                                                wire:click="deleteImage({{ $image->id }})"
+                                                class="absolute bottom-2 right-2 bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg text-xs shadow-lg z-10"
+                                                onclick="return confirm('Are you sure you want to delete this image?')"
+                                            >
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Desktop controls (hover overlay) -->
+                                        <div class="hidden md:block absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
                                             <button
                                                 wire:click="toggleFeatured({{ $image->id }})"
                                                 class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg text-xs shadow-lg"
