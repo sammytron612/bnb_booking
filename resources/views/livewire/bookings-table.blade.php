@@ -207,7 +207,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
 
@@ -348,7 +348,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
 
@@ -360,7 +360,7 @@
         <!-- Legend -->
         <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
             <div class="flex items-center">
-                <div class="w-3 h-3 bg-red-500 rounded-full mr-1 animate-pulse"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-1 animate-pulse"></div>
                 Today
             </div>
 
