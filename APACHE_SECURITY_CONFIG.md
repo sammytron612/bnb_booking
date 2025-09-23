@@ -83,7 +83,49 @@
 </VirtualHost>
 ```
 
-### 2. Required Apache Modules
+### 2. Block Direct IP Access (Prevent IP-based website access)
+
+```apache
+# Default catch-all virtual host to block IP access
+<VirtualHost *:80>
+    ServerName _
+    DocumentRoot /var/www/html/blocked
+    
+    # Return 403 Forbidden for any IP-based access
+    <Location />
+        Require all denied
+        ErrorDocument 403 "Direct IP access is not allowed. Please use the domain name."
+    </Location>
+    
+    # Alternative: Redirect to main domain
+    # Redirect permanent / https://seahamcoastalretreats.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName _
+    DocumentRoot /var/www/html/blocked
+    
+    # Minimal SSL config for catch-all (use self-signed cert)
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
+    SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+    
+    # Return 403 Forbidden for any IP-based access
+    <Location />
+        Require all denied
+        ErrorDocument 403 "Direct IP access is not allowed. Please use the domain name."
+    </Location>
+    
+    # Alternative: Redirect to main domain
+    # Redirect permanent / https://seahamcoastalretreats.com/
+</VirtualHost>
+
+# Create blocked directory and custom error page
+# mkdir -p /var/www/html/blocked
+# echo "<h1>Access Denied</h1><p>Please use the proper domain name to access this website.</p>" > /var/www/html/blocked/index.html
+```
+
+### 3. Required Apache Modules
 
 ```bash
 # Enable essential security modules
@@ -383,6 +425,50 @@ echo "0 12 * * * /usr/bin/certbot renew --quiet" | sudo crontab -
 - [ ] Firewall configured and enabled
 - [ ] Security headers configured
 - [ ] Sensitive directories blocked
+- [ ] **Direct IP access blocked with catch-all virtual hosts**
+
+### Testing IP Blocking:
+```bash
+# Test direct IP access (should return 403 or redirect)
+curl -I http://YOUR_SERVER_IP
+curl -I https://YOUR_SERVER_IP
+
+# Test domain access (should work normally)
+curl -I http://seahamcoastalretreats.com
+curl -I https://seahamcoastalretreats.com
+```
+
+### Alternative Methods to Block IP Access:
+
+#### Method 1: Using mod_rewrite in main virtual host
+```apache
+<VirtualHost *:443>
+    ServerName seahamcoastalretreats.com
+    # ... other config ...
+    
+    # Block direct IP access
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ [NC]
+    RewriteRule ^(.*)$ - [F,L]
+</VirtualHost>
+```
+
+#### Method 2: Using ServerName with IP regex
+```apache
+<VirtualHost *:80>
+    ServerName ~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$
+    <Location />
+        Require all denied
+    </Location>
+</VirtualHost>
+```
+
+#### Method 3: Firewall-level blocking (iptables)
+```bash
+# Block common scanning attempts
+sudo iptables -A INPUT -p tcp --dport 80 -m string --string "Host: [0-9]" --algo bm -j DROP
+sudo iptables -A INPUT -p tcp --dport 443 -m string --string "Host: [0-9]" --algo bm -j DROP
+```
 - [ ] Laravel .env file secured
 - [ ] Database access restricted
 - [ ] Log monitoring set up
