@@ -250,14 +250,11 @@
                                             class="w-full h-48 object-cover rounded-lg {{ $image->featured ? 'ring-4 ring-yellow-400' : '' }}"
                                         >
 
-                                        <!-- Image Controls - Always visible, centered -->
-                                        <div class="absolute inset-0 flex items-center justify-center space-x-3">
-                                            <!-- Background overlay only on desktop hover -->
-                                            <div class="hidden md:block absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg"></div>
-
+                                        <!-- Image Controls - Always visible, no overlay -->
+                                        <div class="absolute inset-0 flex items-center justify-center space-x-3 pointer-events-none">
                                             <button
                                                 wire:click="toggleFeatured({{ $image->id }})"
-                                                class="relative bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg shadow-lg z-20"
+                                                class="pointer-events-auto bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg shadow-lg"
                                                 title="{{ $image->featured ? 'Remove Featured' : 'Set as Featured' }}"
                                             >
                                                 <svg class="w-5 h-5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -267,7 +264,7 @@
 
                                             <button
                                                 wire:click="deleteImage({{ $image->id }})"
-                                                class="relative bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg shadow-lg z-20"
+                                                class="pointer-events-auto bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg shadow-lg"
                                                 onclick="return confirm('Are you sure you want to delete this image?')"
                                             >
                                                 <svg class="w-5 h-5 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
