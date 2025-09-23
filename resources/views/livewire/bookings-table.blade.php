@@ -668,18 +668,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Check if device is mobile/touch-enabled
     const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-    if (isTouchDevice) {
+    console.log('Touch device detected:', isTouchDevice); // Debug log
+
+    function initializeMobileTooltips() {
         // Add touch event listeners to all tooltip triggers
         const tooltipTriggers = document.querySelectorAll('.mobile-tooltip-trigger');
 
-        tooltipTriggers.forEach(trigger => {
+        console.log('Found tooltip triggers:', tooltipTriggers.length); // Debug log
+
+        tooltipTriggers.forEach((trigger, index) => {
             const tooltipId = trigger.getAttribute('data-tooltip-id');
             const tooltip = document.getElementById(tooltipId);
 
+            console.log('Processing trigger', index, 'with tooltip ID:', tooltipId); // Debug log
+
             if (tooltip) {
-                // Touch start - show tooltip
-                trigger.addEventListener('touchstart', function(e) {
-                    e.preventDefault(); // Prevent default touch behavior
+                // Remove any existing event listeners to prevent duplicates
+                trigger.removeEventListener('touchend', trigger._touchHandler);
+
+                // Create touch handler
+                trigger._touchHandler = function(e) {
+                    e.preventDefault(); // Prevent double-tap zoom and other default behaviors
+                    e.stopPropagation(); // Stop event bubbling
+
+                    console.log('Touch detected on trigger:', tooltipId); // Debug log
 
                     // Hide any currently active tooltip
                     if (activeTooltip && activeTooltip !== tooltip) {
@@ -687,30 +699,96 @@ document.addEventListener('DOMContentLoaded', function() {
                         activeTooltip.classList.add('opacity-0');
                     }
 
-                    // Show this tooltip
-                    tooltip.classList.remove('opacity-0');
-                    tooltip.classList.add('opacity-100');
-                    activeTooltip = tooltip;
-                }, { passive: false });
-
-                // Optional: Add tap outside to close functionality
-                document.addEventListener('touchstart', function(e) {
-                    if (activeTooltip && !trigger.contains(e.target) && !activeTooltip.contains(e.target)) {
-                        activeTooltip.classList.remove('opacity-100');
-                        activeTooltip.classList.add('opacity-0');
+                    // Toggle this tooltip
+                    if (activeTooltip === tooltip) {
+                        // Hide if already showing
+                        tooltip.classList.remove('opacity-100');
+                        tooltip.classList.add('opacity-0');
                         activeTooltip = null;
+                    } else {
+                        // Show this tooltip
+                        tooltip.classList.remove('opacity-0');
+                        tooltip.classList.add('opacity-100');
+                        activeTooltip = tooltip;
+                    }
+                };
+
+                // Use touchend instead of touchstart for better mobile UX
+                trigger.addEventListener('touchend', trigger._touchHandler, { passive: false });
+
+                // Also handle regular clicks for desktop
+                trigger.addEventListener('click', function(e) {
+                    if (!isTouchDevice) {
+                        e.preventDefault();
+                        trigger._touchHandler(e);
                     }
                 });
+            } else {
+                console.warn('Tooltip not found for ID:', tooltipId); // Debug warning
+            }
+        });
+
+        // Add tap outside to close functionality
+        document.addEventListener('touchend', function(e) {
+            if (activeTooltip) {
+                let clickedInsideTooltip = false;
+
+                // Check if clicked inside any trigger or tooltip
+                const allTriggers = document.querySelectorAll('.mobile-tooltip-trigger');
+                const allTooltips = document.querySelectorAll('.mobile-tooltip');
+
+                allTriggers.forEach(trigger => {
+                    if (trigger.contains(e.target)) {
+                        clickedInsideTooltip = true;
+                    }
+                });
+
+                allTooltips.forEach(tooltip => {
+                    if (tooltip.contains(e.target)) {
+                        clickedInsideTooltip = true;
+                    }
+                });
+
+                // Hide tooltip if clicked outside
+                if (!clickedInsideTooltip) {
+                    activeTooltip.classList.remove('opacity-100');
+                    activeTooltip.classList.add('opacity-0');
+                    activeTooltip = null;
+                }
             }
         });
     }
 
+    // Initialize on load
+    if (isTouchDevice) {
+        initializeMobileTooltips();
+    }
+
     // Re-initialize when Livewire updates the component
-    window.addEventListener('livewire:load', function () {
-        // Re-run the mobile tooltip setup after Livewire updates
-        setTimeout(() => {
-            document.dispatchEvent(new Event('DOMContentLoaded'));
-        }, 100);
+    document.addEventListener('livewire:navigated', initializeMobileTooltips);
+    document.addEventListener('livewire:load', initializeMobileTooltips);
+
+    // Also reinitialize after any DOM changes (for Livewire updates)
+    const observer = new MutationObserver(function(mutations) {
+        let shouldReinitialize = false;
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1 && (node.classList?.contains('mobile-tooltip-trigger') || node.querySelector?.('.mobile-tooltip-trigger'))) {
+                        shouldReinitialize = true;
+                    }
+                });
+            }
+        });
+
+        if (shouldReinitialize && isTouchDevice) {
+            setTimeout(initializeMobileTooltips, 100);
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
     });
 });
 </script>
