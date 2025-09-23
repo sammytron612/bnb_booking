@@ -123,7 +123,11 @@
                         id="openBookingModal"
                         class="w-full bg-{{ $venue->theme_color }}-600 hover:cursor-pointer hover:bg-{{ $venue->theme_color }}-700 text-white font-bold py-4 px-8 rounded-lg transition-colors text-lg mb-4"
                     >
-                        Check Availability & Book Now
+                        <span class="hidden sm:inline">Check Availability & Book Now</span>
+                        <span class="sm:hidden">
+                            <span class="block">Check Availability</span>
+                            <span class="block">& Book Now</span>
+                        </span>
                     </button>
 
                     <div class="mt-6 text-center">
