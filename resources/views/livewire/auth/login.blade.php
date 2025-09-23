@@ -73,7 +73,7 @@ new #[Layout('components.layouts.auth.custom')] class extends Component {
     }
 }; ?>
 
-<div class="min-h-screen flex">
+<div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
     <!-- Left side - Branding -->
     <div class="flex-1 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 flex items-center justify-center p-12 relative overflow-hidden">
         <!-- Background pattern -->
