@@ -250,7 +250,7 @@
                                             class="w-full h-48 object-cover rounded-lg {{ $image->featured ? 'ring-4 ring-yellow-400' : '' }}"
                                         >
 
-                                        <!-- Image Controls - Mobile: Centered buttons, Desktop: Hover overlay -->
+                                        <!-- Image Controls - Mobile: Centered buttons, Desktop: Always visible centered -->
                                         <!-- Mobile controls (always visible, centered) -->
                                         <div class="md:hidden absolute inset-0 flex items-center justify-center space-x-4">
                                             <button
@@ -274,11 +274,13 @@
                                             </button>
                                         </div>
 
-                                        <!-- Desktop controls (hover overlay) -->
-                                        <div class="hidden md:block absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
+                                        <!-- Desktop controls (always visible, centered with subtle overlay) -->
+                                        <div class="hidden md:flex absolute inset-0 items-center justify-center space-x-3">
+                                            <!-- Subtle background for desktop -->
+                                            <div class="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all rounded-lg"></div>
                                             <button
                                                 wire:click="toggleFeatured({{ $image->id }})"
-                                                class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg text-xs shadow-lg"
+                                                class="relative bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg text-sm shadow-lg z-10"
                                                 title="{{ $image->featured ? 'Remove Featured' : 'Set as Featured' }}"
                                             >
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -288,7 +290,7 @@
 
                                             <button
                                                 wire:click="deleteImage({{ $image->id }})"
-                                                class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg text-xs shadow-lg"
+                                                class="relative bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg text-sm shadow-lg z-10"
                                                 onclick="return confirm('Are you sure you want to delete this image?')"
                                             >
                                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
