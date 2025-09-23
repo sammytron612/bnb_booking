@@ -15,36 +15,48 @@
 
     <!-- 14-Day Calendar -->
     <div class="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100 relative z-[60]">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-3 sm:space-y-0">
             <h3 class="text-lg font-semibold text-gray-900 flex items-center">
                 <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2z"></path>
                 </svg>
-                @if($calendarOffset === 0)
-                    Next 14 Days Overview
-                @elseif($calendarOffset > 0)
-                    Days {{ $calendarOffset + 1 }}-{{ $calendarOffset + 14 }} Overview
-                @else
-                    Days {{ abs($calendarOffset) - 13 }}-{{ abs($calendarOffset) }} Ago
-                @endif
+                <span class="hidden sm:inline">
+                    @if($calendarOffset === 0)
+                        Next 14 Days Overview
+                    @elseif($calendarOffset > 0)
+                        Days {{ $calendarOffset + 1 }}-{{ $calendarOffset + 14 }} Overview
+                    @else
+                        Days {{ abs($calendarOffset) - 13 }}-{{ abs($calendarOffset) }} Ago
+                    @endif
+                </span>
+                <span class="sm:hidden">
+                    @if($calendarOffset === 0)
+                        Next 14 Days
+                    @elseif($calendarOffset > 0)
+                        Days {{ $calendarOffset + 1 }}-{{ $calendarOffset + 14 }}
+                    @else
+                        Days {{ abs($calendarOffset) - 13 }}-{{ abs($calendarOffset) }}
+                    @endif
+                </span>
             </h3>
 
             <!-- Navigation Buttons -->
-            <div class="flex space-x-2">
+            <div class="flex flex-wrap gap-2 justify-center sm:justify-end">
                 <button
                     wire:click="navigateCalendar('prev')"
-                    class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="hover:cursor-pointer inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                     </svg>
-                    Previous
+                    <span class="hidden sm:inline">Previous</span>
+                    <span class="sm:hidden">Prev</span>
                 </button>
 
                 @if($calendarOffset !== 0)
                     <button
                         wire:click="$set('calendarOffset', 0)"
-                        class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-blue-300 shadow-sm text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="hover:cursor-pointer inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 border border-blue-300 shadow-sm text-xs sm:text-sm leading-4 font-medium rounded-md text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         Today
@@ -53,9 +65,10 @@
 
                 <button
                     wire:click="navigateCalendar('next')"
-                    class="hover:cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
-                    Next
-                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="hover:cursor-pointer inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 shadow-sm text-xs sm:text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                    <span class="hidden sm:inline">Next</span>
+                    <span class="sm:hidden">Next</span>
+                    <svg class="w-3 h-3 sm:w-4 sm:h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
                 </button>
