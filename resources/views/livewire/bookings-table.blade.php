@@ -220,7 +220,7 @@
                         @if($day['booking_count'] > 0)
                        <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                  title="{{ $day['booking_count'] }} booking(s)"
-                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">>
+                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
                                 </div>
