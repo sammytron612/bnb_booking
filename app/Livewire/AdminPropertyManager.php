@@ -28,6 +28,7 @@ class AdminPropertyManager extends Component
     public $venuePostcode = '';
     public $venueGuestCapacity = '';
     public $venueInstructions = '';
+    public $venueBookingEnabled = true;
 
     // Image management
     public $newImages = [];
@@ -63,6 +64,7 @@ class AdminPropertyManager extends Component
             $this->venuePostcode = $this->selectedVenue->postcode;
             $this->venueGuestCapacity = $this->selectedVenue->guest_capacity;
             $this->venueInstructions = $this->selectedVenue->instructions;
+            $this->venueBookingEnabled = $this->selectedVenue->booking_enabled;
             $this->existingImages = $this->selectedVenue->propertyImages;
             $this->venueAmenities = $this->selectedVenue->amenities;
         }
@@ -81,6 +83,7 @@ class AdminPropertyManager extends Component
             'venuePostcode' => 'required|string|max:20',
             'venueGuestCapacity' => 'nullable|integer|min:1|max:20',
             'venueInstructions' => 'nullable|string',
+            'venueBookingEnabled' => 'boolean',
         ]);
 
         if ($this->selectedVenue) {
@@ -95,9 +98,27 @@ class AdminPropertyManager extends Component
                 'postcode' => $this->venuePostcode,
                 'guest_capacity' => $this->venueGuestCapacity,
                 'instructions' => $this->venueInstructions,
+                'booking_enabled' => $this->venueBookingEnabled,
             ]);
 
             session()->flash('message', 'Venue updated successfully!');
+            $this->venues = Venue::with('propertyImages')->get();
+        }
+    }
+
+    public function toggleBookingEnabled()
+    {
+        if ($this->selectedVenue) {
+            $this->venueBookingEnabled = !$this->venueBookingEnabled;
+
+            $this->selectedVenue->update([
+                'booking_enabled' => $this->venueBookingEnabled,
+            ]);
+
+            $status = $this->venueBookingEnabled ? 'enabled' : 'disabled';
+            session()->flash('message', "Booking {$status} for {$this->selectedVenue->venue_name}!");
+
+            // Refresh venues list
             $this->venues = Venue::with('propertyImages')->get();
         }
     }

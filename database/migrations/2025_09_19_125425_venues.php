@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('theme_color')->default('blue');
             $table->string('route')->nullable();
             $table->string('badge_text')->nullable();
+            $table->boolean('booking_enabled')->default(true);
         });
     }
 

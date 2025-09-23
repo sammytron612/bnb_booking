@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Booking;
+use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 
@@ -11,6 +12,7 @@ class BookingForm extends Component
 {
     // Public properties for form data
     public $venueId;
+    public $venue;
     public $checkIn = null;
     public $checkOut = null;
     public $guestName = '';
@@ -48,6 +50,7 @@ class BookingForm extends Component
     public function mount($venueId, $pricePerNight)
     {
         $this->venueId = $venueId;
+        $this->venue = Venue::find($venueId);
         $this->pricePerNight = $pricePerNight;
     }
 
@@ -96,6 +99,12 @@ class BookingForm extends Component
 
     public function submitBooking()
     {
+        // Check if booking is enabled for this venue
+        if (!$this->venue || !$this->venue->booking_enabled) {
+            session()->flash('booking_error', 'Sorry, booking is currently disabled for this property.');
+            return;
+        }
+
         $this->validate();
 
         try {

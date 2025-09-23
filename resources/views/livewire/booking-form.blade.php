@@ -33,8 +33,25 @@
 
         <!-- Booking Form (appears when dates are selected) -->
         @if ($this->hasValidDates)
-            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600" wire:transition>
-                <h5 class="font-semibold text-green-800 dark:text-green-200 mb-3">Guest Details</h5>
+            @if($venue && !$venue->booking_enabled)
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-amber-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <h6 class="font-semibold text-amber-800 dark:text-amber-200">Booking Temporarily Unavailable</h6>
+                                <p class="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                                    Online booking is currently disabled for this property. Please contact us directly for availability and reservations.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600" wire:transition>
+                    <h5 class="font-semibold text-green-800 dark:text-green-200 mb-3">Guest Details</h5>
 
                 <form wire:submit="submitBooking" class="space-y-3">
                     <div>
@@ -92,6 +109,7 @@
                     </div>
                 </form>
             </div>
+            @endif
         @endif
 
         <div class="mt-4 space-y-3">
@@ -105,14 +123,26 @@
             </button>
 
             @if ($this->hasValidDates)
-                <button
-                    wire:click="submitBooking"
-                    class="w-full bg-blue-600 hover:cursor-pointer hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
-                    wire:loading.attr="disabled"
-                >
-                    <span wire:loading.remove>Book {{ $nights }} Night{{ $nights !== 1 ? 's' : '' }}</span>
-                    <span wire:loading>Processing...</span>
-                </button>
+                @if($venue && $venue->booking_enabled)
+                    <button
+                        wire:click="submitBooking"
+                        class="w-full bg-blue-600 hover:cursor-pointer hover:bg-blue-700 text-white font-semibold px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
+                        wire:loading.attr="disabled"
+                    >
+                        <span wire:loading.remove>Book {{ $nights }} Night{{ $nights !== 1 ? 's' : '' }}</span>
+                        <span wire:loading>Processing...</span>
+                    </button>
+                @else
+                    <button
+                        class="w-full bg-gray-400 text-white font-semibold px-4 py-3 rounded-lg cursor-not-allowed opacity-50"
+                        disabled
+                    >
+                        <svg class="w-5 h-5 inline-block mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        Booking Temporarily Unavailable
+                    </button>
+                @endif
             @else
                 <button
                     class="w-full bg-gray-400 text-white font-semibold px-4 py-3 rounded-lg cursor-not-allowed opacity-50"

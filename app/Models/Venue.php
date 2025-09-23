@@ -28,6 +28,7 @@ class Venue extends Model
         'theme_color',
         'route',
         'badge_text',
+        'booking_enabled',
     ];
 
     /**

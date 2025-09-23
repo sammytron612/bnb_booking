@@ -45,8 +45,22 @@
                                         £{{ $venue->price }}/night
                                     </p>
                                 </div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $venue->propertyImages->count() }} images
+                                <div class="text-right">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                        {{ $venue->propertyImages->count() }} images
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $venue->booking_enabled ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }}">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                @if($venue->booking_enabled)
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                @else
+                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                @endif
+                                            </svg>
+                                            {{ $venue->booking_enabled ? 'Enabled' : 'Disabled' }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </button>
@@ -194,6 +208,33 @@
                                 placeholder="Enter special instructions for guests (WiFi password, parking info, house rules, etc.)"
                             ></textarea>
                             @error('venueInstructions') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <!-- Booking Enabled Toggle -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Booking Status
+                                    </label>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                                        Enable or disable bookings for this property
+                                    </p>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-sm {{ $venueBookingEnabled ? 'text-green-600 font-medium' : 'text-gray-500' }}">
+                                        {{ $venueBookingEnabled ? 'Enabled' : 'Disabled' }}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        wire:click="toggleBookingEnabled"
+                                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 {{ $venueBookingEnabled ? 'bg-green-600 focus:ring-green-600' : 'bg-red-500 focus:ring-red-500' }}"
+                                    >
+                                        <span class="sr-only">Toggle booking status</span>
+                                        <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $venueBookingEnabled ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-6">
