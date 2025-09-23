@@ -75,8 +75,9 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
-                                 title="{{ $day['booking_count'] }} booking(s)">
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
+                                 data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
                                 </div>
@@ -99,7 +100,7 @@
                                 @endif
 
                                 <!-- Enhanced tooltip with booking details (First week: below card, above second week) -->
-                                <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                <div id="tooltip-week1-{{ $loop->index }}" class="mobile-tooltip absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
@@ -148,8 +149,9 @@
                         @else
                             @if($day['check_out_count'] > 0)
                                 <!-- Show checkout card when no bookings but checkouts exist -->
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
-                                     title="{{ $day['check_out_count'] }} checkout(s)">
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                     title="{{ $day['check_out_count'] }} checkout(s)"
+                                     data-tooltip-id="checkout-tooltip-week1-{{ $loop->index }}">
                                     <div class="text-white text-xs font-bold">
                                         {{ $day['check_out_count'] }}
                                     </div>
@@ -163,7 +165,7 @@
                                     </div>
 
                                     <!-- Enhanced tooltip with checkout details (First week: below card) -->
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                    <div id="checkout-tooltip-week1-{{ $loop->index }}" class="mobile-tooltip absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                         <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                             {{ $day['date']->format('l, F j, Y') }}
                                         </div>
@@ -214,8 +216,9 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
-                                 title="{{ $day['booking_count'] }} booking(s)">
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
+                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">>
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
                                 </div>
@@ -238,7 +241,7 @@
                                 @endif
 
                                 <!-- Enhanced tooltip with booking details -->
-                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                <div id="tooltip-week2-{{ $loop->index }}" class="mobile-tooltip absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
@@ -287,8 +290,9 @@
                         @else
                             @if($day['check_out_count'] > 0)
                                 <!-- Show checkout card when no bookings but checkouts exist -->
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105"
-                                     title="{{ $day['check_out_count'] }} checkout(s)">
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                     title="{{ $day['check_out_count'] }} checkout(s)"
+                                     data-tooltip-id="checkout-tooltip-week2-{{ $loop->index }}">
                                     <div class="text-white text-xs font-bold">
                                         {{ $day['check_out_count'] }}
                                     </div>
@@ -302,7 +306,7 @@
                                     </div>
 
                                     <!-- Enhanced tooltip with checkout details (Second week: above card) -->
-                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
+                                    <div id="checkout-tooltip-week2-{{ $loop->index }}" class="mobile-tooltip absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 bg-gray-900 text-white text-xs rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-all duration-300 z-[120] pointer-events-none shadow-xl">
                                         <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                             {{ $day['date']->format('l, F j, Y') }}
                                         </div>
@@ -655,3 +659,58 @@
         </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mobile tooltip functionality
+    let activeTooltip = null;
+
+    // Check if device is mobile/touch-enabled
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+    if (isTouchDevice) {
+        // Add touch event listeners to all tooltip triggers
+        const tooltipTriggers = document.querySelectorAll('.mobile-tooltip-trigger');
+
+        tooltipTriggers.forEach(trigger => {
+            const tooltipId = trigger.getAttribute('data-tooltip-id');
+            const tooltip = document.getElementById(tooltipId);
+
+            if (tooltip) {
+                // Touch start - show tooltip
+                trigger.addEventListener('touchstart', function(e) {
+                    e.preventDefault(); // Prevent default touch behavior
+
+                    // Hide any currently active tooltip
+                    if (activeTooltip && activeTooltip !== tooltip) {
+                        activeTooltip.classList.remove('opacity-100');
+                        activeTooltip.classList.add('opacity-0');
+                    }
+
+                    // Show this tooltip
+                    tooltip.classList.remove('opacity-0');
+                    tooltip.classList.add('opacity-100');
+                    activeTooltip = tooltip;
+                }, { passive: false });
+
+                // Optional: Add tap outside to close functionality
+                document.addEventListener('touchstart', function(e) {
+                    if (activeTooltip && !trigger.contains(e.target) && !activeTooltip.contains(e.target)) {
+                        activeTooltip.classList.remove('opacity-100');
+                        activeTooltip.classList.add('opacity-0');
+                        activeTooltip = null;
+                    }
+                });
+            }
+        });
+    }
+
+    // Re-initialize when Livewire updates the component
+    window.addEventListener('livewire:load', function () {
+        // Re-run the mobile tooltip setup after Livewire updates
+        setTimeout(() => {
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+        }, 100);
+    });
+});
+</script>
