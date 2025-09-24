@@ -32,7 +32,7 @@ class SendReviewLinkEmails implements ShouldQueue
     {
         // Get bookings that checked out within the last 24 hours, don't have reviews, and haven't been sent review links
         $bookings = Booking::with('venue')
-            ->where('check_out', '<', now()->addHours(24))
+            ->where('check_out', '<=', now()->subDay())
             ->whereDoesntHave('reviews')
             ->whereNull('review_link')
             ->get();
