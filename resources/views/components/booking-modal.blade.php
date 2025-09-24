@@ -52,7 +52,7 @@
                             <div id="daysGrid" class="grid grid-cols-7 gap-px bg-gray-200 dark:bg-gray-600"></div>
                         </div>
                         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                            Select the nights you want to stay. Minimum stay: 2 nights. Unavailable nights are disabled.
+                            Select the nights you want to stay. Minimum stay: <span class="font-semibold">2 nights</span>. Unavailable nights are disabled.
                         </p>
 
                         <!-- Clear Selection Button -->

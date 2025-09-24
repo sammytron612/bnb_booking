@@ -30,15 +30,7 @@ Route::get('/venue/{route}', function ($route) {
     return view('venue', compact('venue', 'reviews'));
 })->name('venue.show');
 
-// Backward compatibility routes - redirect to dynamic route
-/*Route::get('/light-house', function () {
-    return redirect()->route('venue.show', ['route' => 'light-house']);
-})->name('light-house');
 
-Route::get('/saras', function () {
-    return redirect()->route('venue.show', ['route' => 'saras']);
-})->name('saras');
-*/
 // Booking routes - Protected with authentication for admin access
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::middleware(['auth'])->group(function () {
@@ -48,6 +40,57 @@ Route::middleware(['auth'])->group(function () {
 });
 // Public API for calendar dates (no sensitive data)
 Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
+
+// iCal API routes
+Route::get('/api/ical/venue/{venueId}/calendars', [App\Http\Controllers\IcalController::class, 'getVenueCalendars'])->name('ical.venue.calendars');
+Route::get('/api/ical/fetch', [App\Http\Controllers\IcalController::class, 'fetchIcalData'])->name('ical.fetch');
+Route::get('/api/ical/combined', [App\Http\Controllers\IcalController::class, 'getCombinedBookingData'])->name('ical.combined');
+
+// iCal export route for external calendar sync (Airbnb, Booking.com, etc.)
+Route::get('/api/ical/export/{venue_id}', [App\Http\Controllers\IcalController::class, 'exportVenueCalendar'])
+    ->name('ical.export')
+    ->where('venue_id', '[0-9]+');
+
+// Sitemap routes
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-main.xml', [App\Http\Controllers\SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-venues.xml', [App\Http\Controllers\SitemapController::class, 'venues'])->name('sitemap.venues');
+
+// Test route for debugging iCal integration
+Route::get('/test/ical/{venueId?}', function($venueId = 1) {
+    $controller = new App\Http\Controllers\IcalController();
+    $bookingController = new App\Http\Controllers\BookingController();
+
+    echo "<h1>Calendar Integration Debug - Venue $venueId</h1>";
+
+    echo "<h2>1. Database Bookings (existing API):</h2>";
+    $dbRequest = new Illuminate\Http\Request(['venue_id' => $venueId]);
+    $dbResponse = json_decode($bookingController->getBookedDates($dbRequest)->getContent(), true);
+    echo "<pre>" . json_encode($dbResponse, JSON_PRETTY_PRINT) . "</pre>";
+
+    echo "<h2>2. iCal Calendars Available:</h2>";
+    echo "<pre>" . json_encode(json_decode($controller->getVenueCalendars($venueId)->getContent()), JSON_PRETTY_PRINT) . "</pre>";
+
+    echo "<h2>3. iCal Data Only:</h2>";
+    $request = new Illuminate\Http\Request(['venue_id' => $venueId]);
+    $icalResponse = json_decode($controller->fetchIcalData($request)->getContent(), true);
+    echo "<pre>" . json_encode($icalResponse, JSON_PRETTY_PRINT) . "</pre>";
+
+    echo "<h2>4. Combined Data:</h2>";
+    $combinedResponse = json_decode($controller->getCombinedBookingData($request)->getContent(), true);
+    echo "<pre>" . json_encode($combinedResponse, JSON_PRETTY_PRINT) . "</pre>";
+
+    echo "<h2>5. What Frontend Should Receive:</h2>";
+    echo "<strong>Check-in dates (orange):</strong> " . implode(', ', $dbResponse['checkInDates'] ?? []) . "<br>";
+    echo "<strong>Check-out dates (green):</strong> " . implode(', ', $dbResponse['checkOutDates'] ?? []) . "<br>";
+    echo "<strong>Fully booked from DB (gray):</strong> " . implode(', ', $dbResponse['fullyBookedDates'] ?? []) . "<br>";
+    echo "<strong>Additional iCal blocked (gray):</strong> " . implode(', ', array_diff($icalResponse['booked_dates'] ?? [], $dbResponse['bookedDates'] ?? [])) . "<br>";
+
+    echo "<h2>6. All Dates That Should Be Grayed Out:</h2>";
+    $allGrayDates = array_unique(array_merge($dbResponse['fullyBookedDates'] ?? [], $icalResponse['booked_dates'] ?? []));
+    sort($allGrayDates);
+    echo "<strong>Gray dates:</strong> " . implode(', ', $allGrayDates) . "<br>";
+});
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])

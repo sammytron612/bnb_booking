@@ -46,8 +46,8 @@
     // Business information
     $businessInfo = [
         'name' => $siteName,
-        'phone' => '+44 1234 567890', // Update with real phone
-        'email' => 'info@seahamcoastalretreats.com', // Update with real email
+        'phone' => env('OWNER_PHONE_NO', '+44 1234 567890'),
+        'email' => env('OWNER_EMAIL', env('MAIL_FROM_ADDRESS', 'info@seahamcoastalretreats.com')),
         'address' => [
             'street' => 'Seaham',
             'city' => 'Seaham',

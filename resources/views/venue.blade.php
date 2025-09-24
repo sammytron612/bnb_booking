@@ -1,15 +1,150 @@
 @php
     $featuredImage = $venue->propertyImages->where('featured', true)->first();
+
+    // Dynamic location from venue address
+    $location = trim($venue->address2 . ' ' . $venue->postcode) ?: 'Seaham';
+    $locationArea = $venue->address2 ?: 'Seaham';
+
+    // Calculate average rating
+    $avgRating = $reviews && $reviews->count() > 0 ? round($reviews->avg('rating'), 1) : null;
+
+    // Generate dynamic keywords
+    $dynamicKeywords = [
+        strtolower($locationArea) . ' holiday rental',
+        strtolower($venue->venue_name),
+        'luxury accommodation',
+        'vacation rental',
+        strtolower($locationArea) . ' apartment',
+        'coastal holiday',
+        'seaside rental',
+        'North East England',
+        'Durham coast',
+        'self-catering',
+        'short breaks',
+        'business travel',
+        'Seaglass',
+        'Sea Glass',
+    ];
+
+    // Add amenity-based keywords
+    if ($venue->amenities) {
+        foreach ($venue->amenities as $amenity) {
+            if (stripos($amenity->name, 'pet') !== false) $dynamicKeywords[] = 'pet-friendly rental';
+            if (stripos($amenity->name, 'wifi') !== false) $dynamicKeywords[] = 'wifi accommodation';
+            if (stripos($amenity->name, 'parking') !== false) $dynamicKeywords[] = 'parking included';
+            if (stripos($amenity->name, 'kitchen') !== false) $dynamicKeywords[] = 'self-catering';
+        }
+    }
+
     $seoData = [
-        'title' => $venue->venue_name . ' - Luxury Holiday Rental in Seaham',
-        'description' => $venue->description2 ?? $venue->description1,
-        'keywords' => 'Seaham holiday rental, ' . $venue->venue_name . ', coastal accommodation, seaside holiday, luxury apartment, Durham coast, sea views, vacation rental',
+        'title' => $venue->venue_name . ' - Luxury Holiday Rental in ' . $locationArea,
+        'description' => ($venue->description2 ?? $venue->description1 ?? 'Luxury holiday rental accommodation with modern amenities and stunning views.') . ' Located in ' . $locationArea . ', perfect for holidays, business trips and short breaks.',
+        'keywords' => implode(', ', array_unique($dynamicKeywords)),
         'type' => 'website',
-        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : null,
-        'imageAlt' => $venue->venue_name . ' - Holiday Rental in Seaham',
+        'url' => request()->url(),
+        'canonical' => route('venue.show', $venue->route),
+        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : asset('images/default-property.jpg'),
+        'imageAlt' => $venue->venue_name . ' - Holiday Rental in ' . $locationArea,
+        'imageWidth' => '1200',
+        'imageHeight' => '630',
         'venue' => $venue,
         'reviews' => $reviews ?? collect(),
         'price' => $venue->price,
+        'address' => trim($venue->address1 . ', ' . $venue->address2 . ', ' . $venue->postcode),
+        'location' => $locationArea,
+        'coordinates' => [
+            'latitude' => $venue->latitude ?? null,
+            'longitude' => $venue->longitude ?? null
+        ],
+        'rating' => $avgRating,
+        'reviewCount' => $reviews ? $reviews->count() : 0,
+        // Structured data for Google Rich Snippets
+        'structuredData' => [
+            '@context' => 'https://schema.org',
+            '@type' => 'LodgingBusiness',
+            'name' => $venue->venue_name,
+            'description' => $venue->description2 ?? $venue->description1,
+            'image' => $featuredImage ? [asset(ltrim($featuredImage->location, '/'))] : [],
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $venue->address1,
+                'addressLocality' => $venue->address2,
+                'postalCode' => $venue->postcode,
+                'addressRegion' => 'Durham',
+                'addressCountry' => 'GB'
+            ],
+            'geo' => $venue->latitude && $venue->longitude ? [
+                '@type' => 'GeoCoordinates',
+                'latitude' => $venue->latitude,
+                'longitude' => $venue->longitude
+            ] : null,
+            'priceRange' => '£' . $venue->price,
+            'currenciesAccepted' => 'GBP',
+            'paymentAccepted' => 'Cash, Credit Card, Bank Transfer',
+            'url' => route('venue.show', $venue->route),
+            'telephone' => env('OWNER_PHONE_NO', '+44 191 123 4567'),
+            'email' => env('OWNER_EMAIL', env('MAIL_FROM_ADDRESS', 'info@eileen-bnb.co.uk')),
+            'checkinTime' => '15:00',
+            'checkoutTime' => '11:00',
+            'petsAllowed' => $venue->amenities && $venue->amenities->contains('name', 'LIKE', '%pet%') ? 'true' : 'false',
+            'smokingAllowed' => 'false',
+            'aggregateRating' => $avgRating ? [
+                '@type' => 'AggregateRating',
+                'ratingValue' => $avgRating,
+                'reviewCount' => $reviews->count(),
+                'bestRating' => '5',
+                'worstRating' => '1'
+            ] : null,
+            'review' => $reviews && $reviews->count() > 0 ? $reviews->take(5)->map(function($review) {
+                return [
+                    '@type' => 'Review',
+                    'author' => [
+                        '@type' => 'Person',
+                        'name' => $review->reviewer_name ?? 'Anonymous'
+                    ],
+                    'reviewRating' => [
+                        '@type' => 'Rating',
+                        'ratingValue' => $review->rating,
+                        'bestRating' => '5',
+                        'worstRating' => '1'
+                    ],
+                    'reviewBody' => $review->comment,
+                    'datePublished' => $review->created_at->toISOString()
+                ];
+            })->values()->toArray() : null,
+            'amenityFeature' => $venue->amenities ? $venue->amenities->map(function($amenity) {
+                return [
+                    '@type' => 'LocationFeatureSpecification',
+                    'name' => $amenity->name,
+                    'value' => true
+                ];
+            })->values()->toArray() : null,
+        ],
+        // Breadcrumb structured data
+        'breadcrumbData' => [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                [
+                    '@type' => 'ListItem',
+                    'position' => 1,
+                    'name' => 'Home',
+                    'item' => route('home')
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 2,
+                    'name' => 'Properties',
+                    'item' => route('home') . '#properties'
+                ],
+                [
+                    '@type' => 'ListItem',
+                    'position' => 3,
+                    'name' => $venue->venue_name,
+                    'item' => route('venue.show', $venue->route)
+                ]
+            ]
+        ]
     ];
 @endphp
 

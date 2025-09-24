@@ -89,18 +89,20 @@
 
                     <!-- Booking indicator -->
                     <div class="relative">
-                        @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
+                        @if($day['booking_count'] > 0 || $day['ical_count'] > 0)
+                            <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] + $day['ical_count'] }} booking(s)"
                                  data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
-                                    {{ $day['booking_count'] }}
+                                    {{ $day['booking_count'] + $day['ical_count'] }}
                                 </div>
                                 <div class="text-blue-100 text-xs">
-                                    {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
-                                </div>
-
-                                <!-- Check-in indicator -->
+                                    @php $totalCount = $day['booking_count'] + $day['ical_count']; @endphp
+                                    {{ $totalCount === 1 ? 'booking' : 'bookings' }}
+                                    @if($day['ical_count'] > 0)
+                                        <div class="text-orange-200 text-xs">{{ $day['ical_count'] }} ext.</div>
+                                    @endif
+                                </div>                                <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
                                     <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
@@ -155,6 +157,45 @@
                                             </div>
                                         </div>
                                     @endforeach
+
+                                    {{-- iCal External Bookings --}}
+                                    @foreach($day['ical_bookings'] as $icalBooking)
+                                        <div class="mb-2 p-2 bg-gradient-to-r from-orange-800 to-orange-900 rounded border-l-2 border-orange-400">
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex-1">
+                                                    <div class="font-medium text-white flex items-center">
+                                                        @if($icalBooking['source'] === 'airbnb')
+                                                            <svg class="w-3 h-3 mr-1 text-red-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
+                                                                <path d="M12 6.5c-1.381 0-2.5 1.119-2.5 2.5S10.619 11.5 12 11.5s2.5-1.119 2.5-2.5S13.381 6.5 12 6.5z"/>
+                                                                <path d="M7.5 14.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5v1c0 1.381-1.119 2.5-2.5 2.5h-4c-1.381 0-2.5-1.119-2.5-2.5v-1z"/>
+                                                            </svg>
+                                                            Airbnb Booking
+                                                        @elseif($icalBooking['source'] === 'booking')
+                                                            <svg class="w-3 h-3 mr-1 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M23.998 12c0 6.628-5.372 12-11.999 12C5.372 24 0 18.628 0 12S5.372 0 12 0c6.627 0 11.998 5.372 11.998 12zM12 2.016c-5.522 0-9.984 4.462-9.984 9.984s4.462 9.984 9.984 9.984 9.984-4.462 9.984-9.984S17.522 2.016 12 2.016z"/>
+                                                            </svg>
+                                                            Booking.com Booking
+                                                        @else
+                                                            <svg class="w-3 h-3 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                                            </svg>
+                                                            {{ ucfirst($icalBooking['source']) }} Booking
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-orange-200 text-xs">{{ $icalBooking['venue']->venue_name ?? 'External Calendar' }}</div>
+                                                </div>
+                                                <div class="font-mono text-xs text-orange-300">EXT</div>
+                                            </div>
+                                            <div class="text-orange-300 text-xs mt-1">
+                                                External calendar booking
+                                            </div>
+                                            <div class="text-orange-400 text-xs mt-1 font-medium">
+                                                No pricing data
+                                            </div>
+                                        </div>
+                                    @endforeach
+
                                     <!-- Arrow pointing up (connects to card above) -->
                                     <div class="absolute -top-1 left-1/2 transform -translate-x-1/2">
                                         <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -230,18 +271,20 @@
 
                     <!-- Booking indicator -->
                     <div class="relative">
-                        @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
+                        @if($day['booking_count'] > 0 || $day['ical_count'] > 0)
+                            <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] + $day['ical_count'] }} booking(s)"
                                  data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
-                                    {{ $day['booking_count'] }}
+                                    {{ $day['booking_count'] + $day['ical_count'] }}
                                 </div>
                                 <div class="text-blue-100 text-xs">
-                                    {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
-                                </div>
-
-                                <!-- Check-in indicator -->
+                                    @php $totalCount = $day['booking_count'] + $day['ical_count']; @endphp
+                                    {{ $totalCount === 1 ? 'booking' : 'bookings' }}
+                                    @if($day['ical_count'] > 0)
+                                        <div class="text-orange-200 text-xs">{{ $day['ical_count'] }} ext.</div>
+                                    @endif
+                                </div>                                <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
                                     <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
@@ -296,6 +339,45 @@
                                             </div>
                                         </div>
                                     @endforeach
+
+                                    {{-- iCal External Bookings --}}
+                                    @foreach($day['ical_bookings'] as $icalBooking)
+                                        <div class="mb-2 p-2 bg-gradient-to-r from-orange-800 to-orange-900 rounded border-l-2 border-orange-400">
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex-1">
+                                                    <div class="font-medium text-white flex items-center">
+                                                        @if($icalBooking['source'] === 'airbnb')
+                                                            <svg class="w-3 h-3 mr-1 text-red-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
+                                                                <path d="M12 6.5c-1.381 0-2.5 1.119-2.5 2.5S10.619 11.5 12 11.5s2.5-1.119 2.5-2.5S13.381 6.5 12 6.5z"/>
+                                                                <path d="M7.5 14.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5v1c0 1.381-1.119 2.5-2.5 2.5h-4c-1.381 0-2.5-1.119-2.5-2.5v-1z"/>
+                                                            </svg>
+                                                            Airbnb Booking
+                                                        @elseif($icalBooking['source'] === 'booking')
+                                                            <svg class="w-3 h-3 mr-1 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M23.998 12c0 6.628-5.372 12-11.999 12C5.372 24 0 18.628 0 12S5.372 0 12 0c6.627 0 11.998 5.372 11.998 12zM12 2.016c-5.522 0-9.984 4.462-9.984 9.984s4.462 9.984 9.984 9.984 9.984-4.462 9.984-9.984S17.522 2.016 12 2.016z"/>
+                                                            </svg>
+                                                            Booking.com Booking
+                                                        @else
+                                                            <svg class="w-3 h-3 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                                                            </svg>
+                                                            {{ ucfirst($icalBooking['source']) }} Booking
+                                                        @endif
+                                                    </div>
+                                                    <div class="text-orange-200 text-xs">{{ $icalBooking['venue']->venue_name ?? 'External Calendar' }}</div>
+                                                </div>
+                                                <div class="font-mono text-xs text-orange-300">EXT</div>
+                                            </div>
+                                            <div class="text-orange-300 text-xs mt-1">
+                                                External calendar booking
+                                            </div>
+                                            <div class="text-orange-400 text-xs mt-1 font-medium">
+                                                No pricing data
+                                            </div>
+                                        </div>
+                                    @endforeach
+
                                     <!-- Arrow pointing down -->
                                     <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                                         <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>

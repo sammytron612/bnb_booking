@@ -13,7 +13,7 @@ Allow: /venue/
 Allow: /storage/
 
 # Sitemap location
-Sitemap: https://yourdomain.com/sitemap.xml
+Sitemap: http://eileen_bnb.test/sitemap.xml
 
 # Crawl-delay to be respectful
 Crawl-delay: 1
