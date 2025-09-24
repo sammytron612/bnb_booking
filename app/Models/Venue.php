@@ -29,6 +29,8 @@ class Venue extends Model
         'route',
         'badge_text',
         'booking_enabled',
+        'latitude',
+        'longitude',
     ];
 
     /**

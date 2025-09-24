@@ -27,6 +27,8 @@ return new class extends Migration
             $table->string('route')->nullable();
             $table->string('badge_text')->nullable();
             $table->boolean('booking_enabled')->default(true);
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
         });
     }
 
