@@ -137,8 +137,8 @@
             ],
             'geo' => [
                 '@type' => 'GeoCoordinates',
-                'latitude' => 54.8386, // Seaham coordinates
-                'longitude' => -1.3429
+                'latitude' => $seoVenue->latitude ?? 54.8386, // Venue coordinates or Seaham fallback
+                'longitude' => $seoVenue->longitude ?? -1.3429
             ],
             'priceRange' => '££',
             'amenityFeature' => []
@@ -219,8 +219,8 @@
 
 @if($seoVenue)
 <meta property="og:type" content="website">
-<meta property="place:location:latitude" content="54.8386">
-<meta property="place:location:longitude" content="-1.3429">
+<meta property="place:location:latitude" content="{{ $seoVenue->latitude ?? 54.8386 }}">
+<meta property="place:location:longitude" content="{{ $seoVenue->longitude ?? -1.3429 }}">
 @endif
 
 <!-- Twitter Card Meta Tags -->
