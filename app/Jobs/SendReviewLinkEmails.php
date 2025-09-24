@@ -30,9 +30,10 @@ class SendReviewLinkEmails implements ShouldQueue
      */
     public function handle(): void
     {
-        // Get bookings that checked out within the last 24 hours, don't have reviews, and haven't been sent review links
+        // Get bookings that checked out 1+ days ago (but not too old), don't have reviews, and haven't been sent review links
         $bookings = Booking::with('venue')
-            ->where('check_out', '<=', now()->subDay())
+            ->where('check_out', '>=', now()->subDays(30)) // Don't send to very old bookings
+            ->where('check_out', '<=', now()->subDay())     // Must be at least 1 day after checkout
             ->whereDoesntHave('reviews')
             ->whereNull('review_link')
             ->get();
