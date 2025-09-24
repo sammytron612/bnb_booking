@@ -22,4 +22,4 @@ Artisan::command('test:reviews', function () {
 
 // Schedule the email jobs to run daily
 Schedule::job(new SendCheckinReminders())->dailyAt('09:00')->name('send-checkin-reminders');
-Schedule::job(new SendReviewLinkEmails())->dailyAt('10:00')->name('send-review-link-emails');
+Schedule::job(new SendReviewLinkEmails())->dailyAt('09:00')->name('send-review-link-emails');
