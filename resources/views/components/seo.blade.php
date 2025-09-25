@@ -163,7 +163,7 @@
                 'availability' => 'https://schema.org/InStock'
             ];
         }
-
+        dd($seoReviews);
         // Add reviews if available
         if ($seoReviews && $seoReviews->count() > 0) {
             $venueSchema['aggregateRating'] = [
