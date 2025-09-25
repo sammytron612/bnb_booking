@@ -5,7 +5,7 @@
     ['/storage/coast.webp', 'Coast'],
     ['/storage/seaglass.jpg', 'Seaglass']
   ],
-  'interval' => 2000,
+  'interval' => 2500,
   // display mode: cover (crop to fill) or contain (letterbox)
   'mode' => 'cover',
   // height utility (Tailwind) e.g. h-[70vh] or h-screen
