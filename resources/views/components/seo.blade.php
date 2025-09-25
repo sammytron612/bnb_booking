@@ -136,10 +136,14 @@
                 'postalCode' => $seoVenue->postcode ?? 'SR7',
                 'addressCountry' => 'United Kingdom'
             ],
-            'geo' => [
+            'geo' => $seoVenue->latitude && $seoVenue->longitude ? [
                 '@type' => 'GeoCoordinates',
-                'latitude' => $seoVenue->latitude ?? 54.8386, // Venue coordinates or Seaham fallback
-                'longitude' => $seoVenue->longitude ?? -1.3429
+                'latitude' => (float)$seoVenue->latitude,
+                'longitude' => (float)$seoVenue->longitude
+            ] : [
+                '@type' => 'GeoCoordinates',
+                'latitude' => 54.8386, // Seaham fallback
+                'longitude' => -1.3429
             ],
             'priceRange' => '££',
             'amenityFeature' => []
@@ -148,10 +152,13 @@
         // Add amenities to schema
         if ($seoVenue->amenities) {
             foreach ($seoVenue->amenities as $amenity) {
-                $venueSchema['amenityFeature'][] = [
-                    '@type' => 'LocationFeatureSpecification',
-                    'name' => $amenity->title
-                ];
+                // Skip amenities without proper names
+                if (!empty($amenity->name) || !empty($amenity->title)) {
+                    $venueSchema['amenityFeature'][] = [
+                        '@type' => 'LocationFeatureSpecification',
+                        'name' => $amenity->title ?? "Amenity"
+                    ];
+                }
             }
         }
 
@@ -178,8 +185,8 @@
 
             $reviewSchemas = [];
             foreach ($seoReviews->take(5) as $review) {
-                // Skip null reviews
-                if (!$review || !$review->rating || !$review->review) {
+                // Skip null reviews or reviews with empty content
+                if (!$review || !$review->rating || empty($review->review) || trim($review->review) === '') {
                     continue;
                 }
 
