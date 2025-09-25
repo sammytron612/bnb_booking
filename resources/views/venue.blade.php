@@ -1,4 +1,7 @@
 @php
+    // Safely initialize reviews variable if not passed from controller
+    $reviews = $reviews ?? collect();
+
     $featuredImage = $venue->propertyImages->where('featured', true)->first();
 
     // Dynamic location from venue address
@@ -48,7 +51,7 @@
         'imageWidth' => '1200',
         'imageHeight' => '630',
         'venue' => $venue,
-        'reviews' => "",
+        'reviews' => $reviews ?? collect(),
         'price' => $venue->price,
         'address' => trim($venue->address1 . ', ' . $venue->address2 . ', ' . $venue->postcode),
         'location' => $locationArea,
