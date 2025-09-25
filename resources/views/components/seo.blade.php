@@ -166,13 +166,6 @@
         }
 
         // Add reviews if available
-        // Debug: Check what we're working with
-        dd([
-            'seoReviews_exists' => isset($seoReviews),
-            'seoReviews_count' => $seoReviews ? $seoReviews->count() : 0,
-            'seoReviews_type' => gettype($seoReviews),
-            'first_review' => $seoReviews && $seoReviews->count() > 0 ? $seoReviews->first() : null
-        ]);
 
         if ($seoReviews && $seoReviews->count() > 0) {
             $venueSchema['aggregateRating'] = [
