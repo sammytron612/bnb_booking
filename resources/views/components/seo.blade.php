@@ -27,7 +27,7 @@
     $seoVenue = $venue;
     $seoReviews = $reviews;
     $seoPrice = $price;
-
+dd($seoReviews);
 
     // Debug: Check if description is being passed
     // \Log::info('SEO Debug: $description = ' . ($description ?? 'NULL'));
