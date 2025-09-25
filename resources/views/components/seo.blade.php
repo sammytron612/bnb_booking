@@ -176,11 +176,16 @@
 
             $reviewSchemas = [];
             foreach ($seoReviews->take(5) as $review) {
+                // Skip null reviews
+                if (!$review || !$review->rating || !$review->review) {
+                    continue;
+                }
+
                 $reviewSchemas[] = [
                     '@type' => 'Review',
                     'author' => [
                         '@type' => 'Person',
-                        'name' => $review->name ?? $review->guest_name ?? 'Guest'
+                        'name' => $review->name ?? 'Guest'
                     ],
                     'reviewRating' => [
                         '@type' => 'Rating',
@@ -188,11 +193,13 @@
                         'bestRating' => '5',
                         'worstRating' => '1'
                     ],
-                    'reviewBody' => $review->review ?? $review->comment ?? '',
+                    'reviewBody' => $review->review,
                     'datePublished' => $review->created_at ? $review->created_at->toISOString() : null
                 ];
+            }            // Only add reviews if we have valid ones
+            if (!empty($reviewSchemas)) {
+                $venueSchema['review'] = $reviewSchemas;
             }
-            $venueSchema['review'] = $reviewSchemas;
         }
 
         $structuredData[] = $venueSchema;
