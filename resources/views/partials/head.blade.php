@@ -25,13 +25,7 @@
         :breadcrumb-data="$seoData['breadcrumbData'] ?? null"
     />
 
-    <!-- Enhanced Structured Data -->
-    @if(isset($seoData['structuredData']))
-    <script type="application/ld+json">
-    {!! json_encode($seoData['structuredData'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
-    </script>
-    @endif
-
+    <!-- Breadcrumb Structured Data (only) -->
     @if(isset($seoData['breadcrumbData']))
     <script type="application/ld+json">
     {!! json_encode($seoData['breadcrumbData'], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
