@@ -46,8 +46,8 @@
     // Business information
     $businessInfo = [
         'name' => $siteName,
-        'phone' => env('OWNER_PHONE_NO', '+44 1234 567890'),
-        'email' => env('OWNER_EMAIL', env('MAIL_FROM_ADDRESS', 'info@seahamcoastalretreats.com')),
+        'phone' => config('contact.phone', config('contact.phone_fallback', '+44 191 123 4567')),
+        'email' => config('contact.email', config('contact.email_fallback', 'info@seahamcoastalretreats.com')),
         'address' => [
             'street' => 'Seaham',
             'city' => 'Seaham',
