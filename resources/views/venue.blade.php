@@ -48,7 +48,7 @@
         'imageWidth' => '1200',
         'imageHeight' => '630',
         'venue' => $venue,
-        'reviews' => $reviews ?? collect(),
+        'reviews' => "",
         'price' => $venue->price,
         'address' => trim($venue->address1 . ', ' . $venue->address2 . ', ' . $venue->postcode),
         'location' => $locationArea,
