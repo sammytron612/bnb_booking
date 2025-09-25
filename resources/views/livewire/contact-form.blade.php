@@ -68,7 +68,7 @@
         </div>
     </div>
     <div class="text-center">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 horver:cursor-pointer disabled:bg-blue-400 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-lg hover:shadow-xl" wire:loading.attr="disabled">
+        <button type="submit" class="hover:cursor-pointer bg-blue-600 hover:bg-blue-700 horver:cursor-pointer disabled:bg-blue-400 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-lg hover:shadow-xl" wire:loading.attr="disabled">
             <span wire:loading.remove>Send Message</span>
             <span wire:loading>Sending...</span>
         </button>
