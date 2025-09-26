@@ -226,7 +226,7 @@
                         <div class="bg-slate-100 dark:bg-slate-600 rounded-lg p-4">
                             <p class="text-slate-700 dark:text-slate-200"><strong>{{ config('app.name') }}</strong></p>
                             <p class="text-slate-600 dark:text-slate-300">Email: {{ config('mail.from.address') }}</p>
-                            <p class="text-slate-600 dark:text-slate-300">Phone: {{ env('OWNER_PHONE_NO') }}</p>
+                            <p class="text-slate-600 dark:text-slate-300">Phone: {{ config('app.owner_phone_no') }}</p>
                         </div>
                     </section>
 
