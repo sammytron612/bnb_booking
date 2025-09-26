@@ -20,7 +20,6 @@ class BookingForm extends Component
     public $guestPhone = '';
     public $nights = 0;
     public $totalPrice = 0;
-    public $pricePerNight;
 
     // Validation rules
     protected $rules = [
@@ -47,11 +46,12 @@ class BookingForm extends Component
         'datesCleared' => 'clearDates'
     ];
 
-    public function mount($venueId, $pricePerNight)
+    public function mount($venueId)
     {
         $this->venueId = $venueId;
         $this->venue = Venue::find($venueId);
-        $this->pricePerNight = $pricePerNight;
+        // SECURITY: Always use database price, never frontend-provided price
+        $this->pricePerNight = $this->venue->price;
     }
 
     // Method to receive dates from JavaScript calendar
@@ -124,7 +124,6 @@ class BookingForm extends Component
                 'server_nights' => $calculatedNights,
                 'venue_id' => $this->venueId,
                 'venue_price' => $this->venue->price,
-                'price_per_night_param' => $this->pricePerNight,
                 'price_difference' => abs($this->totalPrice - $calculatedPrice),
                 'session_id' => session()->getId(),
                 'timestamp' => now()->toISOString()
