@@ -256,13 +256,16 @@ class PaymentController extends Controller
             }
 
             if ($session->payment_status === 'paid') {
+                // Set protected fields explicitly to prevent mass assignment vulnerabilities
+                $booking->is_paid = true;
+                $booking->payment_completed_at = now();
+                $booking->stripe_payment_intent_id = $session->payment_intent;
+                $booking->stripe_metadata = $session->metadata->toArray();
+                $booking->pay_method = 'stripe';
+
+                // Prepare non-protected fields for mass assignment
                 $updateData = [
-                    'is_paid' => true,
                     'status' => 'confirmed',
-                    'payment_completed_at' => now(),
-                    'stripe_payment_intent_id' => $session->payment_intent,
-                    'stripe_metadata' => $session->metadata->toArray(),
-                    'pay_method' => 'stripe',
                 ];
 
                 // Update email if customer provided one in Stripe checkout - with validation
@@ -278,6 +281,8 @@ class PaymentController extends Controller
                     }
                 }
 
+                // Save protected fields first, then update non-protected fields
+                $booking->save();
                 $booking->update($updateData);
 
                 // Check if webhook has already processed this booking and sent emails
@@ -290,8 +295,9 @@ class PaymentController extends Controller
                         // Double-check that emails haven't been sent by webhook in the meantime
                         if (!$booking->confirmation_email_sent) {
                             try {
-                                // Mark emails as sent to prevent duplicate sending
-                                $booking->update(['confirmation_email_sent' => now()]);
+                                // Mark emails as sent to prevent duplicate sending (protected field)
+                                $booking->confirmation_email_sent = now();
+                                $booking->save();
 
                                 // Send confirmation email to customer
                                 Mail::to($booking->email)->send(new BookingConfirmation($booking));
