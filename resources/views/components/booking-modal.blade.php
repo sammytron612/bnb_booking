@@ -21,8 +21,8 @@
             <!-- Modal Content -->
             <div class="p-6">
                 <!-- Pricing Summary -->
-                <div class="mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                <div class="mb-6 bg-{{ $themeColor }}-50 dark:bg-{{ $themeColor }}-900/20 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-{{ $themeColor }}-600 dark:text-{{ $themeColor }}-400 mb-2">
                         £{{$price}}<span class="text-lg font-normal text-gray-600 dark:text-gray-300">/night</span>
                     </div>
                     <p class="text-gray-600 dark:text-gray-300">
@@ -59,7 +59,7 @@
                         <div class="mt-3">
                             <button
                                 id="clearSelectionBtn"
-                                class="hover:cursor-pointer px-4 py-2 bg-blue-600 hover:bg-blue-500  text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                                class="hover:cursor-pointer px-4 py-2 bg-{{ $themeColor }}-600 hover:bg-{{ $themeColor }}-500 text-white rounded-lg text-sm font-medium transition-colors duration-200"
                             >
                                 Clear Selection
                             </button>

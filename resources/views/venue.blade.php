@@ -286,7 +286,7 @@
 
     </div>
 
-    <x-booking-modal price="{{ $venue->price }}" venue-id="{{ $venue->id }}" />
+    <x-booking-modal price="{{ $venue->price }}" venue-id="{{ $venue->id }}"  theme-color="{{ $venue->theme_color }}" />
 
     <x-venue-image-modal galleryId="{{$venue->venue_name}}-gallery" :images="$venue->propertyImages" />
 
