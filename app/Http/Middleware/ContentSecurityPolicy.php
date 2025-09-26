@@ -31,8 +31,8 @@ class ContentSecurityPolicy
             $csp = [
                 "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com localhost:* *.test",
-                "font-src 'self' https://fonts.gstatic.com data: localhost:* *.test",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com localhost:* *.test",
+                "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data: localhost:* *.test",
                 "img-src 'self' data: https: blob: localhost:* *.test https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com",
                 "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://maps.googleapis.com ws: wss: localhost:* *.test",
                 "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
@@ -45,8 +45,8 @@ class ContentSecurityPolicy
             $csp = [
                 "default-src 'self'",
                 "script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com",
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://maps.googleapis.com",
-                "font-src 'self' https://fonts.gstatic.com data:",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data:",
                 "img-src 'self' data: https: blob: https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com",
                 "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://maps.googleapis.com",
                 "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
