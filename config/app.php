@@ -68,6 +68,11 @@ return [
     'owner_phone_no' => env('OWNER_PHONE_NO'),
     'owner_email' => env('OWNER_EMAIL'),
 
+    // Social Media URLs
+    'facebook_url' => env('FACEBOOK_URL'),
+    'instagram_url' => env('INSTAGRAM_URL'),
+    'tripadvisor_url' => env('TRIPADVISOR_URL'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
