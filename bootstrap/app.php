@@ -14,6 +14,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
         ]);
+
+        // SAFE CSP IMPLEMENTATION: Only applies if enabled in config
+        // Can be disabled instantly via CSP_ENABLED=false in .env
+        $middleware->web(append: [
+            \App\Http\Middleware\ContentSecurityPolicy::class,
+        ]);
+
+        // Create alias for easier reference
+        $middleware->alias([
+            'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

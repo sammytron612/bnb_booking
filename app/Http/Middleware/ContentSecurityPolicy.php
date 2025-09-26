@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ContentSecurityPolicy
+{
+    /**
+     * Handle an incoming request with CSP headers
+     *
+     * FEATURE FLAG: Can be disabled via config('security.csp.enabled')
+     * EMERGENCY DISABLE: Set CSP_ENABLED=false in .env
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $response = $next($request);
+
+        // SAFETY: Check if CSP is enabled via config (can be disabled instantly)
+        if (!config('security.csp.enabled', false)) {
+            return $response;
+        }
+
+        // CSP policy for Eileen BnB with comprehensive Vite/Laravel support
+        $isLocal = app()->environment('local');
+
+        if ($isLocal) {
+            // More permissive CSP for local development
+            $csp = [
+                "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:",
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com localhost:* ws: wss:",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com localhost:* *.test",
+                "font-src 'self' https://fonts.gstatic.com data: localhost:* *.test",
+                "img-src 'self' data: https: blob: localhost:* *.test",
+                "connect-src 'self' https://api.stripe.com https://checkout.stripe.com ws: wss: localhost:* *.test",
+                "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com",
+                "form-action 'self' https://checkout.stripe.com",
+                "base-uri 'self'",
+                "object-src 'none'",
+            ];
+        } else {
+            // Production CSP (more restrictive)
+            $csp = [
+                "default-src 'self'",
+                "script-src 'self' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com",
+                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+                "font-src 'self' https://fonts.gstatic.com data:",
+                "img-src 'self' data: https: blob:",
+                "connect-src 'self' https://api.stripe.com https://checkout.stripe.com",
+                "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com",
+                "frame-ancestors 'none'",
+                "form-action 'self' https://checkout.stripe.com",
+                "base-uri 'self'",
+                "object-src 'none'",
+                "upgrade-insecure-requests",
+            ];
+        }
+
+        // Apply CSP header
+        $cspHeader = implode('; ', $csp);
+
+        // SAFETY: Use report-only mode initially if configured
+        if (config('security.csp.report_only', false)) {
+            $response->headers->set('Content-Security-Policy-Report-Only', $cspHeader);
+        } else {
+            $response->headers->set('Content-Security-Policy', $cspHeader);
+        }
+
+        // Additional security headers (also configurable)
+        if (config('security.headers.x_frame_options', true)) {
+            $response->headers->set('X-Frame-Options', 'DENY');
+        }
+
+        if (config('security.headers.x_content_type_options', true)) {
+            $response->headers->set('X-Content-Type-Options', 'nosniff');
+        }
+
+        if (config('security.headers.x_xss_protection', true)) {
+            $response->headers->set('X-XSS-Protection', '1; mode=block');
+        }
+
+        if (config('security.headers.referrer_policy', true)) {
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        }
+
+        return $response;
+    }
+}
