@@ -273,7 +273,7 @@ class IcalController extends Controller
     }
 
     /**
-     * Export venue bookings as iCal format for external sites to sync
+     * Export venue bookings as iCal format for external sites to sync (Outlook compatible)
      */
     public function exportVenueCalendar($venueId)
     {
@@ -285,25 +285,38 @@ class IcalController extends Controller
                     ->header('Content-Type', 'text/plain');
             }
 
-            // Get all confirmed bookings for this venue (future and current only)
+            // Get all confirmed AND PAID bookings for this venue
+            // Include past bookings for full sync (Outlook expects complete history)
             $bookings = Booking::where('venue_id', $venueId)
-                ->where('status', '!=', 'cancelled')
-                ->whereDate('check_out', '>=', Carbon::today())
+                ->where('status', 'confirmed')  // Only confirmed bookings
+                ->where('is_paid', true)        // Only paid bookings
                 ->orderBy('check_in')
                 ->get();
 
             // Generate iCal content
             $icalContent = $this->generateIcalContent($venue, $bookings);
 
+            // Ensure proper UTF-8 encoding for Outlook
+            $icalContent = mb_convert_encoding($icalContent, 'UTF-8', 'UTF-8');
+
+            // Outlook-compatible headers with proper MIME type
             return response($icalContent)
-                ->header('Content-Type', 'text/calendar; charset=utf-8')
+                ->header('Content-Type', 'text/calendar; charset=utf-8; method=PUBLISH')
                 ->header('Content-Disposition', 'attachment; filename="' . \Str::slug($venue->venue_name) . '.ics"')
-                ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
-                ->header('Pragma', 'no-cache')
-                ->header('Expires', '0');
+                ->header('Content-Length', strlen($icalContent))
+                ->header('Cache-Control', 'no-cache, must-revalidate')
+                ->header('Expires', 'Sat, 26 Jul 1997 05:00:00 GMT')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET, OPTIONS, HEAD')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+                ->header('Vary', 'Accept-Encoding');
 
         } catch (\Exception $e) {
-            \Log::error('Error exporting venue calendar: ' . $e->getMessage());
+            \Log::error('Error exporting venue calendar: ' . $e->getMessage(), [
+                'venue_id' => $venueId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response('Error generating calendar', 500)
                 ->header('Content-Type', 'text/plain');
@@ -311,45 +324,79 @@ class IcalController extends Controller
     }
 
     /**
-     * Generate iCal content from bookings
+     * Generate Outlook-compatible iCal content from bookings
      */
     private function generateIcalContent($venue, $bookings)
     {
         $ical = [];
 
-        // iCal header
+        // Outlook-compatible iCal header
         $ical[] = 'BEGIN:VCALENDAR';
         $ical[] = 'VERSION:2.0';
-        $ical[] = 'PRODID:-//Eileen BnB//Booking Calendar//EN';
+        $ical[] = 'PRODID:-//Seaham Coastal Retreats//Booking Calendar//EN';
         $ical[] = 'CALSCALE:GREGORIAN';
         $ical[] = 'METHOD:PUBLISH';
-        $ical[] = 'X-WR-CALNAME:' . $venue->venue_name . ' - Bookings';
-        $ical[] = 'X-WR-CALDESC:Booking calendar for ' . $venue->venue_name;
-        $ical[] = 'X-WR-TIMEZONE:UTC';
 
-        // Add each booking as an event
+        // Outlook-friendly calendar name (no special characters)
+        $calendarName = $this->sanitizeCalendarText($venue->venue_name . ' Bookings');
+        $calendarDesc = $this->sanitizeCalendarText('Blocked dates for ' . $venue->venue_name);
+
+        $ical[] = 'X-WR-CALNAME:' . $calendarName;
+        $ical[] = 'X-WR-CALDESC:' . $calendarDesc;
+        $ical[] = 'X-WR-TIMEZONE:Europe/London';
+
+        // Add timezone info for Outlook compatibility
+        $ical[] = 'BEGIN:VTIMEZONE';
+        $ical[] = 'TZID:Europe/London';
+        $ical[] = 'BEGIN:STANDARD';
+        $ical[] = 'DTSTART:20071028T020000';
+        $ical[] = 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU';
+        $ical[] = 'TZNAME:GMT';
+        $ical[] = 'TZOFFSETFROM:+0100';
+        $ical[] = 'TZOFFSETTO:+0000';
+        $ical[] = 'END:STANDARD';
+        $ical[] = 'BEGIN:DAYLIGHT';
+        $ical[] = 'DTSTART:20070325T010000';
+        $ical[] = 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU';
+        $ical[] = 'TZNAME:BST';
+        $ical[] = 'TZOFFSETFROM:+0000';
+        $ical[] = 'TZOFFSETTO:+0100';
+        $ical[] = 'END:DAYLIGHT';
+        $ical[] = 'END:VTIMEZONE';
+
+        // Add each booking as an event (Outlook compatible)
         foreach ($bookings as $booking) {
             $checkIn = Carbon::parse($booking->check_in);
             $checkOut = Carbon::parse($booking->check_out);
 
-            // Create unique event ID
-            $eventId = 'booking-' . $booking->id . '@eileen-bnb.com';
+            // Create unique event ID (Outlook compatible)
+            $eventId = 'booking-' . $booking->id . '-' . time() . '@seahamcoastalretreats.com';
 
-            // iCal event
+            // Sanitize text fields for Outlook
+            $guestName = $this->sanitizeCalendarText($booking->name ?? 'Guest');
+            $summary = $this->sanitizeCalendarText('BLOCKED - ' . $guestName);
+            $description = $this->sanitizeCalendarText('Property booked: ' . $venue->venue_name);
+
+            // Outlook-compatible iCal event
             $ical[] = 'BEGIN:VEVENT';
             $ical[] = 'UID:' . $eventId;
             $ical[] = 'DTSTART;VALUE=DATE:' . $checkIn->format('Ymd');
             $ical[] = 'DTEND;VALUE=DATE:' . $checkOut->format('Ymd');
-            $ical[] = 'SUMMARY:Booked - ' . ($booking->name ?? 'Guest');
-            $ical[] = 'DESCRIPTION:Booking #' . $booking->getDisplayBookingId() . ' - ' . $venue->venue_name;
+            $ical[] = 'SUMMARY:' . $summary;
+            $ical[] = 'DESCRIPTION:' . $description;
             $ical[] = 'STATUS:CONFIRMED';
             $ical[] = 'TRANSP:OPAQUE';
+            $ical[] = 'CLASS:PRIVATE';
 
-            // Add creation and modification timestamps
+            // Add current timestamp for Outlook sync
+            $now = Carbon::now()->utc()->format('Ymd\THis\Z');
             $created = Carbon::parse($booking->created_at)->utc()->format('Ymd\THis\Z');
             $modified = Carbon::parse($booking->updated_at)->utc()->format('Ymd\THis\Z');
+
+            $ical[] = 'DTSTAMP:' . $now;
             $ical[] = 'CREATED:' . $created;
             $ical[] = 'LAST-MODIFIED:' . $modified;
+            $ical[] = 'SEQUENCE:0';
 
             $ical[] = 'END:VEVENT';
         }
@@ -357,6 +404,49 @@ class IcalController extends Controller
         // iCal footer
         $ical[] = 'END:VCALENDAR';
 
-        return implode("\r\n", $ical);
+        // Join with proper iCal line endings (CRLF) and fold long lines for Outlook compatibility
+        $content = implode("\r\n", $ical);
+
+        // Fold lines longer than 75 characters (RFC 5545 compliance for Outlook)
+        $lines = explode("\r\n", $content);
+        $foldedLines = [];
+
+        foreach ($lines as $line) {
+            if (strlen($line) <= 75) {
+                $foldedLines[] = $line;
+            } else {
+                // Fold long lines by splitting at 75 characters and continuing on next line with space
+                $foldedLines[] = substr($line, 0, 75);
+                $remainder = substr($line, 75);
+                while (strlen($remainder) > 74) {
+                    $foldedLines[] = ' ' . substr($remainder, 0, 74);
+                    $remainder = substr($remainder, 74);
+                }
+                if (strlen($remainder) > 0) {
+                    $foldedLines[] = ' ' . $remainder;
+                }
+            }
+        }
+
+        return implode("\r\n", $foldedLines);
+    }
+
+    /**
+     * Sanitize text for iCal compatibility (especially Outlook)
+     */
+    private function sanitizeCalendarText($text)
+    {
+        // Remove or escape problematic characters for RFC 5545 compliance
+        $text = str_replace(["\r", "\n", "\t"], ' ', $text);
+        $text = str_replace([',', ';', '\\'], ['\\,', '\\;', '\\\\'], $text);
+        $text = preg_replace('/\s+/', ' ', $text); // Multiple spaces to single
+        $text = trim($text);
+
+        // Limit length to prevent issues
+        if (strlen($text) > 70) {
+            $text = substr($text, 0, 67) . '...';
+        }
+
+        return $text;
     }
 }

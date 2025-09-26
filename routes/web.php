@@ -58,10 +58,19 @@ Route::get('/api/ical/venue/{venueId}/calendars', [App\Http\Controllers\IcalCont
 Route::get('/api/ical/fetch', [App\Http\Controllers\IcalController::class, 'fetchIcalData'])->name('ical.fetch');
 Route::get('/api/ical/combined', [App\Http\Controllers\IcalController::class, 'getCombinedBookingData'])->name('ical.combined');
 
-// iCal export route for external calendar sync (Airbnb, Booking.com, etc.)
+// iCal export route for external calendar sync (Airbnb, Booking.com, Outlook, etc.)
 Route::get('/api/ical/export/{venue_id}', [App\Http\Controllers\IcalController::class, 'exportVenueCalendar'])
     ->name('ical.export')
     ->where('venue_id', '[0-9]+');
+
+// Handle OPTIONS requests for CORS (Outlook compatibility)
+Route::options('/api/ical/export/{venue_id}', function () {
+    return response('', 200)
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        ->header('Access-Control-Max-Age', '86400');
+})->where('venue_id', '[0-9]+');
 
 // Sitemap routes
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
