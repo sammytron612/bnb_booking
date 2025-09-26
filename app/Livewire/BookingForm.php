@@ -7,12 +7,14 @@ use App\Models\Booking;
 use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\DB;
 
 class BookingForm extends Component
 {
     // Public properties for form data
     public $venueId;
     public $venue;
+    public $pricePerNight;
     public $checkIn = null;
     public $checkOut = null;
     public $guestName = '';
@@ -134,17 +136,55 @@ class BookingForm extends Component
             $this->totalPrice = $calculatedPrice;
             $this->nights = $calculatedNights;
         }        try {
-            $booking = Booking::create([
-                'name' => $this->guestName,
-                'email' => $this->guestEmail,
-                'phone' => $this->guestPhone,
-                'check_in' => $this->checkIn,
-                'check_out' => $this->checkOut,
-                'venue_id' => $this->venueId,
-                'nights' => $calculatedNights, // Use server-calculated value
-                'total_price' => $calculatedPrice, // Use server-calculated value
-                'status' => 'pending',
-            ]);
+            // SECURITY: Use database transaction with locking to prevent race conditions
+            $booking = \DB::transaction(function () use ($calculatedNights, $calculatedPrice) {
+                // Lock venue to prevent concurrent bookings
+                $venue = Venue::where('id', $this->venueId)->lockForUpdate()->first();
+                
+                if (!$venue) {
+                    throw new \Exception('Venue not found');
+                }
+                
+                // Check for booking conflicts within the transaction
+                $hasConflict = Booking::where('venue_id', $this->venueId)
+                    ->where('status', '!=', 'cancelled')
+                    ->where(function ($query) {
+                        $query->where(function ($q) {
+                            // New booking starts during existing booking
+                            $q->where('check_in', '<=', $this->checkIn)
+                              ->where('check_out', '>', $this->checkIn);
+                        })->orWhere(function ($q) {
+                            // New booking ends during existing booking  
+                            $q->where('check_in', '<', $this->checkOut)
+                              ->where('check_out', '>=', $this->checkOut);
+                        })->orWhere(function ($q) {
+                            // New booking completely contains existing booking
+                            $q->where('check_in', '>=', $this->checkIn)
+                              ->where('check_out', '<=', $this->checkOut);
+                        })->orWhere(function ($q) {
+                            // Existing booking completely contains new booking
+                            $q->where('check_in', '<=', $this->checkIn)
+                              ->where('check_out', '>=', $this->checkOut);
+                        });
+                    })->exists();
+                
+                if ($hasConflict) {
+                    throw new \Exception('These dates are no longer available. Please select different dates.');
+                }
+                
+                // Create booking only if no conflicts
+                return Booking::create([
+                    'name' => $this->guestName,
+                    'email' => $this->guestEmail,
+                    'phone' => $this->guestPhone,
+                    'check_in' => $this->checkIn,
+                    'check_out' => $this->checkOut,
+                    'venue_id' => $this->venueId,
+                    'nights' => $calculatedNights, // Use server-calculated value
+                    'total_price' => $calculatedPrice, // Use server-calculated value
+                    'status' => 'pending',
+                ]);
+            }, 3); // Retry 3 times on deadlock
 
             // Generate signed URL for payment checkout (valid for 24 hours)
             $checkoutUrl = URL::temporarySignedRoute('payment.checkout', now()->addHours(24), ['booking' => $booking->id]);
@@ -153,7 +193,15 @@ class BookingForm extends Component
             return redirect($checkoutUrl);
 
         } catch (\Exception $e) {
-            session()->flash('booking_error', 'Sorry, there was an error processing your booking. Please try again.');
+            \Log::warning('Booking creation failed', [
+                'venue_id' => $this->venueId,
+                'check_in' => $this->checkIn,
+                'check_out' => $this->checkOut,
+                'error' => $e->getMessage(),
+                'session_id' => session()->getId(),
+            ]);
+            
+            session()->flash('booking_error', $e->getMessage() ?: 'Sorry, there was an error processing your booking. Please try again.');
         }
     }
 

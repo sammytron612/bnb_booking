@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class BookingController extends Controller
 {
@@ -68,18 +69,56 @@ class BookingController extends Controller
         }
 
         try {
-            $booking = Booking::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'check_in' => $request->depart,
-                'check_out' => $request->leave,
-                'venue_id' => $request->venue_id,
-                'nights' => $nights,
-                'total_price' => $request->total_price,
-                'status' => 'pending',
-                'notes' => $request->notes ?? null,
-            ]);
+            // SECURITY: Use database transaction with locking to prevent race conditions
+            $booking = \DB::transaction(function () use ($request, $nights) {
+                // Lock venue to prevent concurrent bookings
+                $venue = \App\Models\Venue::where('id', $request->venue_id)->lockForUpdate()->first();
+                
+                if (!$venue) {
+                    throw new \Exception('Venue not found');
+                }
+                
+                // Check for booking conflicts within the transaction
+                $hasConflict = Booking::where('venue_id', $request->venue_id)
+                    ->where('status', '!=', 'cancelled')
+                    ->where(function ($query) use ($request) {
+                        $query->where(function ($q) use ($request) {
+                            // New booking starts during existing booking
+                            $q->where('check_in', '<=', $request->depart)
+                              ->where('check_out', '>', $request->depart);
+                        })->orWhere(function ($q) use ($request) {
+                            // New booking ends during existing booking  
+                            $q->where('check_in', '<', $request->leave)
+                              ->where('check_out', '>=', $request->leave);
+                        })->orWhere(function ($q) use ($request) {
+                            // New booking completely contains existing booking
+                            $q->where('check_in', '>=', $request->depart)
+                              ->where('check_out', '<=', $request->leave);
+                        })->orWhere(function ($q) use ($request) {
+                            // Existing booking completely contains new booking
+                            $q->where('check_in', '<=', $request->depart)
+                              ->where('check_out', '>=', $request->leave);
+                        });
+                    })->exists();
+                
+                if ($hasConflict) {
+                    throw new \Exception('These dates are no longer available. Please select different dates.');
+                }
+                
+                // Create booking only if no conflicts
+                return Booking::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'check_in' => $request->depart,
+                    'check_out' => $request->leave,
+                    'venue_id' => $request->venue_id,
+                    'nights' => $nights,
+                    'total_price' => $request->total_price,
+                    'status' => 'pending',
+                    'notes' => $request->notes ?? null,
+                ]);
+            }, 3); // Retry 3 times on deadlock
 
             return response()->json([
                 'success' => true,
@@ -88,9 +127,17 @@ class BookingController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
+            \Log::warning('Booking creation failed in controller', [
+                'venue_id' => $request->venue_id,
+                'check_in' => $request->depart,
+                'check_out' => $request->leave,
+                'error' => $e->getMessage(),
+                'ip' => $request->ip(),
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create booking. Please try again.'
+                'message' => $e->getMessage() ?: 'Failed to create booking. Please try again.'
             ], 500);
         }
     }
