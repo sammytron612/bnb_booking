@@ -85,7 +85,7 @@ class BookingForm extends Component
             $checkOutDate = Carbon::parse($this->checkOut);
 
             $this->nights = $checkInDate->diffInDays($checkOutDate);
-            
+
             // Use venue price from database for consistency
             // This ensures client and server calculations always match
             $this->totalPrice = $this->nights * $this->venue->price;
@@ -113,7 +113,7 @@ class BookingForm extends Component
         $checkOutDate = Carbon::parse($this->checkOut);
         $calculatedNights = $checkInDate->diffInDays($checkOutDate);
         $calculatedPrice = $calculatedNights * $this->venue->price;
-        
+
         // Validate that client-side calculations match server-side
         // Allow small tolerance for floating point differences
         if (abs($this->totalPrice - $calculatedPrice) > 0.01 || $this->nights !== $calculatedNights) {
@@ -129,7 +129,7 @@ class BookingForm extends Component
                 'session_id' => session()->getId(),
                 'timestamp' => now()->toISOString()
             ]);
-            
+
             // Instead of blocking, use server-calculated values and log the discrepancy
             // This handles cases where the passed pricePerNight differs from venue->price
             $this->totalPrice = $calculatedPrice;
