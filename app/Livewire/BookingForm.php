@@ -80,19 +80,17 @@ class BookingForm extends Component
 
     private function calculateBooking()
     {
-        if ($this->checkIn && $this->checkOut) {
+        if ($this->checkIn && $this->checkOut && $this->venue) {
             $checkInDate = Carbon::parse($this->checkIn);
             $checkOutDate = Carbon::parse($this->checkOut);
 
             $this->nights = $checkInDate->diffInDays($checkOutDate);
-
-            // NOTE: This client-side calculation is for display only
-            // Server-side validation in submitBooking() prevents manipulation
-            $this->totalPrice = $this->nights * $this->pricePerNight;
+            
+            // Use venue price from database for consistency
+            // This ensures client and server calculations always match
+            $this->totalPrice = $this->nights * $this->venue->price;
         }
-    }
-
-    private function resetForm()
+    }    private function resetForm()
     {
         $this->guestName = '';
         $this->guestEmail = '';
@@ -115,25 +113,28 @@ class BookingForm extends Component
         $checkOutDate = Carbon::parse($this->checkOut);
         $calculatedNights = $checkInDate->diffInDays($checkOutDate);
         $calculatedPrice = $calculatedNights * $this->venue->price;
-
+        
         // Validate that client-side calculations match server-side
+        // Allow small tolerance for floating point differences
         if (abs($this->totalPrice - $calculatedPrice) > 0.01 || $this->nights !== $calculatedNights) {
-            \Log::warning('Price manipulation attempt in Livewire component', [
+            \Log::warning('Price calculation mismatch in Livewire component', [
                 'client_total' => $this->totalPrice,
                 'server_total' => $calculatedPrice,
                 'client_nights' => $this->nights,
                 'server_nights' => $calculatedNights,
                 'venue_id' => $this->venueId,
                 'venue_price' => $this->venue->price,
+                'price_per_night_param' => $this->pricePerNight,
+                'price_difference' => abs($this->totalPrice - $calculatedPrice),
                 'session_id' => session()->getId(),
                 'timestamp' => now()->toISOString()
             ]);
-
-            session()->flash('booking_error', 'There was an error with the price calculation. Please refresh the page and try again.');
-            return;
-        }
-
-        try {
+            
+            // Instead of blocking, use server-calculated values and log the discrepancy
+            // This handles cases where the passed pricePerNight differs from venue->price
+            $this->totalPrice = $calculatedPrice;
+            $this->nights = $calculatedNights;
+        }        try {
             $booking = Booking::create([
                 'name' => $this->guestName,
                 'email' => $this->guestEmail,
