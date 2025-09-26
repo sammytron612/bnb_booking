@@ -69,7 +69,7 @@ Route::get('/sitemap-main.xml', [App\Http\Controllers\SitemapController::class, 
 Route::get('/sitemap-venues.xml', [App\Http\Controllers\SitemapController::class, 'venues'])->name('sitemap.venues');
 
 // Test route for debugging iCal integration
-Route::get('/test/ical/{venueId?}', function($venueId = 1) {
+/*Route::get('/test/ical/{venueId?}', function($venueId = 1) {
     $controller = new App\Http\Controllers\IcalController();
     $bookingController = new App\Http\Controllers\BookingController();
 
@@ -102,7 +102,7 @@ Route::get('/test/ical/{venueId?}', function($venueId = 1) {
     $allGrayDates = array_unique(array_merge($dbResponse['fullyBookedDates'] ?? [], $icalResponse['booked_dates'] ?? []));
     sort($allGrayDates);
     echo "<strong>Gray dates:</strong> " . implode(', ', $allGrayDates) . "<br>";
-});
+});*/
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
