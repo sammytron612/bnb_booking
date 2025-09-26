@@ -186,12 +186,11 @@ class PaymentController extends Controller
                     'venue' => $booking->venue->venue_name,
                     'guest_name' => $booking->name,
                 ],
-            ]);            // Store session ID in booking
-            $booking->update([
-                'stripe_session_id' => $session->id,
-                'stripe_amount' => $booking->total_price,
-                'stripe_currency' => 'gbp',
-            ]);
+            ]);            // Store session ID and payment details in booking (protected fields)
+            $booking->stripe_session_id = $session->id;
+            $booking->stripe_amount = $booking->total_price;
+            $booking->stripe_currency = 'gbp';
+            $booking->save();
 
             // If this is an AJAX request, return JSON
             if ($request->expectsJson()) {
