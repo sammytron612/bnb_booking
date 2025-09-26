@@ -44,6 +44,29 @@ class BookingController extends Controller
             ], 422);
         }
 
+        // SECURITY: Server-side price validation to prevent manipulation
+        $venue = \App\Models\Venue::findOrFail($request->venue_id);
+        $calculatedPrice = $nights * $venue->price;
+        
+        // Allow small floating point differences (within 1 penny)
+        if (abs($request->total_price - $calculatedPrice) > 0.01) {
+            \Log::warning('Price manipulation attempt detected', [
+                'submitted_price' => $request->total_price,
+                'calculated_price' => $calculatedPrice,
+                'venue_id' => $request->venue_id,
+                'nights' => $nights,
+                'venue_price' => $venue->price,
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'timestamp' => now()->toISOString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid price calculation. Please refresh and try again.'
+            ], 422);
+        }
+
         try {
             $booking = Booking::create([
                 'name' => $request->name,
