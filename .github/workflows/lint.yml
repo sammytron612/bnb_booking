@@ -59,7 +59,7 @@ jobs:
         DB_DATABASE: eileen_bnb_testing
         DB_USERNAME: root
         DB_PASSWORD: password
-      run: vendor/bin/phpunit
+      run: vendor/bin/pest
 
       # - name: Commit Changes
       #   uses: stefanzweifel/git-auto-commit-action@v5
