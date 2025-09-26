@@ -144,3 +144,9 @@ Route::get('/robots.txt', function () {
     return response($content)
         ->header('Content-Type', 'text/plain');
 })->name('robots');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return redirect()->route('admin.index');
+    })->name('dashboard');
+});
