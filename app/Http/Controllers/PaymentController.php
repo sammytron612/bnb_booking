@@ -285,47 +285,44 @@ class PaymentController extends Controller
                 $booking->update($updateData);
 
                 // Check if webhook has already processed this booking and sent emails
-                // If not, send emails from here as backup (for cases where webhooks fail)
-                if (!$booking->confirmation_email_sent) {
-                    \DB::transaction(function () use ($booking) {
-                        // Re-fetch booking to check current state
-                        $booking = Booking::where('id', $booking->id)->lockForUpdate()->first();
+                // Use same robust locking pattern as webhook method
+                \DB::transaction(function () use ($booking) {
+                    // Re-fetch booking with lock to prevent race conditions (same as webhook)
+                    $booking = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
-                        // Double-check that emails haven't been sent by webhook in the meantime
-                        if (!$booking->confirmation_email_sent) {
-                            try {
-                                // Mark emails as sent to prevent duplicate sending (protected field)
-                                $booking->confirmation_email_sent = now();
-                                $booking->save();
+                    // Check INSIDE the locked transaction (improved race condition protection)
+                    if ($booking->confirmation_email_sent) {
+                        Log::info('Emails already sent by webhook, skipped backup sending', [
+                            'booking_id' => $booking->id,
+                            'email_sent_at' => $booking->confirmation_email_sent
+                        ]);
+                        return;
+                    }
 
-                                // Send confirmation email to customer
-                                Mail::to($booking->email)->send(new BookingConfirmation($booking));
+                    try {
+                        // Mark emails as sent FIRST to prevent duplicate sending (protected field)
+                        $booking->confirmation_email_sent = now();
+                        $booking->save();
 
-                                // Send notification to owner
-                                if (config('mail.owner_email')) {
-                                    Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
-                                }
+                        // Send confirmation email to customer
+                        Mail::to($booking->email)->send(new BookingConfirmation($booking));
 
-                                Log::info('Confirmation emails sent from success page (webhook backup)', [
-                                    'booking_id' => $booking->id,
-                                    'reason' => 'webhook_not_received'
-                                ]);
-                            } catch (Exception $e) {
-                                Log::error('Failed to send backup confirmation email from success page: ' . $e->getMessage(), [
-                                    'booking_id' => $booking->id
-                                ]);
-                            }
-                        } else {
-                            Log::info('Emails already sent by webhook, skipped backup sending', [
-                                'booking_id' => $booking->id
-                            ]);
+                        // Send notification to owner
+                        if (config('mail.owner_email')) {
+                            Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
                         }
-                    });
-                } else {
-                    Log::info('Booking updated from success page - emails already sent', [
-                        'booking_id' => $booking->id
-                    ]);
-                }
+
+                        Log::info('Confirmation emails sent from success page (webhook backup)', [
+                            'booking_id' => $booking->id,
+                            'reason' => 'webhook_not_received',
+                            'sent_via' => 'success_page_backup'
+                        ]);
+                    } catch (Exception $e) {
+                        Log::error('Failed to send backup confirmation email from success page: ' . $e->getMessage(), [
+                            'booking_id' => $booking->id
+                        ]);
+                    }
+                });
             }
         } catch (Exception $e) {
             // Log error but still show success page
