@@ -86,8 +86,8 @@
                             <li>Maximum occupancy limits must be respected</li>
                             <li>Quiet hours: 10:00 PM - 8:00 AM</li>
                             <li>No smoking inside the properties</li>
-                            <li>No parties or events without prior approval</li>
-                            <li>Pets are not permitted unless specifically stated</li>
+                            <li>No parties or events</li>
+                            <li>Pets are permitted</li>
                             <li>Guests are responsible for any damage to the property</li>
                         </ul>
 
@@ -96,7 +96,7 @@
                             <li><strong>Check-in:</strong> 3:00 PM onwards</li>
                             <li><strong>Check-out:</strong> 11:00 AM</li>
                             <li>Self-check-in instructions will be provided before arrival</li>
-                            <li>Late check-out may be available by arrangement (additional charges may apply)</li>
+                            <li>Late check-out may be available by arrangement</li>
                         </ul>
                     </section>
 
