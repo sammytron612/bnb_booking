@@ -85,7 +85,7 @@ class BookingForm extends Component
             $checkOutDate = Carbon::parse($this->checkOut);
 
             $this->nights = $checkInDate->diffInDays($checkOutDate);
-            
+
             // NOTE: This client-side calculation is for display only
             // Server-side validation in submitBooking() prevents manipulation
             $this->totalPrice = $this->nights * $this->pricePerNight;
@@ -115,7 +115,7 @@ class BookingForm extends Component
         $checkOutDate = Carbon::parse($this->checkOut);
         $calculatedNights = $checkInDate->diffInDays($checkOutDate);
         $calculatedPrice = $calculatedNights * $this->venue->price;
-        
+
         // Validate that client-side calculations match server-side
         if (abs($this->totalPrice - $calculatedPrice) > 0.01 || $this->nights !== $calculatedNights) {
             \Log::warning('Price manipulation attempt in Livewire component', [
@@ -128,7 +128,7 @@ class BookingForm extends Component
                 'session_id' => session()->getId(),
                 'timestamp' => now()->toISOString()
             ]);
-            
+
             session()->flash('booking_error', 'There was an error with the price calculation. Please refresh the page and try again.');
             return;
         }
