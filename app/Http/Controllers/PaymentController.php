@@ -432,14 +432,17 @@ class PaymentController extends Controller
                     // Check if booking is already paid to prevent duplicate emails
                     $wasAlreadyPaid = $booking->is_paid;
 
+                    // Update non-protected fields via mass assignment
                     $updateData = [
-                        'is_paid' => true,
                         'status' => 'confirmed',
-                        'payment_completed_at' => now(),
-                        'stripe_payment_intent_id' => $session['payment_intent'],
-                        'stripe_metadata' => $session['metadata'],
-                        'pay_method' => 'stripe',
                     ];
+
+                    // Set protected payment fields explicitly to prevent mass assignment vulnerabilities
+                    $booking->is_paid = true;
+                    $booking->payment_completed_at = now();
+                    $booking->stripe_payment_intent_id = $session['payment_intent'];
+                    $booking->stripe_metadata = $session['metadata'];
+                    $booking->pay_method = 'stripe';
 
                     // Update email if customer provided one in Stripe checkout - with validation
                     if (!empty($session['customer_email'])) {
@@ -466,8 +469,9 @@ class PaymentController extends Controller
                     if (!$booking->confirmation_email_sent) {
                         try {
                             // Mark emails as sent FIRST to prevent other webhooks from sending
-                            $updateData['confirmation_email_sent'] = now();
-                            $booking->update($updateData);
+                            $booking->confirmation_email_sent = now();
+                            $booking->save(); // Save protected fields
+                            $booking->update($updateData); // Update non-protected fields
 
                             // Send confirmation email to CUSTOMER only
                             Mail::to($booking->email)->send(new BookingConfirmation($booking));
@@ -489,7 +493,8 @@ class PaymentController extends Controller
                         }
                     } else {
                         // Just update booking data without sending emails
-                        $booking->update($updateData);
+                        $booking->save(); // Save protected fields
+                        $booking->update($updateData); // Update non-protected fields
                         Log::info('Emails already sent for this booking, webhook updated booking only', [
                             'booking_id' => $booking->id,
                             'email_sent_at' => $booking->confirmation_email_sent
@@ -545,11 +550,15 @@ class PaymentController extends Controller
             $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
 
             if ($booking && !$booking->is_paid) {
+                // Set protected fields explicitly
+                $booking->is_paid = true;
+                $booking->payment_completed_at = now();
+                $booking->pay_method = 'stripe';
+                $booking->save();
+
+                // Update non-protected fields
                 $booking->update([
-                    'is_paid' => true,
                     'status' => 'confirmed',
-                    'payment_completed_at' => now(),
-                    'pay_method' => 'stripe',
                 ]);
 
                 Log::info('Booking updated via charge.updated (no emails sent)', ['booking_id' => $booking->id]);
@@ -567,11 +576,15 @@ class PaymentController extends Controller
             $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
 
             if ($booking && !$booking->is_paid) {
+                // Set protected fields explicitly
+                $booking->is_paid = true;
+                $booking->payment_completed_at = now();
+                $booking->pay_method = 'stripe';
+                $booking->save();
+
+                // Update non-protected fields
                 $booking->update([
-                    'is_paid' => true,
                     'status' => 'confirmed',
-                    'payment_completed_at' => now(),
-                    'pay_method' => 'stripe',
                 ]);
 
                 Log::info('Booking updated via charge.succeeded (no emails sent)', ['booking_id' => $booking->id]);
