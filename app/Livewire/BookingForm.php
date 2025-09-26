@@ -140,11 +140,11 @@ class BookingForm extends Component
             $booking = \DB::transaction(function () use ($calculatedNights, $calculatedPrice) {
                 // Lock venue to prevent concurrent bookings
                 $venue = Venue::where('id', $this->venueId)->lockForUpdate()->first();
-                
+
                 if (!$venue) {
                     throw new \Exception('Venue not found');
                 }
-                
+
                 // Check for booking conflicts within the transaction
                 $hasConflict = Booking::where('venue_id', $this->venueId)
                     ->where('status', '!=', 'cancelled')
@@ -154,7 +154,7 @@ class BookingForm extends Component
                             $q->where('check_in', '<=', $this->checkIn)
                               ->where('check_out', '>', $this->checkIn);
                         })->orWhere(function ($q) {
-                            // New booking ends during existing booking  
+                            // New booking ends during existing booking
                             $q->where('check_in', '<', $this->checkOut)
                               ->where('check_out', '>=', $this->checkOut);
                         })->orWhere(function ($q) {
@@ -167,11 +167,11 @@ class BookingForm extends Component
                               ->where('check_out', '>=', $this->checkOut);
                         });
                     })->exists();
-                
+
                 if ($hasConflict) {
                     throw new \Exception('These dates are no longer available. Please select different dates.');
                 }
-                
+
                 // Create booking only if no conflicts
                 return Booking::create([
                     'name' => $this->guestName,
@@ -200,7 +200,7 @@ class BookingForm extends Component
                 'error' => $e->getMessage(),
                 'session_id' => session()->getId(),
             ]);
-            
+
             session()->flash('booking_error', $e->getMessage() ?: 'Sorry, there was an error processing your booking. Please try again.');
         }
     }

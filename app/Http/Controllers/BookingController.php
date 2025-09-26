@@ -73,11 +73,11 @@ class BookingController extends Controller
             $booking = \DB::transaction(function () use ($request, $nights) {
                 // Lock venue to prevent concurrent bookings
                 $venue = \App\Models\Venue::where('id', $request->venue_id)->lockForUpdate()->first();
-                
+
                 if (!$venue) {
                     throw new \Exception('Venue not found');
                 }
-                
+
                 // Check for booking conflicts within the transaction
                 $hasConflict = Booking::where('venue_id', $request->venue_id)
                     ->where('status', '!=', 'cancelled')
@@ -87,7 +87,7 @@ class BookingController extends Controller
                             $q->where('check_in', '<=', $request->depart)
                               ->where('check_out', '>', $request->depart);
                         })->orWhere(function ($q) use ($request) {
-                            // New booking ends during existing booking  
+                            // New booking ends during existing booking
                             $q->where('check_in', '<', $request->leave)
                               ->where('check_out', '>=', $request->leave);
                         })->orWhere(function ($q) use ($request) {
@@ -100,11 +100,11 @@ class BookingController extends Controller
                               ->where('check_out', '>=', $request->leave);
                         });
                     })->exists();
-                
+
                 if ($hasConflict) {
                     throw new \Exception('These dates are no longer available. Please select different dates.');
                 }
-                
+
                 // Create booking only if no conflicts
                 return Booking::create([
                     'name' => $request->name,
@@ -134,7 +134,7 @@ class BookingController extends Controller
                 'error' => $e->getMessage(),
                 'ip' => $request->ip(),
             ]);
-            
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage() ?: 'Failed to create booking. Please try again.'
