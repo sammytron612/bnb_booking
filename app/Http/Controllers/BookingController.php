@@ -16,13 +16,18 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:20',
+            'name' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\.\']+$/u',
+            'email' => 'required|email:rfc,dns|max:255',
+            'phone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)\.]+$/',
             'depart' => 'required|date|after_or_equal:today',
             'leave' => 'required|date|after:depart',
             'venue_id' => 'required|integer|exists:venues,id',
             'total_price' => 'required|numeric|min:0',
+        ], [
+            'name.regex' => 'Name can only contain letters, spaces, hyphens, periods, and apostrophes.',
+            'email.email' => 'Please enter a valid email address with a valid domain.',
+            'phone.regex' => 'Please enter a valid phone number (numbers, spaces, hyphens, parentheses, and + allowed).',
+            'phone.min' => 'Phone number must be at least 10 characters.',
         ]);
 
         if ($validator->fails()) {

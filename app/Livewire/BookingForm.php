@@ -23,20 +23,26 @@ class BookingForm extends Component
     public $nights = 0;
     public $totalPrice = 0;
 
-    // Validation rules
+    // Advanced validation rules with security patterns
     protected $rules = [
-        'guestName' => 'required|string|min:2',
-        'guestEmail' => 'required|email',
-        'guestPhone' => 'required|string|min:10',
+        'guestName' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\.\']+$/u',
+        'guestEmail' => 'required|email:rfc,dns|max:255',
+        'guestPhone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)\.]+$/',
         'checkIn' => 'required|date|after_or_equal:today',
         'checkOut' => 'required|date|after:checkIn',
     ];
 
     protected $messages = [
         'guestName.required' => 'Please enter your full name.',
+        'guestName.regex' => 'Name can only contain letters, spaces, hyphens, periods, and apostrophes.',
+        'guestName.max' => 'Name cannot exceed 100 characters.',
         'guestEmail.required' => 'Please enter your email address.',
-        'guestEmail.email' => 'Please enter a valid email address.',
+        'guestEmail.email' => 'Please enter a valid email address with a valid domain.',
+        'guestEmail.max' => 'Email address cannot exceed 255 characters.',
         'guestPhone.required' => 'Please enter your phone number.',
+        'guestPhone.regex' => 'Please enter a valid phone number (numbers, spaces, hyphens, parentheses, and + allowed).',
+        'guestPhone.min' => 'Phone number must be at least 10 characters.',
+        'guestPhone.max' => 'Phone number cannot exceed 20 characters.',
         'checkIn.required' => 'Please select a check-in date.',
         'checkOut.required' => 'Please select a check-out date.',
         'checkOut.after' => 'Check-out date must be after check-in date.',
