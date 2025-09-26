@@ -30,6 +30,18 @@ Route::get('/venue/{route}', function ($route) {
     return view('venue', compact('venue', 'reviews'));
 })->name('venue.show');
 
+// Legal pages
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/terms-of-service', function () {
+    return view('terms-of-service');
+})->name('terms-of-service');
+
+Route::get('/cookie-policy', function () {
+    return view('cookie-policy');
+})->name('cookie-policy');
 
 // Booking routes - Protected with authentication for admin access
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
