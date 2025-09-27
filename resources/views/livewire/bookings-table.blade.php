@@ -1,11 +1,14 @@
 <div class="bg-white shadow-xl rounded-lg p-6">
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
-    @if (session('success'))
-        <div class="mb-4 rounded border border-green-200 bg-gr                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
-                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">-50 text-green-800 px-4 py-2">
-            {{ session('success') }}
+    @if ($successMessage)
+        <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-800 px-4 py-2 flex justify-between items-center">
+            <span>{{ $successMessage }}</span>
+            <button wire:click="clearSuccessMessage" class="text-green-600 hover:text-green-800">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
     @endif
 
@@ -887,5 +890,12 @@ document.addEventListener('DOMContentLoaded', function() {
         childList: true,
         subtree: true
     });
+
+    // Auto-clear success message after 5 seconds
+    @if($successMessage)
+    setTimeout(() => {
+        @this.call('clearSuccessMessage');
+    }, 5000);
+    @endif
 });
 </script>

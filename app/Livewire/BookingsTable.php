@@ -19,6 +19,7 @@ class BookingsTable extends Component
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
     public $calendarOffset = 0; // Track calendar navigation offset
+    public $successMessage = ''; // Livewire success message
 
     // Form fields for editing
     public $editStatus = '';
@@ -74,7 +75,7 @@ class BookingsTable extends Component
         $booking = Booking::find($bookingId);
         if ($booking) {
             $booking->delete();
-            session()->flash('success', 'Booking deleted successfully.');
+            $this->successMessage = 'Booking deleted successfully.';
         }
     }
 
@@ -103,7 +104,12 @@ class BookingsTable extends Component
         $this->editStatus = '';
         $this->editNotes = '';
         $this->editPayment = "0";
-        session()->flash('success', 'Booking updated successfully.');
+        $this->successMessage = 'Booking updated successfully.';
+    }
+
+    public function clearSuccessMessage()
+    {
+        $this->successMessage = '';
     }
 
     public function navigateCalendar($direction)
