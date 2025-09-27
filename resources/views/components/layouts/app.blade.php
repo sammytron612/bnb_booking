@@ -2,4 +2,6 @@
     <flux:main>
         {{ $slot }}
     </flux:main>
+    
+    <x-footer />
 </x-layouts.app.header>
