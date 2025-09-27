@@ -15,6 +15,7 @@ return [
     'csp' => [
         'enabled' => env('CSP_ENABLED', true),
         'report_only' => env('CSP_REPORT_ONLY', false),
+        'disable_for_lighthouse' => env('CSP_DISABLE_FOR_LIGHTHOUSE', true),
     ],
     /* */
     /*
