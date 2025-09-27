@@ -53,6 +53,11 @@ return [
         'x_xss_protection' => env('SECURITY_X_XSS_PROTECTION', true),
         'referrer_policy' => env('SECURITY_REFERRER_POLICY', true),
         'permissions_policy' => env('SECURITY_PERMISSIONS_POLICY', false), // Disabled by default
+
+        // Cross-Origin headers for better isolation
+        'cross_origin_resource_policy' => env('SECURITY_CORP', true),
+        'cross_origin_embedder_policy' => env('SECURITY_COEP', false), // Can break third-party embeds
+        'cross_origin_opener_policy' => env('SECURITY_COOP', true),
     ],
 
     /*

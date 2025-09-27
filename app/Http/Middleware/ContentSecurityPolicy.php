@@ -65,6 +65,21 @@ class ContentSecurityPolicy
             $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         }
 
+        // Cross Origin Resource Policy (CORP) - prevents cross-origin resource loading
+        if (config('security.headers.cross_origin_resource_policy', true)) {
+            $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+        }
+
+        // Cross Origin Embedder Policy (COEP) - additional isolation (can break third-party embeds)
+        if (config('security.headers.cross_origin_embedder_policy', false)) {
+            $response->headers->set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+        }
+
+        // Cross Origin Opener Policy (COOP) - prevents window references
+        if (config('security.headers.cross_origin_opener_policy', true)) {
+            $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+        }
+
         return $response;
     }
 }
