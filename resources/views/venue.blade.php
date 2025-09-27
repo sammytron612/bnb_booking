@@ -190,7 +190,10 @@
                         src="{{ $featuredImage->location }}"
                         alt="{{ $featuredImage->title }}"
                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
+                        width="800"
+                        height="600"
                     >
                 </div>
                 @else
@@ -212,6 +215,9 @@
                             alt="{{ $image->title }}"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="lazy"
+                            decoding="async"
+                            width="400"
+                            height="300"
                         >
                         @if($loop->last && $otherImages->count() > 4)
                             <div class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">

@@ -1,0 +1,91 @@
+/* Enhanced Accessibility and Performance Styles */
+
+/* Improved color contrast ratios */
+.text-slate-500 {
+    color: #475569 !important; /* Improved from #64748b for better contrast */
+}
+
+.text-slate-600 {
+    color: #374151 !important; /* Improved contrast */
+}
+
+/* Ensure focus indicators are visible */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Skip to content link for screen readers */
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #3b82f6;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 100;
+}
+
+.skip-to-content:focus {
+    top: 6px;
+}
+
+/* Improve button contrast */
+.bg-slate-600:hover {
+    background-color: #374151 !important;
+}
+
+/* Ensure sufficient contrast for navbar items */
+.text-slate-700 {
+    color: #374151 !important;
+}
+
+/* Performance: Reduce paint on hover animations */
+.hover\\:scale-105:hover {
+    transform: scale(1.05);
+    will-change: transform;
+}
+
+/* Performance: Optimize transitions */
+.transition-transform {
+    transition: transform 0.3s ease-in-out;
+}
+
+.transition-colors {
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Accessibility: Ensure proper spacing for touch targets */
+@media (max-width: 768px) {
+    button, 
+    a[role="button"],
+    input[type="button"],
+    input[type="submit"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Performance: Optimize image loading */
+img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

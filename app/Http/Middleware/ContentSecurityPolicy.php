@@ -22,10 +22,10 @@ class ContentSecurityPolicy
             return $response;
         }
 
-        // Content Security Policy - allows necessary external resources
+        // Content Security Policy - enhanced with Trusted Types for XSS protection
         $csp = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com localhost:* *.test",
             "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data: localhost:* *.test",
             "img-src 'self' data: https: blob: localhost:* *.test https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com https://*.google-analytics.com",
@@ -35,6 +35,8 @@ class ContentSecurityPolicy
             "base-uri 'self'",
             "object-src 'none'",
             "frame-ancestors 'none'",
+            "require-trusted-types-for 'script'",
+            "trusted-types default",
         ];
 
         // Apply CSP header
@@ -59,6 +61,33 @@ class ContentSecurityPolicy
             $response->headers->set('Cross-Origin-Embedder-Policy', 'unsafe-none');
         }
 
+        // Performance optimization - cache control headers
+        $this->addCacheHeaders($request, $response);
+
         return $response;
+    }
+
+    /**
+     * Add appropriate cache headers based on request type
+     */
+    private function addCacheHeaders(Request $request, Response $response): void
+    {
+        $path = $request->path();
+        
+        // Static assets - aggressive caching
+        if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i', $path)) {
+            $response->headers->set('Cache-Control', 'public, max-age=31536000, immutable');
+            $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 31536000));
+        }
+        // API routes - moderate caching
+        elseif (str_starts_with($path, 'api/')) {
+            $response->headers->set('Cache-Control', 'public, max-age=3600');
+            $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
+        }
+        // Regular pages - short caching
+        else {
+            $response->headers->set('Cache-Control', 'public, max-age=1800');
+            $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 1800));
+        }
     }
 }

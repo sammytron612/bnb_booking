@@ -6,6 +6,9 @@
         @include('partials.head', ['seoData' => $seoData])
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800 flex flex-col">
+        <!-- Skip to content link for accessibility -->
+        <a href="#main-content" class="skip-to-content">Skip to main content</a>
+        
         <flux:header container sticky class="border-b border-gray-200 bg-gradient-to-r from-slate-50 via-blue-50 to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 dark:border-slate-600 backdrop-blur-sm shadow-xl py-4 z-50">
             <flux:sidebar.toggle class="lg:hidden text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" icon="bars-2" inset="left" />
 
