@@ -186,11 +186,11 @@ class BookingsTable extends Component
     private function getExternalBookings()
     {
         $externalBookings = collect();
-        
+
         try {
             // Get all active iCal feeds
             $icalFeeds = \App\Models\Ical::where('active', true)->with('venue')->get();
-            
+
             foreach ($icalFeeds as $feed) {
                 $icalData = $this->fetchIcalData($feed->url);
                 if ($icalData) {
@@ -201,10 +201,10 @@ class BookingsTable extends Component
         } catch (\Exception $e) {
             \Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
         }
-        
+
         return $externalBookings;
     }
-    
+
     private function fetchIcalData($url)
     {
         try {
@@ -214,23 +214,23 @@ class BookingsTable extends Component
                     'user_agent' => 'Eileen BnB Calendar Sync/1.0'
                 ]
             ]);
-            
+
             return file_get_contents($url, false, $context);
         } catch (\Exception $e) {
             return null;
         }
     }
-    
+
     private function parseIcalEvents($icalData, $venue)
     {
         $events = collect();
         $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
-        
+
         $currentEvent = null;
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
-            
+
             if ($line === 'BEGIN:VEVENT') {
                 $currentEvent = [];
             } elseif ($line === 'END:VEVENT' && $currentEvent !== null) {
@@ -251,19 +251,19 @@ class BookingsTable extends Component
                         'pay_method' => 'external',
                         'is_paid' => true
                     ]);
-                    
+
                     // Set a fake ID and mark as external
                     $booking->id = 'ext-' . uniqid();
                     $booking->venue = $venue;
                     $booking->setAttribute('is_external', true);
                     $booking->exists = false; // Don't try to save this to database
-                    
+
                     $events->push($booking);
                 }
                 $currentEvent = null;
             } elseif ($currentEvent !== null && strpos($line, ':') !== false) {
                 [$key, $value] = explode(':', $line, 2);
-                
+
                 if (strpos($key, 'DTSTART') === 0) {
                     $currentEvent['start_date'] = $this->parseIcalDate($value);
                 } elseif (strpos($key, 'DTEND') === 0) {
@@ -275,10 +275,10 @@ class BookingsTable extends Component
                 }
             }
         }
-        
+
         return $events;
     }
-    
+
     private function parseIcalDate($dateString)
     {
         if (strlen($dateString) === 8) {
@@ -288,7 +288,7 @@ class BookingsTable extends Component
         } elseif (strlen($dateString) === 15) {
             return \Carbon\Carbon::createFromFormat('Ymd\THis', $dateString);
         }
-        
+
         return \Carbon\Carbon::parse($dateString);
     }
 
