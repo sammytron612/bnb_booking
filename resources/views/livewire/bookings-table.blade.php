@@ -88,14 +88,26 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
-                                 data-tooltip-id="tooltip-week1-{{ $loop->index }}">
+                            @if($day['has_double_booking'])
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger animate-pulse"
+                                     title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
+                                     data-tooltip-id="tooltip-week1-{{ $loop->index }}">
+                            @else
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                     title="{{ $day['booking_count'] }} booking(s)"
+                                     data-tooltip-id="tooltip-week1-{{ $loop->index }}">
+                            @endif
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
+                                    @if($day['has_double_booking'])
+                                        <span class="text-yellow-300">⚠️</span>
+                                    @endif
                                 </div>
-                                <div class="text-blue-100 text-xs">
+                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
+                                    @if($day['has_double_booking'])
+                                        <div class="text-yellow-200 font-bold">CONFLICT!</div>
+                                    @endif
                                 </div>
 
                                 <!-- Check-in indicator -->
@@ -117,6 +129,20 @@
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
+
+                                    @if($day['has_double_booking'])
+                                        <div class="mb-3 p-2 bg-red-800 rounded border-l-4 border-red-400">
+                                            <div class="font-bold text-red-300 flex items-center">
+                                                <span class="mr-1">⚠️</span> DOUBLE BOOKING CONFLICT!
+                                            </div>
+                                            <div class="text-red-200 text-xs mt-1">Multiple bookings detected at the same venue(s)</div>
+                                            @foreach($day['double_booking_venues'] as $venue)
+                                                <div class="text-red-100 text-xs mt-1 font-medium">
+                                                    • {{ $venue['venue_name'] }}: {{ $venue['booking_count'] }} bookings
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
 
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
@@ -224,14 +250,26 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
-                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">
+                            @if($day['has_double_booking'])
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger animate-pulse"
+                                     title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
+                                     data-tooltip-id="tooltip-week2-{{ $loop->index }}">
+                            @else
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                     title="{{ $day['booking_count'] }} booking(s)"
+                                     data-tooltip-id="tooltip-week2-{{ $loop->index }}">
+                            @endif
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
+                                    @if($day['has_double_booking'])
+                                        <span class="text-yellow-300">⚠️</span>
+                                    @endif
                                 </div>
-                                <div class="text-blue-100 text-xs">
+                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
+                                    @if($day['has_double_booking'])
+                                        <div class="text-yellow-200 font-bold">CONFLICT!</div>
+                                    @endif
                                 </div>
 
                                 <!-- Check-in indicator -->
@@ -253,6 +291,20 @@
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
+
+                                    @if($day['has_double_booking'])
+                                        <div class="mb-3 p-2 bg-red-800 rounded border-l-4 border-red-400">
+                                            <div class="font-bold text-red-300 flex items-center">
+                                                <span class="mr-1">⚠️</span> DOUBLE BOOKING CONFLICT!
+                                            </div>
+                                            <div class="text-red-200 text-xs mt-1">Multiple bookings detected at the same venue(s)</div>
+                                            @foreach($day['double_booking_venues'] as $venue)
+                                                <div class="text-red-100 text-xs mt-1 font-medium">
+                                                    • {{ $venue['venue_name'] }}: {{ $venue['booking_count'] }} bookings
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
 
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
