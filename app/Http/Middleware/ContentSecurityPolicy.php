@@ -44,8 +44,8 @@ class ContentSecurityPolicy
         $this->addCacheHeaders($request, $response);
 
         // Skip CSP for non-HTML responses, if disabled, or for Lighthouse testing
-        if (!config('security.csp.enabled', true) || 
-            !$this->isHtmlResponse($response) || 
+        if (!config('security.csp.enabled', true) ||
+            !$this->isHtmlResponse($response) ||
             (config('security.csp.disable_for_lighthouse', true) && $this->isLighthouseRequest($request))) {
             return;
         }
@@ -119,7 +119,7 @@ class ContentSecurityPolicy
     private function isLighthouseRequest(Request $request): bool
     {
         $userAgent = $request->header('User-Agent', '');
-        
+
         // Check for Lighthouse, PageSpeed Insights, and other performance tools
         $performanceTools = [
             'Chrome-Lighthouse',
@@ -129,13 +129,13 @@ class ContentSecurityPolicy
             'Pingdom',
             'Lighthouse'
         ];
-        
+
         foreach ($performanceTools as $tool) {
             if (str_contains($userAgent, $tool)) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }
