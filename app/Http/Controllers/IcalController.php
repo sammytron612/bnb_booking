@@ -322,6 +322,10 @@ class IcalController extends Controller
         $ical .= "PRODID:-//Eileen BnB//Booking Calendar//EN\r\n";
         $ical .= "CALSCALE:GREGORIAN\r\n";
 
+        // Add calendar name and description for Outlook
+        $ical .= "X-WR-CALNAME:" . $venue->venue_name . " - Bookings\r\n";
+        $ical .= "X-WR-CALDESC:Blocked dates for " . $venue->venue_name . "\r\n";
+
         foreach ($bookings as $booking) {
             $checkIn = \Carbon\Carbon::parse($booking->check_in);
             $checkOut = \Carbon\Carbon::parse($booking->check_out);
