@@ -242,7 +242,7 @@ class BookingController extends Controller
             foreach ($icalFeeds as $feed) {
                 $icalData = $this->fetchIcalData($feed->url);
                 if ($icalData) {
-                    $events = $this->parseIcalEvents($icalData, $feed->venue);
+                    $events = $this->parseIcalEvents($icalData, $feed->venue, $feed);
                     $externalBookings = $externalBookings->merge($events);
                 }
             }
@@ -269,7 +269,7 @@ class BookingController extends Controller
         }
     }
 
-    private function parseIcalEvents($icalData, $venue)
+    private function parseIcalEvents($icalData, $venue, $feed = null)
     {
         $events = collect();
         $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
@@ -288,6 +288,7 @@ class BookingController extends Controller
                         'check_in' => $currentEvent['start_date'],
                         'check_out' => $currentEvent['end_date'],
                         'venue_id' => $venue->id,
+                        'source' => $feed ? $feed->source : 'External'
                     ];
 
                     $events->push($booking);

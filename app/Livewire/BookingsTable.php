@@ -135,7 +135,9 @@ class BookingsTable extends Component
 
             // Get external bookings for this date
             $dayExternalBookings = $externalBookings->filter(function ($booking) use ($date) {
-                return $booking->check_in <= $date && $booking->check_out > $date;
+                $checkIn = \Carbon\Carbon::parse($booking->check_in);
+                $checkOut = \Carbon\Carbon::parse($booking->check_out);
+                return $checkIn->lte($date) && $checkOut->gt($date);
             });
 
             // Combine both types of bookings
@@ -168,18 +170,40 @@ class BookingsTable extends Component
             $checkOuts = $checkOutsDb->merge($checkOutsExternal);
 
             // Check for double bookings (multiple bookings at same venue on same date)
-            $venueBookings = $dayBookings->groupBy('venue_id');
+            $venueBookings = [];
+
+            // Group bookings by venue_id manually for better control
+            foreach ($dayBookings as $booking) {
+                $venueId = null;
+
+                // Get venue_id from different booking types
+                if (isset($booking->venue_id)) {
+                    $venueId = $booking->venue_id;
+                } elseif ($booking->getAttribute('venue_id')) {
+                    $venueId = $booking->getAttribute('venue_id');
+                } elseif (isset($booking->attributes['venue_id'])) {
+                    $venueId = $booking->attributes['venue_id'];
+                }
+
+                if ($venueId) {
+                    if (!isset($venueBookings[$venueId])) {
+                        $venueBookings[$venueId] = [];
+                    }
+                    $venueBookings[$venueId][] = $booking;
+                }
+            }
+
             $hasDoubleBooking = false;
             $doubleBookingVenues = [];
 
             foreach ($venueBookings as $venueId => $bookings) {
-                if ($bookings->count() > 1) {
+                if (count($bookings) > 1) {
                     $hasDoubleBooking = true;
-                    $venue = $bookings->first()->venue ?? null;
+                    $venue = $bookings[0]->venue ?? null;
                     $doubleBookingVenues[] = [
                         'venue_id' => $venueId,
                         'venue_name' => $venue ? $venue->venue_name : 'Unknown Venue',
-                        'booking_count' => $bookings->count()
+                        'booking_count' => count($bookings)
                     ];
                 }
             }
@@ -214,10 +238,11 @@ class BookingsTable extends Component
             // Convert the raw objects into Booking-like models for calendar compatibility
             if ($rawExternalBookings && $rawExternalBookings->count() > 0) {
                 foreach ($rawExternalBookings as $rawBooking) {
+                $sourceName = $rawBooking->source ?? 'External Booking';
                 $booking = new Booking([
                     'venue_id' => $rawBooking->venue_id,
                     'booking_id' => 'EXT-' . strtoupper(substr(md5(uniqid()), 0, 6)),
-                    'name' => 'External Booking',
+                    'name' => $sourceName,
                     'email' => 'external@booking.com',
                     'phone' => '',
                     'check_in' => $rawBooking->check_in,

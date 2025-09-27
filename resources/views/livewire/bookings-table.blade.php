@@ -88,15 +88,22 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
+                       <div class="relative hover:z-[70] bg-gradient-to-br {{ $day['has_double_booking'] ? 'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' : 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' }} transition-all duration-200 rounded-lg {{ $day['has_double_booking'] ? 'p-6 min-w-[100px] min-h-[100px] shadow-xl' : 'p-3' }} cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s){{ $day['has_double_booking'] ? ' - DOUBLE BOOKING!' : '' }}"
                                  data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
                                 </div>
-                                <div class="text-blue-100 text-xs">
+                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
                                 </div>
+
+                                <!-- Double booking warning indicator -->
+                                @if($day['has_double_booking'])
+                                    <div class="absolute -bottom-2 -left-2 bg-yellow-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ⚠
+                                    </div>
+                                @endif
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
@@ -161,15 +168,16 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show checkout card when no bookings but checkouts exist -->
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                <!-- Show blank card with only checkout indicator when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-transparent border-2 border-dashed border-gray-300 hover:border-gray-400 transition-all duration-200 rounded-lg p-3 cursor-pointer group mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week1-{{ $loop->index }}">
-                                    <div class="text-white text-xs font-bold">
-                                        {{ $day['check_out_count'] }}
+                                    <!-- No bookings content -->
+                                    <div class="text-gray-400 text-xs font-medium text-center">
+                                        No bookings
                                     </div>
-                                    <div class="text-red-100 text-xs">
-                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    <div class="text-transparent text-xs">
+                                        .
                                     </div>
 
                                     <!-- Check-out indicator -->
@@ -229,15 +237,22 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
+                       <div class="relative hover:z-[70] bg-gradient-to-br {{ $day['has_double_booking'] ? 'from-red-500 to-red-600 hover:from-red-600 hover:to-red-700' : 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' }} transition-all duration-200 rounded-lg {{ $day['has_double_booking'] ? 'p-6 min-w-[100px] min-h-[100px] shadow-xl' : 'p-3' }} cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s){{ $day['has_double_booking'] ? ' - DOUBLE BOOKING!' : '' }}"
                                  data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
                                 </div>
-                                <div class="text-blue-100 text-xs">
+                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
                                 </div>
+
+                                <!-- Double booking warning indicator -->
+                                @if($day['has_double_booking'])
+                                    <div class="absolute -bottom-2 -left-2 bg-yellow-400 text-black text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                        ⚠
+                                    </div>
+                                @endif
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
@@ -302,15 +317,16 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show checkout card when no bookings but checkouts exist -->
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                <!-- Show blank card with only checkout indicator when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-transparent border-2 border-dashed border-gray-300 hover:border-gray-400 transition-all duration-200 rounded-lg p-3 cursor-pointer group mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week2-{{ $loop->index }}">
-                                    <div class="text-white text-xs font-bold">
-                                        {{ $day['check_out_count'] }}
+                                    <!-- No bookings content -->
+                                    <div class="text-gray-400 text-xs font-medium text-center">
+                                        No bookings
                                     </div>
-                                    <div class="text-red-100 text-xs">
-                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    <div class="text-transparent text-xs">
+                                        .
                                     </div>
 
                                     <!-- Check-out indicator -->
