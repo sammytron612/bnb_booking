@@ -67,6 +67,9 @@ return [
 
     'owner_phone_no' => env('OWNER_PHONE_NO'),
     'owner_email' => env('OWNER_EMAIL'),
+    'facebook_url' => env('FACEBOOK_URL'),
+    'instagram_url' => env('INSTAGRAM_URL'),
+    'tripadvisor_url' => env('TRIPADVISOR_URL'),
 
     /*
     |--------------------------------------------------------------------------
