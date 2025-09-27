@@ -167,6 +167,23 @@ class BookingsTable extends Component
 
             $checkOuts = $checkOutsDb->merge($checkOutsExternal);
 
+            // Check for double bookings (multiple bookings at same venue on same date)
+            $venueBookings = $dayBookings->groupBy('venue_id');
+            $hasDoubleBooking = false;
+            $doubleBookingVenues = [];
+
+            foreach ($venueBookings as $venueId => $bookings) {
+                if ($bookings->count() > 1) {
+                    $hasDoubleBooking = true;
+                    $venue = $bookings->first()->venue ?? null;
+                    $doubleBookingVenues[] = [
+                        'venue_id' => $venueId,
+                        'venue_name' => $venue ? $venue->venue_name : 'Unknown Venue',
+                        'booking_count' => $bookings->count()
+                    ];
+                }
+            }
+
             $days->push([
                 'date' => $date,
                 'bookings' => $dayBookings,
@@ -176,7 +193,9 @@ class BookingsTable extends Component
                 'check_outs' => $checkOuts,
                 'check_out_count' => $checkOuts->count(),
                 'is_today' => $date->isToday(),
-                'is_weekend' => $date->isWeekend()
+                'is_weekend' => $date->isWeekend(),
+                'has_double_booking' => $hasDoubleBooking,
+                'double_booking_venues' => $doubleBookingVenues
             ]);
         }
 

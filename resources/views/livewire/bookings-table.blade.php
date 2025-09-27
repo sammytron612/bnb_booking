@@ -88,38 +88,26 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                            @if($day['has_double_booking'])
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                     title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
-                                     data-tooltip-id="tooltip-week1-{{ $loop->index }}">
-                            @else
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                     title="{{ $day['booking_count'] }} booking(s)"
-                                     data-tooltip-id="tooltip-week1-{{ $loop->index }}">
-                            @endif
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
+                                 data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
-                                    @if($day['has_double_booking'])
-                                        <span class="text-yellow-300">⚠️</span>
-                                    @endif
                                 </div>
-                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
+                                <div class="text-blue-100 text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
-                                    @if($day['has_double_booking'])
-                                        <div class="text-yellow-200 font-bold">CONFLICT!</div>
-                                    @endif
                                 </div>
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
-                                    <div class="absolute -top-2 -left-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
                                     </div>
                                 @endif
 
                                 <!-- Check-out indicator -->
                                 @if($day['check_out_count'] > 0)
-                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
                                 @endif
@@ -129,20 +117,6 @@
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
-
-                                    @if($day['has_double_booking'])
-                                        <div class="mb-3 p-2 bg-red-800 rounded border-l-4 border-red-400">
-                                            <div class="font-bold text-red-300 flex items-center">
-                                                <span class="mr-1">⚠️</span> DOUBLE BOOKING CONFLICT!
-                                            </div>
-                                            <div class="text-red-200 text-xs mt-1">Multiple bookings detected at the same venue(s)</div>
-                                            @foreach($day['double_booking_venues'] as $venue)
-                                                <div class="text-red-100 text-xs mt-1 font-medium">
-                                                    • {{ $venue['venue_name'] }}: {{ $venue['booking_count'] }} bookings
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
 
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
@@ -154,10 +128,10 @@
                                     @endif
 
                                     @if($day['check_out_count'] > 0)
-                                        <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
-                                            <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
-                                                <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
                                     @endif
@@ -187,14 +161,19 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show no bookings style with checkout badge when only checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer group mobile-tooltip-trigger"
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week1-{{ $loop->index }}">
-                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-red-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
 
                                     <!-- Check-out indicator -->
-                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
 
@@ -204,10 +183,10 @@
                                             {{ $day['date']->format('l, F j, Y') }}
                                         </div>
 
-                                        <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
-                                            <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
-                                                <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
 
@@ -226,7 +205,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
 
@@ -250,38 +229,26 @@
                     <!-- Booking indicator -->
                     <div class="relative">
                         @if($day['booking_count'] > 0)
-                            @if($day['has_double_booking'])
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                     title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
-                                     data-tooltip-id="tooltip-week2-{{ $loop->index }}">
-                            @else
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                     title="{{ $day['booking_count'] }} booking(s)"
-                                     data-tooltip-id="tooltip-week2-{{ $loop->index }}">
-                            @endif
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
+                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
                                     {{ $day['booking_count'] }}
-                                    @if($day['has_double_booking'])
-                                        <span class="text-yellow-300">⚠️</span>
-                                    @endif
                                 </div>
-                                <div class="{{ $day['has_double_booking'] ? 'text-red-100' : 'text-blue-100' }} text-xs">
+                                <div class="text-blue-100 text-xs">
                                     {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
-                                    @if($day['has_double_booking'])
-                                        <div class="text-yellow-200 font-bold">CONFLICT!</div>
-                                    @endif
                                 </div>
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
-                                    <div class="absolute -top-2 -left-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
                                     </div>
                                 @endif
 
                                 <!-- Check-out indicator -->
                                 @if($day['check_out_count'] > 0)
-                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
                                 @endif
@@ -291,20 +258,6 @@
                                     <div class="font-bold mb-2 text-blue-300 border-b border-gray-700 pb-1">
                                         {{ $day['date']->format('l, F j, Y') }}
                                     </div>
-
-                                    @if($day['has_double_booking'])
-                                        <div class="mb-3 p-2 bg-red-800 rounded border-l-4 border-red-400">
-                                            <div class="font-bold text-red-300 flex items-center">
-                                                <span class="mr-1">⚠️</span> DOUBLE BOOKING CONFLICT!
-                                            </div>
-                                            <div class="text-red-200 text-xs mt-1">Multiple bookings detected at the same venue(s)</div>
-                                            @foreach($day['double_booking_venues'] as $venue)
-                                                <div class="text-red-100 text-xs mt-1 font-medium">
-                                                    • {{ $venue['venue_name'] }}: {{ $venue['booking_count'] }} bookings
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
 
                                     @if($day['check_in_count'] > 0)
                                         <div class="mb-2 p-2 bg-green-800 rounded border-l-2 border-green-400">
@@ -316,10 +269,10 @@
                                     @endif
 
                                     @if($day['check_out_count'] > 0)
-                                        <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
-                                            <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
-                                                <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
                                     @endif
@@ -349,14 +302,19 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show no bookings style with checkout badge when only checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer group mobile-tooltip-trigger"
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week2-{{ $loop->index }}">
-                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-red-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
 
                                     <!-- Check-out indicator -->
-                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
 
@@ -366,10 +324,10 @@
                                             {{ $day['date']->format('l, F j, Y') }}
                                         </div>
 
-                                        <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
-                                            <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
-                                                <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
 
@@ -388,7 +346,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
                         @endif
 
 
@@ -400,7 +358,7 @@
         <!-- Legend -->
         <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
             <div class="flex items-center">
-                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-1"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-1 animate-pulse"></div>
                 Today
             </div>
 
@@ -409,8 +367,8 @@
                 Check-ins <span class="ml-1 text-green-600">↓</span>
             </div>
             <div class="flex items-center">
-                <div class="w-3 h-3 bg-amber-500 rounded-full mr-1"></div>
-                Check-outs <span class="ml-1 text-amber-600">↑</span>
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
+                Check-outs <span class="ml-1 text-red-600">↑</span>
             </div>
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
@@ -847,4 +805,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
