@@ -28,7 +28,6 @@
     $seoReviews = $reviews;
     $seoPrice = $price;
 
-
     // Debug: Check if description is being passed
     // \Log::info('SEO Debug: $description = ' . ($description ?? 'NULL'));
     // \Log::info('SEO Debug: $seoVenue description = ' . ($seoVenue?->description2 ?? 'NULL'));
@@ -47,8 +46,8 @@
     // Business information
     $businessInfo = [
         'name' => $siteName,
-        'phone' => config('contact.phone', config('contact.phone_fallback', '+44 191 123 4567')),
-        'email' => config('contact.email', config('contact.email_fallback', 'info@seahamcoastalretreats.com')),
+        'phone' => '+44 1234 567890', // Update with real phone
+        'email' => 'info@seahamcoastalretreats.com', // Update with real email
         'address' => [
             'street' => 'Seaham',
             'city' => 'Seaham',
@@ -136,13 +135,9 @@
                 'postalCode' => $seoVenue->postcode ?? 'SR7',
                 'addressCountry' => 'United Kingdom'
             ],
-            'geo' => $seoVenue->latitude && $seoVenue->longitude ? [
+            'geo' => [
                 '@type' => 'GeoCoordinates',
-                'latitude' => (float)$seoVenue->latitude,
-                'longitude' => (float)$seoVenue->longitude
-            ] : [
-                '@type' => 'GeoCoordinates',
-                'latitude' => 54.8386, // Seaham fallback
+                'latitude' => 54.8386, // Seaham coordinates
                 'longitude' => -1.3429
             ],
             'priceRange' => '££',
@@ -152,13 +147,10 @@
         // Add amenities to schema
         if ($seoVenue->amenities) {
             foreach ($seoVenue->amenities as $amenity) {
-                // Skip amenities without proper names
-                if (!empty($amenity->name) || !empty($amenity->title)) {
-                    $venueSchema['amenityFeature'][] = [
-                        '@type' => 'LocationFeatureSpecification',
-                        'name' => $amenity->title ?? "Amenity"
-                    ];
-                }
+                $venueSchema['amenityFeature'][] = [
+                    '@type' => 'LocationFeatureSpecification',
+                    'name' => $amenity->title
+                ];
             }
         }
 
@@ -173,7 +165,6 @@
         }
 
         // Add reviews if available
-
         if ($seoReviews && $seoReviews->count() > 0) {
             $venueSchema['aggregateRating'] = [
                 '@type' => 'AggregateRating',
@@ -185,16 +176,11 @@
 
             $reviewSchemas = [];
             foreach ($seoReviews->take(5) as $review) {
-                // Skip null reviews or reviews with empty content
-                if (!$review || !$review->rating || empty($review->review) || trim($review->review) === '') {
-                    continue;
-                }
-
                 $reviewSchemas[] = [
                     '@type' => 'Review',
                     'author' => [
                         '@type' => 'Person',
-                        'name' => $review->name ?? 'Guest'
+                        'name' => $review->name ?? $review->guest_name ?? 'Guest'
                     ],
                     'reviewRating' => [
                         '@type' => 'Rating',
@@ -202,13 +188,11 @@
                         'bestRating' => '5',
                         'worstRating' => '1'
                     ],
-                    'reviewBody' => $review->review,
+                    'reviewBody' => $review->review ?? $review->comment ?? '',
                     'datePublished' => $review->created_at ? $review->created_at->toISOString() : null
                 ];
-            }            // Only add reviews if we have valid ones
-            if (!empty($reviewSchemas)) {
-                $venueSchema['review'] = $reviewSchemas;
             }
+            $venueSchema['review'] = $reviewSchemas;
         }
 
         $structuredData[] = $venueSchema;
@@ -235,8 +219,8 @@
 
 @if($seoVenue)
 <meta property="og:type" content="website">
-<meta property="place:location:latitude" content="{{ $seoVenue->latitude ?? 54.8386 }}">
-<meta property="place:location:longitude" content="{{ $seoVenue->longitude ?? -1.3429 }}">
+<meta property="place:location:latitude" content="54.8386">
+<meta property="place:location:longitude" content="-1.3429">
 @endif
 
 <!-- Twitter Card Meta Tags -->

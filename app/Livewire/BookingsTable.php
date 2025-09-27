@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Booking;
-use App\Models\Ical;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,7 +18,6 @@ class BookingsTable extends Component
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
     public $calendarOffset = 0; // Track calendar navigation offset
-    public $successMessage = ''; // Livewire success message
 
     // Form fields for editing
     public $editStatus = '';
@@ -75,7 +73,7 @@ class BookingsTable extends Component
         $booking = Booking::find($bookingId);
         if ($booking) {
             $booking->delete();
-            $this->successMessage = 'Booking deleted successfully.';
+            session()->flash('success', 'Booking deleted successfully.');
         }
     }
 
@@ -91,56 +89,20 @@ class BookingsTable extends Component
             'editPayment' => 'required|in:0,1',
         ]);
 
-        // Debug: Log what we're trying to save
-        \Log::info('Saving booking payment status', [
-            'booking_id' => $this->selectedBooking->id,
-            'editPayment' => $this->editPayment,
-            'validated_editPayment' => $validated['editPayment'],
-            'is_paid_value' => $validated['editPayment'] === "1",
-            'is_paid_int' => (int) $validated['editPayment']
-        ]);
-
         // Get fresh model from database and update it
         $booking = Booking::find($this->selectedBooking->id);
-
-        // Use explicit boolean conversion
-        $isPaid = $validated['editPayment'] === "1" || $validated['editPayment'] === 1;
-
-        // Update non-guarded fields first
         $booking->update([
             'status' => $validated['editStatus'],
-            'notes' => $validated['editNotes']
+            'notes' => $validated['editNotes'],
+            'is_paid' => $validated['editPayment'] === "1"
         ]);
-
-        // Explicitly set the guarded is_paid field
-        $booking->is_paid = $isPaid;
-        $booking->save();
-
-        // Debug: Verify the update worked
-        $booking->refresh();
-        \Log::info('After update', [
-            'booking_id' => $booking->id,
-            'is_paid_in_db' => $booking->is_paid,
-            'is_paid_type' => gettype($booking->is_paid)
-        ]);
-
-        // Refresh the booking to show updated values
-        $booking->refresh();
 
         $this->showEditModal = false;
         $this->selectedBooking = null;
         $this->editStatus = '';
         $this->editNotes = '';
         $this->editPayment = "0";
-        $this->successMessage = 'Booking updated successfully.';
-
-        // Force component refresh to update the display
-        $this->dispatch('$refresh');
-    }
-
-    public function clearSuccessMessage()
-    {
-        $this->successMessage = '';
+        session()->flash('success', 'Booking updated successfully.');
     }
 
     public function navigateCalendar($direction)
@@ -157,13 +119,8 @@ class BookingsTable extends Component
         $days = collect();
         $startDate = now()->addDays($this->calendarOffset);
 
-        // Get iCal blocked dates for the date range
-        $endDate = $startDate->copy()->addDays(13);
-        $icalBlockedDates = $this->getIcalBlockedDates($startDate, $endDate);
-
         for ($i = 0; $i < 14; $i++) {
             $date = $startDate->copy()->addDays($i);
-            $dateStr = $date->format('Y-m-d');
 
             // Get bookings for this date
             $dayBookings = Booking::with('venue')->where(function ($query) use ($date) {
@@ -185,11 +142,6 @@ class BookingsTable extends Component
                 ->where('status', '!=', 'cancelled')
                 ->get();
 
-            // Get iCal bookings for this date
-            $icalBookings = collect($icalBlockedDates)->filter(function ($icalDate) use ($dateStr) {
-                return $icalDate['date'] === $dateStr;
-            })->values();
-
             $days->push([
                 'date' => $date,
                 'bookings' => $dayBookings,
@@ -198,100 +150,12 @@ class BookingsTable extends Component
                 'check_in_count' => $checkIns->count(),
                 'check_outs' => $checkOuts,
                 'check_out_count' => $checkOuts->count(),
-                'ical_bookings' => $icalBookings,
-                'ical_count' => $icalBookings->count(),
                 'is_today' => $date->isToday(),
                 'is_weekend' => $date->isWeekend()
             ]);
         }
 
         return $days;
-    }
-
-    private function getIcalBlockedDates($startDate, $endDate)
-    {
-        // Get all iCal URLs that are active
-        $icals = \App\Models\Ical::where('active', true)->with('venue')->get();
-        $blockedDates = [];
-
-        foreach ($icals as $ical) {
-            try {
-                // Fetch iCal data
-                $icalContent = file_get_contents($ical->url);
-                if ($icalContent) {
-                    $dates = $this->parseIcalContent($icalContent, $startDate, $endDate);
-                    foreach ($dates as $date) {
-                        $blockedDates[] = [
-                            'date' => $date,
-                            'source' => $ical->source,
-                            'venue' => $ical->venue,
-                            'name' => $ical->name
-                        ];
-                    }
-                }
-            } catch (\Exception $e) {
-                // Log error but don't break the calendar
-                \Log::error("Error fetching iCal for {$ical->name}: " . $e->getMessage());
-            }
-        }
-
-        return $blockedDates;
-    }
-
-    private function parseIcalContent($content, $startDate, $endDate)
-    {
-        $dates = [];
-        $lines = explode("\n", $content);
-        $inEvent = false;
-        $eventStart = null;
-        $eventEnd = null;
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-
-            if ($line === 'BEGIN:VEVENT') {
-                $inEvent = true;
-                $eventStart = null;
-                $eventEnd = null;
-            } elseif ($line === 'END:VEVENT' && $inEvent) {
-                if ($eventStart && $eventEnd) {
-                    // Generate all dates between start and end (exclusive of end date)
-                    $current = \Carbon\Carbon::parse($eventStart);
-                    $end = \Carbon\Carbon::parse($eventEnd);
-
-                    while ($current->lt($end) && $current->between($startDate, $endDate)) {
-                        $dates[] = $current->format('Y-m-d');
-                        $current->addDay();
-                    }
-                }
-                $inEvent = false;
-            } elseif ($inEvent) {
-                if (strpos($line, 'DTSTART') === 0) {
-                    $eventStart = $this->parseIcalDate($line);
-                } elseif (strpos($line, 'DTEND') === 0) {
-                    $eventEnd = $this->parseIcalDate($line);
-                }
-            }
-        }
-
-        return array_unique($dates);
-    }
-
-    private function parseIcalDate($line)
-    {
-        $parts = explode(':', $line, 2);
-        if (count($parts) === 2) {
-            $dateStr = $parts[1];
-            // Handle different date formats (with or without time)
-            if (strlen($dateStr) === 8) {
-                // YYYYMMDD format
-                return \Carbon\Carbon::createFromFormat('Ymd', $dateStr)->format('Y-m-d');
-            } elseif (strlen($dateStr) === 15) {
-                // YYYYMMDDTHHMMSSZ format
-                return \Carbon\Carbon::createFromFormat('Ymd\THis\Z', $dateStr)->format('Y-m-d');
-            }
-        }
-        return null;
     }
 
     public function render()

@@ -9,73 +9,55 @@ use Carbon\Carbon;
 
 class SitemapController extends Controller
 {
-    /**
-     * Generate sitemap index file
-     */
     public function index()
     {
-        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        $sitemaps = [
+            [
+                'loc' => route('sitemap.main'),
+                'lastmod' => Carbon::now()->toISOString()
+            ],
+            [
+                'loc' => route('sitemap.venues'),
+                'lastmod' => Carbon::now()->toISOString()
+            ]
+        ];
 
-        // Main sitemap
-        $sitemap .= $this->addSitemapUrl(route('api.sitemap.main'), Carbon::now());
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.sitemap-index', compact('sitemaps'))->render();
 
-        // Venues sitemap
-        $sitemap .= $this->addSitemapUrl(route('api.sitemap.venues'), Carbon::now());
-
-        $sitemap .= '</sitemapindex>';
-
-        return response($sitemap)
-            ->header('Content-Type', 'application/xml')
-            ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+        return response($content)
+            ->header('Content-Type', 'application/xml');
     }
 
-    /**
-     * Generate main pages sitemap
-     */
     public function main()
     {
         $urls = [
             [
-                'url' => route('home'),
-                'priority' => '1.0',
-                'changefreq' => 'daily',
-                'lastmod' => Carbon::now()->toISOString()
-            ],
-            [
-                'url' => route('home') . '#contact',
-                'priority' => '0.8',
-                'changefreq' => 'monthly',
-                'lastmod' => Carbon::now()->toISOString()
-            ],
-            [
-                'url' => route('home') . '#about-seaham',
-                'priority' => '0.7',
-                'changefreq' => 'monthly',
-                'lastmod' => Carbon::now()->toISOString()
-            ],
-            // Add more static pages as needed
+                'loc' => route('home'),
+                'lastmod' => Carbon::now()->toISOString(),
+                'changefreq' => 'weekly',
+                'priority' => '1.0'
+            ]
         ];
 
-        return $this->generateSitemap($urls);
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.urlset', compact('urls'))->render();
+
+        return response($content)
+            ->header('Content-Type', 'application/xml');
     }
 
-    /**
-     * Generate venues sitemap
-     */
     public function venues()
     {
-        $venues = Venue::where('booking_enabled', true)
-            ->orderBy('id', 'desc')
-            ->get();
-
+        $venues = Venue::all();
         $urls = [];
+
         foreach ($venues as $venue) {
+            $lastmod = Carbon::now()->toISOString(); // You could use updated_at if available
+
             $urls[] = [
-                'url' => route('venue.show', $venue->route),
-                'priority' => '0.9',
+                'loc' => route('venue.show', $venue->route),
+                'lastmod' => $lastmod,
                 'changefreq' => 'weekly',
-                'lastmod' => Carbon::now()->toISOString(),
+                'priority' => '0.8',
                 'images' => $venue->propertyImages->map(function ($image) use ($venue) {
                     return [
                         'loc' => asset(ltrim($image->location, '/')),
@@ -86,54 +68,9 @@ class SitemapController extends Controller
             ];
         }
 
-        return $this->generateSitemap($urls);
-    }
+        $content = '<?xml version="1.0" encoding="UTF-8"?>' . view('sitemaps.urlset', compact('urls'))->render();
 
-    /**
-     * Generate XML sitemap from URLs array
-     */
-    private function generateSitemap($urls)
-    {
-        $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-        $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
-
-        foreach ($urls as $url) {
-            $sitemap .= "  <url>\n";
-            $sitemap .= "    <loc>" . htmlspecialchars($url['url']) . "</loc>\n";
-
-            if (isset($url['lastmod'])) {
-                $sitemap .= "    <lastmod>" . $url['lastmod'] . "</lastmod>\n";
-            }
-
-            $sitemap .= "    <changefreq>" . $url['changefreq'] . "</changefreq>\n";
-            $sitemap .= "    <priority>" . $url['priority'] . "</priority>\n";
-
-            // Add image sitemap data
-            if (isset($url['images']) && $url['images']->count() > 0) {
-                foreach ($url['images'] as $image) {
-                    $sitemap .= "    <image:image>\n";
-                    $sitemap .= "      <image:loc>" . htmlspecialchars($image['loc']) . "</image:loc>\n";
-                    $sitemap .= "      <image:title>" . htmlspecialchars($image['title']) . "</image:title>\n";
-                    $sitemap .= "      <image:caption>" . htmlspecialchars($image['caption']) . "</image:caption>\n";
-                    $sitemap .= "    </image:image>\n";
-                }
-            }
-
-            $sitemap .= "  </url>\n";
-        }
-
-        $sitemap .= '</urlset>';
-
-        return response($sitemap)
-            ->header('Content-Type', 'application/xml')
-            ->header('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-    }
-
-    /**
-     * Helper method to add sitemap URL to index
-     */
-    private function addSitemapUrl($url, $lastmod)
-    {
-        return "  <sitemap>\n    <loc>" . $url . "</loc>\n    <lastmod>" . $lastmod->toISOString() . "</lastmod>\n  </sitemap>\n";
+        return response($content)
+            ->header('Content-Type', 'application/xml');
     }
 }

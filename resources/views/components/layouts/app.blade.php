@@ -1,5 +1,5 @@
 <x-layouts.app.header :title="$title ?? null" :seoData="$seoData ?? null">
-    <flux:main id="main-content">
+    <flux:main>
         {{ $slot }}
     </flux:main>
 </x-layouts.app.header>

@@ -186,11 +186,12 @@ class PaymentController extends Controller
                     'venue' => $booking->venue->venue_name,
                     'guest_name' => $booking->name,
                 ],
-            ]);            // Store session ID and payment details in booking (protected fields)
-            $booking->stripe_session_id = $session->id;
-            $booking->stripe_amount = $booking->total_price;
-            $booking->stripe_currency = 'gbp';
-            $booking->save();
+            ]);            // Store session ID in booking
+            $booking->update([
+                'stripe_session_id' => $session->id,
+                'stripe_amount' => $booking->total_price,
+                'stripe_currency' => 'gbp',
+            ]);
 
             // If this is an AJAX request, return JSON
             if ($request->expectsJson()) {
@@ -255,16 +256,13 @@ class PaymentController extends Controller
             }
 
             if ($session->payment_status === 'paid') {
-                // Set protected fields explicitly to prevent mass assignment vulnerabilities
-                $booking->is_paid = true;
-                $booking->payment_completed_at = now();
-                $booking->stripe_payment_intent_id = $session->payment_intent;
-                $booking->stripe_metadata = $session->metadata->toArray();
-                $booking->pay_method = 'stripe';
-
-                // Prepare non-protected fields for mass assignment
                 $updateData = [
+                    'is_paid' => true,
                     'status' => 'confirmed',
+                    'payment_completed_at' => now(),
+                    'stripe_payment_intent_id' => $session->payment_intent,
+                    'stripe_metadata' => $session->metadata->toArray(),
+                    'pay_method' => 'stripe',
                 ];
 
                 // Update email if customer provided one in Stripe checkout - with validation
@@ -280,49 +278,49 @@ class PaymentController extends Controller
                     }
                 }
 
-                // Save protected fields first, then update non-protected fields
-                $booking->save();
                 $booking->update($updateData);
 
                 // Check if webhook has already processed this booking and sent emails
-                // Use same robust locking pattern as webhook method
-                \DB::transaction(function () use ($booking) {
-                    // Re-fetch booking with lock to prevent race conditions (same as webhook)
-                    $booking = Booking::where('id', $booking->id)->lockForUpdate()->first();
+                // If not, send emails from here as backup (for cases where webhooks fail)
+                if (!$booking->confirmation_email_sent) {
+                    \DB::transaction(function () use ($booking) {
+                        // Re-fetch booking to check current state
+                        $booking = Booking::where('id', $booking->id)->lockForUpdate()->first();
 
-                    // Check INSIDE the locked transaction (improved race condition protection)
-                    if ($booking->confirmation_email_sent) {
-                        Log::info('Emails already sent by webhook, skipped backup sending', [
-                            'booking_id' => $booking->id,
-                            'email_sent_at' => $booking->confirmation_email_sent
-                        ]);
-                        return;
-                    }
+                        // Double-check that emails haven't been sent by webhook in the meantime
+                        if (!$booking->confirmation_email_sent) {
+                            try {
+                                // Mark emails as sent to prevent duplicate sending
+                                $booking->update(['confirmation_email_sent' => now()]);
 
-                    try {
-                        // Mark emails as sent FIRST to prevent duplicate sending (protected field)
-                        $booking->confirmation_email_sent = now();
-                        $booking->save();
+                                // Send confirmation email to customer
+                                Mail::to($booking->email)->send(new BookingConfirmation($booking));
 
-                        // Send confirmation email to customer
-                        Mail::to($booking->email)->send(new BookingConfirmation($booking));
+                                // Send notification to owner
+                                if (config('mail.owner_email')) {
+                                    Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
+                                }
 
-                        // Send notification to owner
-                        if (config('mail.owner_email')) {
-                            Mail::to(config('mail.owner_email'))->send(new NewBooking($booking));
+                                Log::info('Confirmation emails sent from success page (webhook backup)', [
+                                    'booking_id' => $booking->id,
+                                    'reason' => 'webhook_not_received'
+                                ]);
+                            } catch (Exception $e) {
+                                Log::error('Failed to send backup confirmation email from success page: ' . $e->getMessage(), [
+                                    'booking_id' => $booking->id
+                                ]);
+                            }
+                        } else {
+                            Log::info('Emails already sent by webhook, skipped backup sending', [
+                                'booking_id' => $booking->id
+                            ]);
                         }
-
-                        Log::info('Confirmation emails sent from success page (webhook backup)', [
-                            'booking_id' => $booking->id,
-                            'reason' => 'webhook_not_received',
-                            'sent_via' => 'success_page_backup'
-                        ]);
-                    } catch (Exception $e) {
-                        Log::error('Failed to send backup confirmation email from success page: ' . $e->getMessage(), [
-                            'booking_id' => $booking->id
-                        ]);
-                    }
-                });
+                    });
+                } else {
+                    Log::info('Booking updated from success page - emails already sent', [
+                        'booking_id' => $booking->id
+                    ]);
+                }
             }
         } catch (Exception $e) {
             // Log error but still show success page
@@ -434,17 +432,14 @@ class PaymentController extends Controller
                     // Check if booking is already paid to prevent duplicate emails
                     $wasAlreadyPaid = $booking->is_paid;
 
-                    // Update non-protected fields via mass assignment
                     $updateData = [
+                        'is_paid' => true,
                         'status' => 'confirmed',
+                        'payment_completed_at' => now(),
+                        'stripe_payment_intent_id' => $session['payment_intent'],
+                        'stripe_metadata' => $session['metadata'],
+                        'pay_method' => 'stripe',
                     ];
-
-                    // Set protected payment fields explicitly to prevent mass assignment vulnerabilities
-                    $booking->is_paid = true;
-                    $booking->payment_completed_at = now();
-                    $booking->stripe_payment_intent_id = $session['payment_intent'];
-                    $booking->stripe_metadata = $session['metadata'];
-                    $booking->pay_method = 'stripe';
 
                     // Update email if customer provided one in Stripe checkout - with validation
                     if (!empty($session['customer_email'])) {
@@ -471,9 +466,8 @@ class PaymentController extends Controller
                     if (!$booking->confirmation_email_sent) {
                         try {
                             // Mark emails as sent FIRST to prevent other webhooks from sending
-                            $booking->confirmation_email_sent = now();
-                            $booking->save(); // Save protected fields
-                            $booking->update($updateData); // Update non-protected fields
+                            $updateData['confirmation_email_sent'] = now();
+                            $booking->update($updateData);
 
                             // Send confirmation email to CUSTOMER only
                             Mail::to($booking->email)->send(new BookingConfirmation($booking));
@@ -495,8 +489,7 @@ class PaymentController extends Controller
                         }
                     } else {
                         // Just update booking data without sending emails
-                        $booking->save(); // Save protected fields
-                        $booking->update($updateData); // Update non-protected fields
+                        $booking->update($updateData);
                         Log::info('Emails already sent for this booking, webhook updated booking only', [
                             'booking_id' => $booking->id,
                             'email_sent_at' => $booking->confirmation_email_sent
@@ -552,15 +545,11 @@ class PaymentController extends Controller
             $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
 
             if ($booking && !$booking->is_paid) {
-                // Set protected fields explicitly
-                $booking->is_paid = true;
-                $booking->payment_completed_at = now();
-                $booking->pay_method = 'stripe';
-                $booking->save();
-
-                // Update non-protected fields
                 $booking->update([
+                    'is_paid' => true,
                     'status' => 'confirmed',
+                    'payment_completed_at' => now(),
+                    'pay_method' => 'stripe',
                 ]);
 
                 Log::info('Booking updated via charge.updated (no emails sent)', ['booking_id' => $booking->id]);
@@ -578,15 +567,11 @@ class PaymentController extends Controller
             $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
 
             if ($booking && !$booking->is_paid) {
-                // Set protected fields explicitly
-                $booking->is_paid = true;
-                $booking->payment_completed_at = now();
-                $booking->pay_method = 'stripe';
-                $booking->save();
-
-                // Update non-protected fields
                 $booking->update([
+                    'is_paid' => true,
                     'status' => 'confirmed',
+                    'payment_completed_at' => now(),
+                    'pay_method' => 'stripe',
                 ]);
 
                 Log::info('Booking updated via charge.succeeded (no emails sent)', ['booking_id' => $booking->id]);

@@ -16,7 +16,6 @@ let bookedDates = new Set(); // 'YYYY-MM-DD' - Backward compatibility
 let checkInDates = new Set(); // Dates when properties are checking in (can end booking here but not start)
 let checkOutDates = new Set(); // Dates when properties are checking out (can start booking here but not end)
 let fullyBookedDates = new Set(); // Dates completely unavailable
-let icalBookedDates = new Set(); // iCal dates cached for month navigation
 let checkIn = null; // Date
 let checkOut = null; // Date
 
@@ -148,8 +147,6 @@ function initializeBookingCalendar() {
             const isBooked = bookedDates.has(key); // For backward compatibility
             const isOrphaned = isOrphanedDate(date);
 
-
-
             // Calculate selection ranges for visual display
             // inRange represents nights you're staying (check-in date to day before check-out)
             const inRange = checkIn && checkOut && date >= checkIn && date < checkOut;
@@ -167,12 +164,13 @@ function initializeBookingCalendar() {
             ];
 
             // Determine if the date is clickable
-            // Only fully booked dates and past dates are not clickable
-            const isClickable = !isPast && !isFullyBooked;
+            // Fully booked dates are never clickable when selecting nights to stay
+            const isClickable = !isPast && !isOrphaned && !isFullyBooked;
 
             // Style based on availability, with fully booked taking precedence
-            // Note: Removed orphaned date blocking - let users try to book and handle minimum nights in selection logic
-            if (isFullyBooked) {
+            if (isOrphaned) {
+                classNames.push('line-through text-gray-400 bg-red-50 cursor-not-allowed border border-red-200');
+            } else if (isFullyBooked) {
                 // Fully booked dates are always gray and blocked
                 classNames.push('line-through text-gray-400 bg-gray-100 cursor-not-allowed');
             } else if (isCheckInDay) {
@@ -203,14 +201,14 @@ function initializeBookingCalendar() {
             btn.textContent = d;
 
             // Add tooltip for special dates
-            if (isCheckInDay) {
+            if (isOrphaned) {
+                btn.title = 'Unavailable - Cannot accommodate minimum 2-night stay';
+            } else if (isCheckInDay) {
                 btn.title = 'Check-in day - Available for checkout (11am departure, 3pm arrival)';
             } else if (isCheckOutDay) {
                 btn.title = 'Check-out day - Available for check-in (11am departure, 3pm arrival)';
             } else if (isFullyBooked && !isCheckInDay && !isCheckOutDay) {
                 btn.title = 'Fully booked';
-            } else if (isOrphaned) {
-                btn.title = 'Limited availability - May require flexible dates for minimum stay';
             }
 
             // Add click handler based on clickability
@@ -250,13 +248,22 @@ function initializeBookingCalendar() {
             dateKeyType: typeof dateKey
         });
 
+        // Allow clearing orphaned dates if they're currently selected
+        const isCurrentlySelectedStart = checkIn && fmt(date) === fmt(checkIn);
+        const isCurrentlySelectedEnd = checkOut && fmt(date) === fmt(addDays(checkOut, -1));
+
+        // If clicking on an orphaned date that's currently selected, clear the selection
+        if (isOrphaned && (isCurrentlySelectedStart || isCurrentlySelectedEnd)) {
+            clearSelection();
+            return;
+        }
+
         // When selecting nights to stay:
         // - Can't select nights that are fully booked (someone staying that night)
         // - CAN select on check-out days (previous guest leaves, you can start staying)
         // - CANNOT select on check-in days (someone else is starting to stay that night)
-        // Note: Removed orphaned date blocking - let users select any available date
-        if (fullyBookedDates.has(dateKey)) {
-            console.log('Blocked selection:', dateKey, 'fullyBooked:', fullyBookedDates.has(dateKey));
+        if (fullyBookedDates.has(dateKey) || isOrphaned) {
+            console.log('Blocked selection:', dateKey, 'fullyBooked:', fullyBookedDates.has(dateKey), 'isOrphaned:', isOrphaned);
             return; // Invalid night selection
         }
 
@@ -335,7 +342,7 @@ function initializeBookingCalendar() {
 
         console.log('Final selection:', fmt(checkIn), 'to', fmt(checkOut));
         renderCalendar();
-    }    // Navigation (with null checks) - only loads database data for performance
+    }    // Navigation (with null checks)
     if (prevMonthBtn) {
         prevMonthBtn.addEventListener('click', async () => {
             viewMonth--;
@@ -343,7 +350,7 @@ function initializeBookingCalendar() {
                 viewMonth = 11;
                 viewYear--;
             }
-            await loadDatabaseBookedDates(currentVenue);
+            await loadAllBookedDates(currentVenue);
         });
     }
 
@@ -354,7 +361,7 @@ function initializeBookingCalendar() {
                 viewMonth = 0;
                 viewYear++;
             }
-            await loadDatabaseBookedDates(currentVenue);
+            await loadAllBookedDates(currentVenue);
         });
     }
 
@@ -426,7 +433,37 @@ function initializeBookingCalendar() {
         });
     }
 
-
+    // --- iCal parsing ---
+    // Parse a subset of iCal to get date ranges from VEVENT DTSTART/DTEND (date-only formats)
+    function parseIcs(icsText) {
+        const lines = icsText.replace(/\r/g,'').split('\n');
+        const events = [];
+        let cur = null;
+        for (let raw of lines) {
+            const line = raw.trim();
+            if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
+            if (line === 'END:VEVENT') { if (cur && cur.DTSTART && cur.DTEND) events.push(cur); cur = null; continue; }
+            if (!cur) continue;
+            if (line.startsWith('DTSTART')) { cur.DTSTART = line.split(':').pop(); }
+            if (line.startsWith('DTEND')) { cur.DTEND = line.split(':').pop(); }
+        }
+        const added = [];
+        for (const ev of events) {
+            const start = ev.DTSTART.substring(0,8); // YYYYMMDD
+            const end = ev.DTEND.substring(0,8); // exclusive
+            if (!/^\d{8}$/.test(start) || !/^\d{8}$/.test(end)) continue;
+            const s = `${start.slice(0,4)}-${start.slice(4,6)}-${start.slice(6,8)}`;
+            const e = `${end.slice(0,4)}-${end.slice(4,6)}-${end.slice(6,8)}`;
+            let d = dFrom(s);
+            const eDate = dFrom(e);
+            while (d < eDate) {
+                bookedDates.add(fmt(d));
+                added.push(fmt(d));
+                d = addDays(d,1);
+            }
+        }
+        return added.length;
+    }
 
     // Load booked dates from Laravel database
     async function loadBookedDatesFromDatabase(venueId = null) {
@@ -483,20 +520,6 @@ function initializeBookingCalendar() {
                 }
 
                 console.log(`Loaded booking data - Check-ins: ${checkInDates.size}, Check-outs: ${checkOutDates.size}, Fully booked: ${fullyBookedDates.size}`);
-
-                // Reapply cached iCal dates during month navigation
-                if (icalBookedDates.size > 0) {
-                    let icalReappliedCount = 0;
-                    icalBookedDates.forEach(dateStr => {
-                        if (!fullyBookedDates.has(dateStr) && !bookedDates.has(dateStr)) {
-                            fullyBookedDates.add(dateStr);
-                            bookedDates.add(dateStr);
-                            icalReappliedCount++;
-                        }
-                    });
-                    console.log(`Reapplied ${icalReappliedCount} cached iCal dates during month navigation`);
-                }
-
                 return data.count || data.bookedDates?.length || 0;
             } else {
                 console.error('Failed to load booked dates:', data);
@@ -508,172 +531,40 @@ function initializeBookingCalendar() {
         }
     }
 
-
-
-    // Load iCal data from our API endpoints
-    async function loadIcalDataFromAPI(venueId = null) {
-        if (!venueId) return 0;
-
-        // Update loading status
-        updateLoadingStatus('Fetching external calendar data...');
-
+    // Modified iCal loading function
+    async function loadIcalFromUrl(url) {
         const status = document.getElementById('icalStatus');
-        if (status) status.textContent = 'Loading iCal calendars…';
-
+        if (status) status.textContent = 'Loading iCal from URL…';
         try {
-            const url = `/api/ical/fetch?venue_id=${venueId}`;
-            console.log('Fetching iCal data from API:', url);
-
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log('iCal API Response:', data);
-
-            if (data.success && data.booked_dates) {
-                // Clear and store iCal dates for persistence during navigation
-                icalBookedDates.clear();
-
-                // Add iCal booked dates as fully booked dates (blocked)
-                let addedCount = 0;
-                data.booked_dates.forEach(dateStr => {
-                    // Store in iCal cache for month navigation
-                    icalBookedDates.add(dateStr);
-
-                    if (!fullyBookedDates.has(dateStr) && !bookedDates.has(dateStr)) {
-                        fullyBookedDates.add(dateStr);
-                        bookedDates.add(dateStr);
-                        addedCount++;
-                    }
-                });
-
-                if (status) {
-                    const message = `Loaded ${data.booked_dates.length} dates from ${data.calendars_synced} iCal calendar(s)`;
-                    status.textContent = message;
-                }
-
-                console.log(`Added ${addedCount} new booked dates from iCal as fully booked`);
-
-                // Update loading status with success
-                updateLoadingStatus(`Synced ${data.calendars_synced} calendar(s) successfully`);
-
-                return addedCount;
-            } else {
-                if (status) status.textContent = data.message || 'No iCal data available';
-                return 0;
-            }
-
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('HTTP '+res.status);
+            const text = await res.text();
+            const count = parseIcs(text);
+            if (status) status.textContent = `Imported ${count} booked days from iCal.`;
+            console.log(`Loaded ${count} booked dates from iCal`);
+            return count;
         } catch (err) {
-            console.error('iCal API load error:', err);
-            if (status) status.textContent = 'Failed to load iCal calendars.';
+            console.error('iCal load error:', err);
+            if (status) status.textContent = 'Failed to load iCal calendar.';
             return 0;
         }
     }
 
-    // Get venue calendars (for admin/debug purposes)
-    async function getVenueCalendars(venueId) {
-        try {
-            const response = await fetch(`/api/ical/venue/${venueId}/calendars`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log('Venue calendars:', data);
-            return data;
-
-        } catch (err) {
-            console.error('Error fetching venue calendars:', err);
-            return null;
-        }
-    }
-
-    // Load database booking dates only (for regular calendar navigation)
-    async function loadDatabaseBookedDates(venueId = null) {
-        // Clear existing booked dates
-        bookedDates.clear();
-        checkInDates.clear();
-        checkOutDates.clear();
-        fullyBookedDates.clear();
-
-        // Load detailed database booking data only
-        await loadBookedDatesFromDatabase(venueId);
-
-        // Re-render calendar with updated booked dates
-        renderCalendar();
-    }
-
-    // Load all booked dates (database + iCal via API) - for modal opening only
+    // Load all booked dates (database + iCal)
     async function loadAllBookedDates(venueId = null) {
         // Clear existing booked dates
         bookedDates.clear();
-        checkInDates.clear();
-        checkOutDates.clear();
-        fullyBookedDates.clear();
 
-        // Update loading status
-        setLoadingState(true, 'Loading database bookings...');
-
-        // Load detailed database booking data first (for check-in/out categorization)
+        // Load from database first
         await loadBookedDatesFromDatabase(venueId);
 
-        // Update loading status for iCal sync
-        setLoadingState(true, 'Syncing external calendars...');
-
-        // Load additional iCal dates and add them as fully booked
-        await loadIcalDataFromAPI(venueId);
+        // Optionally load from iCal (if you have a valid URL)
+        // Uncomment the lines below if you want to use iCal integration
+        // const icalUrl = 'https://your-actual-ical-url.ics';
+        // await loadIcalFromUrl(icalUrl);
 
         // Re-render calendar with updated booked dates
         renderCalendar();
-    }
-
-    // Alternative: Load combined booking data in one API call
-    async function loadCombinedBookingData(venueId = null) {
-        if (!venueId) return;
-
-        try {
-            const url = `/api/ical/combined?venue_id=${venueId}`;
-            console.log('Fetching combined booking data from:', url);
-
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log('Combined API Response:', data);
-
-            if (data.success && data.booked_dates) {
-                // Clear existing data
-                bookedDates.clear();
-                checkInDates.clear();
-                checkOutDates.clear();
-                fullyBookedDates.clear();
-
-                // Add all booked dates
-                data.booked_dates.forEach(dateStr => {
-                    bookedDates.add(dateStr);
-                });
-
-                console.log(`Loaded ${data.booked_dates.length} total booked dates (Database: ${data.sources.database_count}, iCal: ${data.sources.ical_count})`);
-
-                // Re-render calendar
-                renderCalendar();
-                return data.booked_dates.length;
-            } else {
-                console.error('Failed to load combined booking data:', data.message);
-                return 0;
-            }
-
-        } catch (err) {
-            console.error('Combined booking data load error:', err);
-            return 0;
-        }
     }
 
     // Enable/disable proceed button based on selection
@@ -690,76 +581,12 @@ function initializeBookingCalendar() {
         }
     }
 
-    // Loading state management
-    function setLoadingState(isLoading, statusText = 'Syncing calendar data...') {
-        const calendarContainer = document.querySelector('#daysGrid');
-        const modalContent = bookingModal?.querySelector('.relative');
+    // Initial render and data loading
+    loadAllBookedDates(currentVenue); // Load booked dates from database
 
-        if (isLoading) {
-            // Show loading spinner
-            if (calendarContainer && !document.querySelector('#calendarLoadingSpinner')) {
-                const spinner = document.createElement('div');
-                spinner.id = 'calendarLoadingSpinner';
-                spinner.className = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10';
-                spinner.innerHTML = `
-                    <div class="flex flex-col items-center space-y-2">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-                        <p id="loadingStatusText" class="text-sm text-gray-600">${statusText}</p>
-                    </div>
-                `;
-
-                // Make calendar container relative for positioning
-                calendarContainer.style.position = 'relative';
-                calendarContainer.appendChild(spinner);
-            } else {
-                // Update existing status text
-                const statusElement = document.querySelector('#loadingStatusText');
-                if (statusElement) {
-                    statusElement.textContent = statusText;
-                }
-            }
-
-            // Disable calendar interactions
-            if (calendarContainer) {
-                calendarContainer.style.pointerEvents = 'none';
-                calendarContainer.style.opacity = '0.7';
-            }
-
-            // Disable navigation buttons
-            if (prevMonthBtn) prevMonthBtn.disabled = true;
-            if (nextMonthBtn) nextMonthBtn.disabled = true;
-
-        } else {
-            // Hide loading spinner
-            const spinner = document.querySelector('#calendarLoadingSpinner');
-            if (spinner) {
-                spinner.remove();
-            }
-
-            // Re-enable calendar interactions
-            if (calendarContainer) {
-                calendarContainer.style.pointerEvents = 'auto';
-                calendarContainer.style.opacity = '1';
-            }
-
-            // Re-enable navigation buttons
-            if (prevMonthBtn) prevMonthBtn.disabled = false;
-            if (nextMonthBtn) nextMonthBtn.disabled = false;
-        }
-    }
-
-    // Update loading status text
-    function updateLoadingStatus(statusText) {
-        const statusElement = document.querySelector('#loadingStatusText');
-        if (statusElement) {
-            statusElement.textContent = statusText;
-        }
-    }
-
-    // Initial render and data loading (database only for performance)
-    loadDatabaseBookedDates(currentVenue); // Load booked dates from database only
-
-
+    // Auto-sync iCal once on load (disabled by default, uncomment if needed)
+    // const AIRBNB_ICAL_URL = 'https://example.com/your-airbnb-calendar.ics';
+    // loadIcalFromUrl(AIRBNB_ICAL_URL);
 
     // Booking Modal functionality (only if elements exist)
     if (bookingModal && openBookingBtn) {
@@ -768,20 +595,8 @@ function initializeBookingCalendar() {
             bookingModal.classList.remove('hidden');
             bookingModal.classList.add('flex');
             document.body.style.overflow = 'hidden';
-
-            // Show loading state while syncing iCal data
-            setLoadingState(true);
-
-            try {
-                // Sync all booking data (database + iCal) when modal opens
-                await loadAllBookedDates(currentVenue);
-            } catch (error) {
-                console.error('Error loading booking data:', error);
-                // Still allow modal to function with database data only
-            } finally {
-                // Hide loading state regardless of success/failure
-                setLoadingState(false);
-            }
+            // Refresh booked dates from database when modal opens
+            await loadAllBookedDates(currentVenue);
         });
 
         // Close booking modal

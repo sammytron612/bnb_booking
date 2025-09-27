@@ -20,11 +20,6 @@ Route::get('/', function () {
 
 // Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {
-    // SECURITY: Validate route parameter to prevent SQL injection
-    if (!preg_match('/^[a-zA-Z0-9\-_]+$/', $route) || strlen($route) > 50) {
-        abort(404);
-    }
-
     $venue = Venue::with('propertyImages','amenities')->where('route', $route)->firstOrFail();
 
     // Get reviews for SEO - reviews are connected through bookings
@@ -33,21 +28,17 @@ Route::get('/venue/{route}', function ($route) {
     })->with(['booking.venue'])->get();
 
     return view('venue', compact('venue', 'reviews'));
-})->where('route', '[a-zA-Z0-9\-_]+')->name('venue.show');
+})->name('venue.show');
 
-// Legal pages
-Route::get('/privacy-policy', function () {
-    return view('privacy-policy');
-})->name('privacy-policy');
+// Backward compatibility routes - redirect to dynamic route
+/*Route::get('/light-house', function () {
+    return redirect()->route('venue.show', ['route' => 'light-house']);
+})->name('light-house');
 
-Route::get('/terms-of-service', function () {
-    return view('terms-of-service');
-})->name('terms-of-service');
-
-Route::get('/cookie-policy', function () {
-    return view('cookie-policy');
-})->name('cookie-policy');
-
+Route::get('/saras', function () {
+    return redirect()->route('venue.show', ['route' => 'saras']);
+})->name('saras');
+*/
 // Booking routes - Protected with authentication for admin access
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::middleware(['auth'])->group(function () {
@@ -55,42 +46,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 });
-
-// Test route for debugging iCal integration
-/*Route::get('/test/ical/{venueId?}', function($venueId = 1) {
-    $controller = new App\Http\Controllers\IcalController();
-    $bookingController = new App\Http\Controllers\BookingController();
-
-    echo "<h1>Calendar Integration Debug - Venue $venueId</h1>";
-
-    echo "<h2>1. Database Bookings (existing API):</h2>";
-    $dbRequest = new Illuminate\Http\Request(['venue_id' => $venueId]);
-    $dbResponse = json_decode($bookingController->getBookedDates($dbRequest)->getContent(), true);
-    echo "<pre>" . json_encode($dbResponse, JSON_PRETTY_PRINT) . "</pre>";
-
-    echo "<h2>2. iCal Calendars Available:</h2>";
-    echo "<pre>" . json_encode(json_decode($controller->getVenueCalendars($venueId)->getContent()), JSON_PRETTY_PRINT) . "</pre>";
-
-    echo "<h2>3. iCal Data Only:</h2>";
-    $request = new Illuminate\Http\Request(['venue_id' => $venueId]);
-    $icalResponse = json_decode($controller->fetchIcalData($request)->getContent(), true);
-    echo "<pre>" . json_encode($icalResponse, JSON_PRETTY_PRINT) . "</pre>";
-
-    echo "<h2>4. Combined Data:</h2>";
-    $combinedResponse = json_decode($controller->getCombinedBookingData($request)->getContent(), true);
-    echo "<pre>" . json_encode($combinedResponse, JSON_PRETTY_PRINT) . "</pre>";
-
-    echo "<h2>5. What Frontend Should Receive:</h2>";
-    echo "<strong>Check-in dates (orange):</strong> " . implode(', ', $dbResponse['checkInDates'] ?? []) . "<br>";
-    echo "<strong>Check-out dates (green):</strong> " . implode(', ', $dbResponse['checkOutDates'] ?? []) . "<br>";
-    echo "<strong>Fully booked from DB (gray):</strong> " . implode(', ', $dbResponse['fullyBookedDates'] ?? []) . "<br>";
-    echo "<strong>Additional iCal blocked (gray):</strong> " . implode(', ', array_diff($icalResponse['booked_dates'] ?? [], $dbResponse['bookedDates'] ?? [])) . "<br>";
-
-    echo "<h2>6. All Dates That Should Be Grayed Out:</h2>";
-    $allGrayDates = array_unique(array_merge($dbResponse['fullyBookedDates'] ?? [], $icalResponse['booked_dates'] ?? []));
-    sort($allGrayDates);
-    echo "<strong>Gray dates:</strong> " . implode(', ', $allGrayDates) . "<br>";
-});*/
+// Public API for calendar dates (no sensitive data)
+Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
@@ -132,8 +89,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return redirect()->route('admin.index');
-    })->name('dashboard');
-});
+// Sitemap routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
+
+// Dynamic robots.txt
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
+
+    return response($content)
+        ->header('Content-Type', 'text/plain');
+})->name('robots');

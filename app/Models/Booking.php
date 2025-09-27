@@ -40,15 +40,6 @@ class Booking extends Model
         'total_price',
         'status',
         'notes',
-    ];
-
-    /**
-     * The attributes that are NOT mass assignable (protected fields).
-     * These fields can only be set explicitly to prevent unauthorized manipulation.
-     *
-     * @var array<int, string>
-     */
-    protected $guarded = [
         'pay_method',
         'is_paid',
         'stripe_payment_intent_id',

@@ -67,7 +67,7 @@
                     </div>
 
                     <!-- Booking Summary Sidebar -->
-                    <livewire:booking-form :venueId="$venueId" />
+                    <livewire:booking-form :pricePerNight="$price" :venueId="$venueId" />
                 </div>
 
                 <!-- Terms and Cancellation -->

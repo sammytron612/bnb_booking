@@ -1,14 +1,11 @@
 <div class="bg-white shadow-xl rounded-lg p-6">
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
-    @if ($successMessage)
-        <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-800 px-4 py-2 flex justify-between items-center">
-            <span>{{ $successMessage }}</span>
-            <button wire:click="clearSuccessMessage" class="text-green-600 hover:text-green-800">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+    @if (session('success'))
+        <div class="mb-4 rounded border border-green-200 bg-gr                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
+                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">-50 text-green-800 px-4 py-2">
+            {{ session('success') }}
         </div>
     @endif
 
@@ -92,20 +89,18 @@
 
                     <!-- Booking indicator -->
                     <div class="relative">
-                        @if($day['booking_count'] > 0 || $day['ical_count'] > 0)
-                            <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] + $day['ical_count'] }} booking(s)"
+                        @if($day['booking_count'] > 0)
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
                                  data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
-                                    {{ $day['booking_count'] + $day['ical_count'] }}
+                                    {{ $day['booking_count'] }}
                                 </div>
                                 <div class="text-blue-100 text-xs">
-                                    @php $totalCount = $day['booking_count'] + $day['ical_count']; @endphp
-                                    {{ $totalCount === 1 ? 'booking' : 'bookings' }}
-                                    @if($day['ical_count'] > 0)
-                                        <div class="text-orange-200 text-xs">{{ $day['ical_count'] }} ext.</div>
-                                    @endif
-                                </div>                                <!-- Check-in indicator -->
+                                    {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
+                                </div>
+
+                                <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
                                     <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
@@ -160,45 +155,6 @@
                                             </div>
                                         </div>
                                     @endforeach
-
-                                    {{-- iCal External Bookings --}}
-                                    @foreach($day['ical_bookings'] as $icalBooking)
-                                        <div class="mb-2 p-2 bg-gradient-to-r from-orange-800 to-orange-900 rounded border-l-2 border-orange-400">
-                                            <div class="flex justify-between items-start">
-                                                <div class="flex-1">
-                                                    <div class="font-medium text-white flex items-center">
-                                                        @if($icalBooking['source'] === 'airbnb')
-                                                            <svg class="w-3 h-3 mr-1 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
-                                                                <path d="M12 6.5c-1.381 0-2.5 1.119-2.5 2.5S10.619 11.5 12 11.5s2.5-1.119 2.5-2.5S13.381 6.5 12 6.5z"/>
-                                                                <path d="M7.5 14.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5v1c0 1.381-1.119 2.5-2.5 2.5h-4c-1.381 0-2.5-1.119-2.5-2.5v-1z"/>
-                                                            </svg>
-                                                            Airbnb Booking
-                                                        @elseif($icalBooking['source'] === 'booking')
-                                                            <svg class="w-3 h-3 mr-1 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M23.998 12c0 6.628-5.372 12-11.999 12C5.372 24 0 18.628 0 12S5.372 0 12 0c6.627 0 11.998 5.372 11.998 12zM12 2.016c-5.522 0-9.984 4.462-9.984 9.984s4.462 9.984 9.984 9.984 9.984-4.462 9.984-9.984S17.522 2.016 12 2.016z"/>
-                                                            </svg>
-                                                            Booking.com Booking
-                                                        @else
-                                                            <svg class="w-3 h-3 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                                            </svg>
-                                                            {{ ucfirst($icalBooking['source']) }} Booking
-                                                        @endif
-                                                    </div>
-                                                    <div class="text-orange-200 text-xs">{{ $icalBooking['venue']->venue_name ?? 'External Calendar' }}</div>
-                                                </div>
-                                                <div class="font-mono text-xs text-orange-300">EXT</div>
-                                            </div>
-                                            <div class="text-orange-300 text-xs mt-1">
-                                                External calendar booking
-                                            </div>
-                                            <div class="text-orange-400 text-xs mt-1 font-medium">
-                                                No pricing data
-                                            </div>
-                                        </div>
-                                    @endforeach
-
                                     <!-- Arrow pointing up (connects to card above) -->
                                     <div class="absolute -top-1 left-1/2 transform -translate-x-1/2">
                                         <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -274,20 +230,18 @@
 
                     <!-- Booking indicator -->
                     <div class="relative">
-                        @if($day['booking_count'] > 0 || $day['ical_count'] > 0)
-                            <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] + $day['ical_count'] }} booking(s)"
+                        @if($day['booking_count'] > 0)
+                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
+                                 title="{{ $day['booking_count'] }} booking(s)"
                                  data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                                 <div class="text-white text-xs font-bold">
-                                    {{ $day['booking_count'] + $day['ical_count'] }}
+                                    {{ $day['booking_count'] }}
                                 </div>
                                 <div class="text-blue-100 text-xs">
-                                    @php $totalCount = $day['booking_count'] + $day['ical_count']; @endphp
-                                    {{ $totalCount === 1 ? 'booking' : 'bookings' }}
-                                    @if($day['ical_count'] > 0)
-                                        <div class="text-orange-200 text-xs">{{ $day['ical_count'] }} ext.</div>
-                                    @endif
-                                </div>                                <!-- Check-in indicator -->
+                                    {{ $day['booking_count'] === 1 ? 'booking' : 'bookings' }}
+                                </div>
+
+                                <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
                                     <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
@@ -342,45 +296,6 @@
                                             </div>
                                         </div>
                                     @endforeach
-
-                                    {{-- iCal External Bookings --}}
-                                    @foreach($day['ical_bookings'] as $icalBooking)
-                                        <div class="mb-2 p-2 bg-gradient-to-r from-orange-800 to-orange-900 rounded border-l-2 border-orange-400">
-                                            <div class="flex justify-between items-start">
-                                                <div class="flex-1">
-                                                    <div class="font-medium text-white flex items-center">
-                                                        @if($icalBooking['source'] === 'airbnb')
-                                                            <svg class="w-3 h-3 mr-1 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/>
-                                                                <path d="M12 6.5c-1.381 0-2.5 1.119-2.5 2.5S10.619 11.5 12 11.5s2.5-1.119 2.5-2.5S13.381 6.5 12 6.5z"/>
-                                                                <path d="M7.5 14.5c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5v1c0 1.381-1.119 2.5-2.5 2.5h-4c-1.381 0-2.5-1.119-2.5-2.5v-1z"/>
-                                                            </svg>
-                                                            Airbnb Booking
-                                                        @elseif($icalBooking['source'] === 'booking')
-                                                            <svg class="w-3 h-3 mr-1 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M23.998 12c0 6.628-5.372 12-11.999 12C5.372 24 0 18.628 0 12S5.372 0 12 0c6.627 0 11.998 5.372 11.998 12zM12 2.016c-5.522 0-9.984 4.462-9.984 9.984s4.462 9.984 9.984 9.984 9.984-4.462 9.984-9.984S17.522 2.016 12 2.016z"/>
-                                                            </svg>
-                                                            Booking.com Booking
-                                                        @else
-                                                            <svg class="w-3 h-3 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                                                            </svg>
-                                                            {{ ucfirst($icalBooking['source']) }} Booking
-                                                        @endif
-                                                    </div>
-                                                    <div class="text-orange-200 text-xs">{{ $icalBooking['venue']->venue_name ?? 'External Calendar' }}</div>
-                                                </div>
-                                                <div class="font-mono text-xs text-orange-300">EXT</div>
-                                            </div>
-                                            <div class="text-orange-300 text-xs mt-1">
-                                                External calendar booking
-                                            </div>
-                                            <div class="text-orange-400 text-xs mt-1 font-medium">
-                                                No pricing data
-                                            </div>
-                                        </div>
-                                    @endforeach
-
                                     <!-- Arrow pointing down -->
                                     <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                                         <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
@@ -638,20 +553,6 @@
                             @endif
                         </button>
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortByField('is_paid')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
-                            <span>Payment</span>
-                            @if($sortBy === 'is_paid')
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    @if($sortDirection === 'asc')
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                                    @else
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    @endif
-                                </svg>
-                            @endif
-                        </button>
-                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -680,13 +581,6 @@
                                 {{ ucfirst($booking->status) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                @if($booking->is_paid) bg-green-100 text-green-800
-                                @else bg-red-100 text-red-800 @endif">
-                                {{ $booking->is_paid ? 'Paid' : 'Unpaid' }}
-                            </span>
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button wire:click="editBooking({{ $booking->id }})" class="text-white  bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-lg p-2 mr-3">Edit</button>
                             <button wire:click="deleteBooking({{ $booking->id }})" class="text-white bg-red-600 hover:bg-red-700 hover:cursor-pointer rounded-lg p-2" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
@@ -694,7 +588,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="11" class="px-6 py-4 text-center text-gray-500">No bookings found</td>
+                        <td colspan="10" class="px-6 py-4 text-center text-gray-500">No bookings found</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -756,9 +650,9 @@
                         <!-- Payment Status Field -->
                         <div>
                             <label for="editPayment" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-                            <select wire:model.live="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0" {{ $editPayment == '0' ? 'selected' : '' }}>Unpaid</option>
-                                <option value="1" {{ $editPayment == '1' ? 'selected' : '' }}>Paid</option>
+                            <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="0">Unpaid</option>
+                                <option value="1">Paid</option>
                             </select>
                             @error('editPayment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -773,8 +667,8 @@
                 </div>
 
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="closeEditModal" class="hover:cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-                    <button wire:click="saveBooking" class="hover:cursor-pointer px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
+                    <button wire:click="closeEditModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button wire:click="saveBooking" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -911,12 +805,5 @@ document.addEventListener('DOMContentLoaded', function() {
         childList: true,
         subtree: true
     });
-
-    // Auto-clear success message after 5 seconds
-    @if($successMessage)
-    setTimeout(() => {
-        @this.call('clearSuccessMessage');
-    }, 5000);
-    @endif
 });
 </script>

@@ -29,8 +29,6 @@ class Venue extends Model
         'route',
         'badge_text',
         'booking_enabled',
-        'latitude',
-        'longitude',
     ];
 
     /**
@@ -70,13 +68,5 @@ class Venue extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
-    }
-
-    /**
-     * Get the ical calendars for the venue.
-     */
-    public function icalCalendars()
-    {
-        return $this->hasMany(Ical::class);
     }
 }

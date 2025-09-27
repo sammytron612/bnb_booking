@@ -44,7 +44,7 @@
     <div class="relative w-full h-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700">
         @if(count($venueImages) > 0)
             @if($venue && $venue->route)
-                <a href="{{ route('venue.show', ['route' => $venue->route]) }}" class="block w-full h-full" aria-label="View {{ $venue->venue_name ?? 'venue' }} details and booking">
+                <a href="{{ route('venue.show', ['route' => $venue->route]) }}" class="block w-full h-full">
                     <img
                         src="{{ $venueImages[0]['src'] }}"
                         alt="{{ $venueImages[0]['alt'] }}"
