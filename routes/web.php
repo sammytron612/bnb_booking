@@ -18,13 +18,13 @@ Route::get('/', function () {
     return view('home', compact('venues'));
 })->name('home');
 
-// Dynamic venue route using the route field from the database  
+// Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {
     // SECURITY: Validate route parameter to prevent SQL injection
     if (!preg_match('/^[a-zA-Z0-9\-_]+$/', $route) || strlen($route) > 50) {
         abort(404);
     }
-    
+
     $venue = Venue::with('propertyImages','amenities')->where('route', $route)->firstOrFail();
 
     // Get reviews for SEO - reviews are connected through bookings
