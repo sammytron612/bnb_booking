@@ -63,10 +63,8 @@ Route::get('/api/ical/export/{venue_id}', [App\Http\Controllers\IcalController::
     ->name('ical.export')
     ->where('venue_id', '[0-9]+');
 
-// Calendar subscription route for Outlook webcal protocol
-Route::get('/calendar/{venue_id}.ics', [App\Http\Controllers\IcalController::class, 'exportVenueCalendar'])
-    ->name('ical.subscription')
-    ->where('venue_id', '[0-9]+');
+
+
 
 // Handle OPTIONS requests for CORS (Outlook compatibility)
 Route::options('/api/ical/export/{venue_id}', function () {
