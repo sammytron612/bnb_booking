@@ -119,6 +119,8 @@ class BookingsTable extends Component
         $days = collect();
         $startDate = now()->addDays($this->calendarOffset);
 
+
+
         // Get external bookings once for all dates
         $externalBookings = $this->getExternalBookings();
 
@@ -137,11 +139,22 @@ class BookingsTable extends Component
             $dayExternalBookings = $externalBookings->filter(function ($booking) use ($date) {
                 $checkIn = \Carbon\Carbon::parse($booking->check_in);
                 $checkOut = \Carbon\Carbon::parse($booking->check_out);
-                return $checkIn->lte($date) && $checkOut->gt($date);
+                $matches = $checkIn->lte($date) && $checkOut->gt($date);
+
+
+
+                return $matches;
             });
 
-            // Combine both types of bookings
-            $dayBookings = $dayDbBookings->merge($dayExternalBookings);
+
+
+            // Combine both types of bookings - convert external to array to avoid collection merge issues
+            $dayBookings = collect($dayDbBookings);
+            foreach ($dayExternalBookings as $extBooking) {
+                $dayBookings->push($extBooking);
+            }
+
+
 
             // Get check-ins for this specific date (database)
             $checkInsDb = Booking::with('venue')
@@ -235,13 +248,19 @@ class BookingsTable extends Component
             $controller = new \App\Http\Controllers\BookingController();
             $rawExternalBookings = $controller->getExternalBookings();
 
+
+
             // Convert the raw objects into Booking-like models for calendar compatibility
             if ($rawExternalBookings && $rawExternalBookings->count() > 0) {
+                $index = 0;
                 foreach ($rawExternalBookings as $rawBooking) {
                 $sourceName = $rawBooking->source ?? 'External Booking';
+                $uniqueId = 'ext-' . $rawBooking->source . '-' . $index . '-' . uniqid();
+
+
                 $booking = new Booking([
                     'venue_id' => $rawBooking->venue_id,
-                    'booking_id' => 'EXT-' . strtoupper(substr(md5(uniqid()), 0, 6)),
+                    'booking_id' => 'EXT-' . strtoupper(substr(md5($uniqueId), 0, 6)),
                     'name' => $sourceName,
                     'email' => 'external@booking.com',
                     'phone' => '',
@@ -255,19 +274,24 @@ class BookingsTable extends Component
                     'is_paid' => true
                 ]);
 
-                // Set a fake ID and venue relationship
-                $booking->id = 'ext-' . uniqid();
+                // Set venue relationship and external flag
                 $booking->venue = \App\Models\Venue::find($rawBooking->venue_id);
                 $booking->setAttribute('is_external', true);
+                $booking->setAttribute('external_unique_id', $uniqueId);
                 $booking->exists = false; // Don't try to save this to database
 
+                // Override the getKey method to return unique ID for collection merging
+                $booking->setKeyName('external_unique_id');
+
                 $externalBookings->push($booking);
+                $index++;
                 }
             }
 
         } catch (\Exception $e) {
             \Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
         }
+
 
         return $externalBookings;
     }    public function render()
