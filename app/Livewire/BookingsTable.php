@@ -3,8 +3,11 @@
 namespace App\Livewire;
 
 use App\Models\Booking;
+use App\Models\Ical;
+use App\Http\Controllers\IcalController;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Http\Request;
 
 class BookingsTable extends Component
 {
@@ -18,6 +21,8 @@ class BookingsTable extends Component
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
     public $calendarOffset = 0; // Track calendar navigation offset
+    public $syncing = false; // Track sync status
+    public $lastSyncTime = null;
 
     // Form fields for editing
     public $editStatus = '';
@@ -29,6 +34,12 @@ class BookingsTable extends Component
         'sortBy' => ['except' => 'check_in'],
         'sortDirection' => ['except' => 'asc'],
     ];
+
+    public function mount()
+    {
+        // Sync external bookings on page load
+        $this->syncExternalBookings();
+    }
 
     public function updatedSearch()
     {
@@ -158,6 +169,60 @@ class BookingsTable extends Component
         return $days;
     }
 
+    /**
+     * Sync external bookings from iCal feeds
+     */
+    public function syncExternalBookings()
+    {
+        $this->syncing = true;
+
+        try {
+            // Get all active iCal feeds
+            $activeFeeds = Ical::where('active', true)->with('venue')->get();
+
+            if ($activeFeeds->count() > 0) {
+                $icalController = new IcalController();
+                $request = new Request();
+
+                // Trigger sync for all feeds
+                $response = $icalController->fetchIcalData($request);
+
+                $this->lastSyncTime = now()->format('H:i');
+
+                // Flash success message
+                session()->flash('message', 'External bookings synced successfully at ' . $this->lastSyncTime);
+            }
+        } catch (\Exception $e) {
+            // Flash error message
+            session()->flash('error', 'Failed to sync external bookings: ' . $e->getMessage());
+        } finally {
+            $this->syncing = false;
+        }
+    }
+
+    /**
+     * Manual sync trigger
+     */
+    public function refreshExternalBookings()
+    {
+        $this->syncExternalBookings();
+        $this->resetPage(); // Refresh the booking list
+    }
+
+    /**
+     * Get sync status for display
+     */
+    public function getSyncStatus()
+    {
+        $icalFeeds = Ical::where('active', true)->get();
+
+        return [
+            'total_feeds' => $icalFeeds->count(),
+            'last_sync' => $icalFeeds->max('last_synced_at'),
+            'has_errors' => $icalFeeds->whereNotNull('last_error')->count() > 0
+        ];
+    }
+
     public function render()
     {
         $bookings = Booking::with('venue')
@@ -178,10 +243,14 @@ class BookingsTable extends Component
             ->paginate($this->perPage);
 
         $calendarData = $this->getCalendarData();
+        $syncStatus = $this->getSyncStatus();
 
         return view('livewire.bookings-table', [
             'bookings' => $bookings,
-            'calendarData' => $calendarData
+            'calendarData' => $calendarData,
+            'syncStatus' => $syncStatus,
+            'syncing' => $this->syncing,
+            'lastSyncTime' => $this->lastSyncTime
         ]);
     }
 }

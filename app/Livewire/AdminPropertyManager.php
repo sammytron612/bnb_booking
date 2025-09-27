@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Venue;
 use App\Models\PropertyImage;
 use App\Models\Amenity;
+use App\Models\Ical;
 use Illuminate\Support\Facades\Storage;
 
 class AdminPropertyManager extends Component
@@ -44,9 +45,20 @@ class AdminPropertyManager extends Component
     public $editingAmenityTitle = '';
     public $editingAmenitySvg = '';
 
+    // iCal feeds management
+    public $icalFeeds = [];
+    public $newIcalName = '';
+    public $newIcalUrl = '';
+    public $newIcalSource = '';
+    public $editingIcalId = null;
+    public $editingIcalName = '';
+    public $editingIcalUrl = '';
+    public $editingIcalSource = '';
+    public $editingIcalActive = true;
+
     public function mount()
     {
-        $this->venues = Venue::with(['propertyImages', 'amenities'])->get();
+        $this->venues = Venue::with(['propertyImages', 'amenities', 'icalFeeds'])->get();
     }
 
     public function selectVenue($venueId)
@@ -294,11 +306,102 @@ class AdminPropertyManager extends Component
     private function refreshVenueData()
     {
         if ($this->selectedVenue) {
-            $this->selectedVenue = Venue::with(['propertyImages', 'amenities'])->find($this->selectedVenue->id);
+            $this->selectedVenue = Venue::with(['propertyImages', 'amenities', 'icalFeeds'])->find($this->selectedVenue->id);
             $this->existingImages = $this->selectedVenue->propertyImages;
             $this->venueAmenities = $this->selectedVenue->amenities;
-            $this->venues = Venue::with(['propertyImages', 'amenities'])->get();
+            $this->icalFeeds = $this->selectedVenue->icalFeeds;
+            $this->venues = Venue::with(['propertyImages', 'amenities', 'icalFeeds'])->get();
         }
+    }
+
+    // iCal Feed Management Methods
+    public function addIcalFeed()
+    {
+        $this->validate([
+            'newIcalName' => 'required|string|max:255',
+            'newIcalUrl' => 'required|url',
+            'newIcalSource' => 'required|string|max:255',
+        ]);
+
+        if ($this->selectedVenue) {
+            Ical::create([
+                'venue_id' => $this->selectedVenue->id,
+                'url' => $this->newIcalUrl,
+                'source' => $this->newIcalSource,
+                'name' => $this->newIcalName,
+                'active' => true
+            ]);
+
+            $this->newIcalName = '';
+            $this->newIcalUrl = '';
+            $this->newIcalSource = '';
+            $this->refreshVenueData();
+            session()->flash('message', 'iCal feed added successfully!');
+        }
+    }
+
+    public function editIcalFeed($icalId)
+    {
+        $ical = Ical::find($icalId);
+        if ($ical && $ical->venue_id === $this->selectedVenue->id) {
+            $this->editingIcalId = $icalId;
+            $this->editingIcalName = $ical->name;
+            $this->editingIcalUrl = $ical->url;
+            $this->editingIcalSource = $ical->source;
+            $this->editingIcalActive = $ical->active;
+        }
+    }
+
+    public function updateIcalFeed()
+    {
+        $this->validate([
+            'editingIcalName' => 'required|string|max:255',
+            'editingIcalUrl' => 'required|url',
+            'editingIcalSource' => 'required|string|max:255',
+        ]);
+
+        $ical = Ical::find($this->editingIcalId);
+        if ($ical && $ical->venue_id === $this->selectedVenue->id) {
+            $ical->update([
+                'url' => $this->editingIcalUrl,
+                'source' => $this->editingIcalSource,
+                'name' => $this->editingIcalName,
+                'active' => $this->editingIcalActive
+            ]);
+
+            $this->cancelIcalEdit();
+            $this->refreshVenueData();
+            session()->flash('message', 'iCal feed updated successfully!');
+        }
+    }
+
+    public function toggleIcalFeed($icalId)
+    {
+        $ical = Ical::find($icalId);
+        if ($ical && $ical->venue_id === $this->selectedVenue->id) {
+            $ical->update(['active' => !$ical->active]);
+            $this->refreshVenueData();
+            session()->flash('message', 'iCal feed ' . ($ical->active ? 'activated' : 'deactivated') . ' successfully!');
+        }
+    }
+
+    public function deleteIcalFeed($icalId)
+    {
+        $ical = Ical::find($icalId);
+        if ($ical && $ical->venue_id === $this->selectedVenue->id) {
+            $ical->delete();
+            $this->refreshVenueData();
+            session()->flash('message', 'iCal feed deleted successfully!');
+        }
+    }
+
+    public function cancelIcalEdit()
+    {
+        $this->editingIcalId = null;
+        $this->editingIcalName = '';
+        $this->editingIcalUrl = '';
+        $this->editingIcalSource = '';
+        $this->editingIcalActive = true;
     }
 
     public function render()

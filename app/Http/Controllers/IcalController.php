@@ -64,26 +64,255 @@ class IcalController extends Controller
     }
 
     /**
-     * Get venue calendars (placeholder for admin functionality)
+     * Get venue calendars and their sync status
      */
     public function getVenueCalendars($venueId)
     {
-        return response()->json(['message' => 'Feature coming soon'], 501);
+        $venue = Venue::find($venueId);
+        if (!$venue) {
+            return response()->json(['error' => 'Venue not found'], 404);
+        }
+
+        $icalFeeds = $venue->icalFeeds()->get();
+
+        return response()->json([
+            'venue' => $venue->only(['id', 'venue_name']),
+            'ical_feeds' => $icalFeeds
+        ]);
     }
 
     /**
-     * Fetch iCal data (placeholder for admin functionality)
+     * Fetch and parse iCal data from external URLs
      */
-    public function fetchIcalData()
+    public function fetchIcalData(Request $request)
     {
-        return response()->json(['message' => 'Feature coming soon'], 501);
+        $venueId = $request->get('venue_id');
+
+        if ($venueId) {
+            return $this->syncVenueIcalFeeds($venueId);
+        }
+
+        return $this->syncAllIcalFeeds();
     }
 
     /**
-     * Get combined booking data (placeholder for admin functionality)
+     * Get combined booking data including external bookings
      */
-    public function getCombinedBookingData()
+    public function getCombinedBookingData(Request $request)
     {
-        return response()->json(['message' => 'Feature coming soon'], 501);
+        $venueId = $request->get('venue_id');
+
+        // Sync external bookings first
+        if ($venueId) {
+            $this->syncVenueIcalFeeds($venueId);
+        } else {
+            $this->syncAllIcalFeeds();
+        }
+
+        // Get local bookings
+        $query = Booking::with('venue');
+
+        if ($venueId) {
+            $query->where('venue_id', $venueId);
+        }
+
+        $bookings = $query->where('status', '!=', 'cancelled')
+                         ->orderBy('check_in')
+                         ->get();
+
+        return response()->json([
+            'bookings' => $bookings,
+            'synced_at' => now()->toISOString()
+        ]);
+    }
+
+    /**
+     * Sync iCal feeds for a specific venue
+     */
+    private function syncVenueIcalFeeds($venueId)
+    {
+        $venue = Venue::find($venueId);
+        if (!$venue) {
+            return response()->json(['error' => 'Venue not found'], 404);
+        }
+
+        $icalFeeds = $venue->icalFeeds()->where('active', true)->get();
+        $totalSynced = 0;
+        $errors = [];
+
+        foreach ($icalFeeds as $feed) {
+            try {
+                $bookings = $this->parseIcalFromUrl($feed->url, $venue);
+                $feed->updateSyncStats(count($bookings));
+                $totalSynced += count($bookings);
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'feed' => $feed->name,
+                    'error' => $e->getMessage()
+                ];
+                $feed->updateSyncStats(0);
+            }
+        }
+
+        return response()->json([
+            'venue' => $venue->venue_name,
+            'feeds_synced' => $icalFeeds->count(),
+            'bookings_synced' => $totalSynced,
+            'errors' => $errors
+        ]);
+    }
+
+    /**
+     * Sync all active iCal feeds
+     */
+    private function syncAllIcalFeeds()
+    {
+        $icalFeeds = \App\Models\Ical::where('active', true)->with('venue')->get();
+        $totalSynced = 0;
+        $errors = [];
+
+        foreach ($icalFeeds as $feed) {
+            try {
+                $bookings = $this->parseIcalFromUrl($feed->url, $feed->venue);
+                $feed->updateSyncStats(count($bookings));
+                $totalSynced += count($bookings);
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'feed' => $feed->name,
+                    'venue' => $feed->venue->venue_name,
+                    'error' => $e->getMessage()
+                ];
+                $feed->updateSyncStats(0);
+            }
+        }
+
+        return response()->json([
+            'feeds_synced' => $icalFeeds->count(),
+            'bookings_synced' => $totalSynced,
+            'errors' => $errors
+        ]);
+    }
+
+    /**
+     * Parse iCal data from URL and create/update bookings
+     */
+    private function parseIcalFromUrl($url, $venue)
+    {
+        // Fetch iCal data
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 30,
+                'user_agent' => 'Eileen BnB Calendar Sync/1.0'
+            ]
+        ]);
+
+        $icalData = file_get_contents($url, false, $context);
+
+        if ($icalData === false) {
+            throw new \Exception('Failed to fetch iCal data from URL');
+        }
+
+        return $this->parseIcalData($icalData, $venue);
+    }
+
+    /**
+     * Parse iCal content and create booking records
+     */
+    private function parseIcalData($icalData, $venue)
+    {
+        $bookings = [];
+        $events = $this->extractEventsFromIcal($icalData);
+
+        foreach ($events as $event) {
+            // Create unique identifier for external bookings
+            $externalBookingId = 'EXT-' . strtoupper(substr(md5(($event['uid'] ?? uniqid()) . $venue->id), 0, 8));
+
+            // Create or update booking from external source
+            $booking = Booking::updateOrCreate(
+                [
+                    'venue_id' => $venue->id,
+                    'booking_id' => $externalBookingId,
+                    'check_in' => $event['start_date'],
+                    'check_out' => $event['end_date']
+                ],
+                [
+                    'name' => 'External Booking',
+                    'email' => 'external@booking.com',
+                    'phone' => '',
+                    'total_price' => 0,
+                    'status' => 'confirmed',
+                    'notes' => 'Imported from external calendar: ' . ($event['summary'] ?? ''),
+                    'nights' => $event['start_date']->diffInDays($event['end_date']),
+                    'pay_method' => 'external',
+                    'is_paid' => true
+                ]
+            );
+
+            $bookings[] = $booking;
+        }
+
+        return $bookings;
+    }
+
+    /**
+     * Extract events from iCal data
+     */
+    private function extractEventsFromIcal($icalData)
+    {
+        $events = [];
+        $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
+
+        $currentEvent = null;
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === 'BEGIN:VEVENT') {
+                $currentEvent = [];
+            } elseif ($line === 'END:VEVENT' && $currentEvent !== null) {
+                if (isset($currentEvent['start_date']) && isset($currentEvent['end_date'])) {
+                    $events[] = $currentEvent;
+                }
+                $currentEvent = null;
+            } elseif ($currentEvent !== null) {
+                if (strpos($line, ':') !== false) {
+                    [$key, $value] = explode(':', $line, 2);
+
+                    // Handle date fields
+                    if (strpos($key, 'DTSTART') === 0) {
+                        $currentEvent['start_date'] = $this->parseIcalDate($value);
+                    } elseif (strpos($key, 'DTEND') === 0) {
+                        $currentEvent['end_date'] = $this->parseIcalDate($value);
+                    } elseif ($key === 'UID') {
+                        $currentEvent['uid'] = $value;
+                    } elseif ($key === 'SUMMARY') {
+                        $currentEvent['summary'] = $value;
+                    }
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    /**
+     * Parse iCal date format to Carbon instance
+     */
+    private function parseIcalDate($dateString)
+    {
+        // Handle different date formats
+        if (strlen($dateString) === 8) {
+            // YYYYMMDD format
+            return Carbon::createFromFormat('Ymd', $dateString);
+        } elseif (strlen($dateString) === 15 && substr($dateString, -1) === 'Z') {
+            // YYYYMMDDTHHMMSSZ format
+            return Carbon::createFromFormat('Ymd\THis\Z', $dateString);
+        } elseif (strlen($dateString) === 15) {
+            // YYYYMMDDTHHMMSS format
+            return Carbon::createFromFormat('Ymd\THis', $dateString);
+        }
+
+        // Fallback to parsing any recognizable date format
+        return Carbon::parse($dateString);
     }
 }

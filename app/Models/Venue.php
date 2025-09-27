@@ -69,4 +69,12 @@ class Venue extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Get the iCal feeds for the venue.
+     */
+    public function icalFeeds()
+    {
+        return $this->hasMany(Ical::class);
+    }
 }
