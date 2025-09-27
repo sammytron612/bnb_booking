@@ -191,6 +191,7 @@
                         alt="{{ $featuredImage->title }}"
                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                         loading="eager"
+                        fetchpriority="high"
                         decoding="async"
                         width="800"
                         height="600"
