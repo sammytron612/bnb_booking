@@ -17,7 +17,7 @@
                     </svg>
                 </button>
             </div>
-<div></div>
+
             <!-- Modal Content -->
             <div class="p-6">
                 <!-- Pricing Summary -->

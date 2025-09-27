@@ -188,111 +188,45 @@ class BookingsTable extends Component
         $externalBookings = collect();
 
         try {
-            // Get all active iCal feeds
-            $icalFeeds = \App\Models\Ical::where('active', true)->with('venue')->get();
+            // Use the BookingController API to get external bookings
+            $controller = new \App\Http\Controllers\BookingController();
+            $rawExternalBookings = $controller->getExternalBookings();
 
-            foreach ($icalFeeds as $feed) {
-                $icalData = $this->fetchIcalData($feed->url);
-                if ($icalData) {
-                    $events = $this->parseIcalEvents($icalData, $feed->venue);
-                    $externalBookings = $externalBookings->merge($events);
+            // Convert the raw objects into Booking-like models for calendar compatibility
+            if ($rawExternalBookings && $rawExternalBookings->count() > 0) {
+                foreach ($rawExternalBookings as $rawBooking) {
+                $booking = new Booking([
+                    'venue_id' => $rawBooking->venue_id,
+                    'booking_id' => 'EXT-' . strtoupper(substr(md5(uniqid()), 0, 6)),
+                    'name' => 'External Booking',
+                    'email' => 'external@booking.com',
+                    'phone' => '',
+                    'check_in' => $rawBooking->check_in,
+                    'check_out' => $rawBooking->check_out,
+                    'total_price' => 0,
+                    'status' => 'confirmed',
+                    'notes' => 'External calendar booking',
+                    'nights' => $rawBooking->check_in->diffInDays($rawBooking->check_out),
+                    'pay_method' => 'external',
+                    'is_paid' => true
+                ]);
+
+                // Set a fake ID and venue relationship
+                $booking->id = 'ext-' . uniqid();
+                $booking->venue = \App\Models\Venue::find($rawBooking->venue_id);
+                $booking->setAttribute('is_external', true);
+                $booking->exists = false; // Don't try to save this to database
+
+                $externalBookings->push($booking);
                 }
             }
+
         } catch (\Exception $e) {
             \Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
         }
 
         return $externalBookings;
-    }
-
-    private function fetchIcalData($url)
-    {
-        try {
-            $context = stream_context_create([
-                'http' => [
-                    'timeout' => 10,
-                    'user_agent' => 'Eileen BnB Calendar Sync/1.0'
-                ]
-            ]);
-
-            return file_get_contents($url, false, $context);
-        } catch (\Exception $e) {
-            return null;
-        }
-    }
-
-    private function parseIcalEvents($icalData, $venue)
-    {
-        $events = collect();
-        $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
-
-        $currentEvent = null;
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-
-            if ($line === 'BEGIN:VEVENT') {
-                $currentEvent = [];
-            } elseif ($line === 'END:VEVENT' && $currentEvent !== null) {
-                if (isset($currentEvent['start_date']) && isset($currentEvent['end_date'])) {
-                    // Create a booking-like object for display using Booking model
-                    $booking = new Booking([
-                        'venue_id' => $venue->id,
-                        'booking_id' => 'EXT-' . strtoupper(substr(md5($currentEvent['uid'] ?? uniqid()), 0, 6)),
-                        'name' => 'External Booking',
-                        'email' => 'external@booking.com',
-                        'phone' => '',
-                        'check_in' => $currentEvent['start_date'],
-                        'check_out' => $currentEvent['end_date'],
-                        'total_price' => 0,
-                        'status' => 'confirmed',
-                        'notes' => 'External: ' . ($currentEvent['summary'] ?? ''),
-                        'nights' => $currentEvent['start_date']->diffInDays($currentEvent['end_date']),
-                        'pay_method' => 'external',
-                        'is_paid' => true
-                    ]);
-
-                    // Set a fake ID and mark as external
-                    $booking->id = 'ext-' . uniqid();
-                    $booking->venue = $venue;
-                    $booking->setAttribute('is_external', true);
-                    $booking->exists = false; // Don't try to save this to database
-
-                    $events->push($booking);
-                }
-                $currentEvent = null;
-            } elseif ($currentEvent !== null && strpos($line, ':') !== false) {
-                [$key, $value] = explode(':', $line, 2);
-
-                if (strpos($key, 'DTSTART') === 0) {
-                    $currentEvent['start_date'] = $this->parseIcalDate($value);
-                } elseif (strpos($key, 'DTEND') === 0) {
-                    $currentEvent['end_date'] = $this->parseIcalDate($value);
-                } elseif ($key === 'UID') {
-                    $currentEvent['uid'] = $value;
-                } elseif ($key === 'SUMMARY') {
-                    $currentEvent['summary'] = $value;
-                }
-            }
-        }
-
-        return $events;
-    }
-
-    private function parseIcalDate($dateString)
-    {
-        if (strlen($dateString) === 8) {
-            return \Carbon\Carbon::createFromFormat('Ymd', $dateString);
-        } elseif (strlen($dateString) === 15 && substr($dateString, -1) === 'Z') {
-            return \Carbon\Carbon::createFromFormat('Ymd\THis\Z', $dateString);
-        } elseif (strlen($dateString) === 15) {
-            return \Carbon\Carbon::createFromFormat('Ymd\THis', $dateString);
-        }
-
-        return \Carbon\Carbon::parse($dateString);
-    }
-
-    public function render()
+    }    public function render()
     {
         // Get database bookings only (for the table)
         $paginatedBookings = Booking::with('venue')
