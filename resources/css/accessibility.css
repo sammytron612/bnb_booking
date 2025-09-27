@@ -63,7 +63,7 @@ textarea:focus {
 
 /* Accessibility: Ensure proper spacing for touch targets */
 @media (max-width: 768px) {
-    button, 
+    button,
     a[role="button"],
     input[type="button"],
     input[type="submit"] {

@@ -73,7 +73,7 @@ class ContentSecurityPolicy
     private function addCacheHeaders(Request $request, Response $response): void
     {
         $path = $request->path();
-        
+
         // Static assets - aggressive caching
         if (preg_match('/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i', $path)) {
             $response->headers->set('Cache-Control', 'public, max-age=31536000, immutable');
