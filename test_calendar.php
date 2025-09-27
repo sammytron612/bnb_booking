@@ -24,6 +24,16 @@ try {
         echo "- Has double booking: " . ($sept28['has_double_booking'] ? 'YES' : 'NO') . "\n";
         echo "- Check-ins: " . $sept28['check_in_count'] . "\n";
         echo "- Check-outs: " . $sept28['check_out_count'] . "\n";
+
+        echo "\nCheck-in sources:\n";
+        foreach ($sept28['check_ins'] as $checkIn) {
+            echo "  - " . $checkIn->name . "\n";
+        }
+
+        echo "\nAll booking sources:\n";
+        foreach ($sept28['bookings'] as $booking) {
+            echo "  - " . $booking->name . "\n";
+        }
     } else {
         echo "\nSept 28th NOT found in calendar range\n";
     }

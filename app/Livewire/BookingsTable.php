@@ -167,7 +167,11 @@ class BookingsTable extends Component
                 return $booking->check_in->format('Y-m-d') === $date->format('Y-m-d');
             });
 
-            $checkIns = $checkInsDb->merge($checkInsExternal);
+            // Combine check-ins manually to avoid ID collision issues
+            $checkIns = collect($checkInsDb);
+            foreach ($checkInsExternal as $extCheckIn) {
+                $checkIns->push($extCheckIn);
+            }
 
             // Get check-outs for this specific date (database)
             $checkOutsDb = Booking::with('venue')
@@ -180,7 +184,11 @@ class BookingsTable extends Component
                 return $booking->check_out->format('Y-m-d') === $date->format('Y-m-d');
             });
 
-            $checkOuts = $checkOutsDb->merge($checkOutsExternal);
+            // Combine check-outs manually to avoid ID collision issues
+            $checkOuts = collect($checkOutsDb);
+            foreach ($checkOutsExternal as $extCheckOut) {
+                $checkOuts->push($extCheckOut);
+            }
 
             // Check for double bookings (multiple bookings at same venue on same date)
             $venueBookings = [];
