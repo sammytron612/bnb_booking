@@ -112,14 +112,14 @@
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
-                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
                                     </div>
                                 @endif
 
                                 <!-- Check-out indicator -->
                                 @if($day['check_out_count'] > 0)
-                                    <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
                                 @endif
@@ -194,7 +194,7 @@
                                     <div class="text-gray-400 text-xs font-medium">No bookings</div>
 
                                     <!-- Check-out indicator -->
-                                    <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
 
@@ -274,14 +274,14 @@
 
                                 <!-- Check-in indicator -->
                                 @if($day['check_in_count'] > 0)
-                                    <div class="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -left-2 bg-green-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↓{{ $day['check_in_count'] }}
                                     </div>
                                 @endif
 
                                 <!-- Check-out indicator -->
                                 @if($day['check_out_count'] > 0)
-                                    <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
                                 @endif
@@ -356,7 +356,7 @@
                                     <div class="text-gray-400 text-xs font-medium">No bookings</div>
 
                                     <!-- Check-out indicator -->
-                                    <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div class="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
                                         ↑{{ $day['check_out_count'] }}
                                     </div>
 
