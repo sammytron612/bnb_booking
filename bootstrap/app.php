@@ -14,6 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
         ]);
+
+        // Apply CSP and security headers to all web requests
+        $middleware->web(append: [
+            \App\Http\Middleware\ContentSecurityPolicy::class,
+        ]);
+
+        // Create alias for easier reference
+        $middleware->alias([
+            'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

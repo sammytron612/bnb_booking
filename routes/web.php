@@ -101,3 +101,8 @@ Route::get('/robots.txt', function () {
     return response($content)
         ->header('Content-Type', 'text/plain');
 })->name('robots');
+
+// Security: Block common scanning attempts
+Route::get('/flux/{any?}', function () {
+    abort(404);
+})->where('any', '.*')->name('flux.blocked');
