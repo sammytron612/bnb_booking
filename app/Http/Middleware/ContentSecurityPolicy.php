@@ -23,46 +23,20 @@ class ContentSecurityPolicy
             return $response;
         }
 
-        // Generate a unique nonce for this request
-        $nonce = base64_encode(random_bytes(16));
-        
-        // Share nonce with views for inline scripts
-        view()->share('cspNonce', $nonce);
-
-        // CSP policy for Eileen BnB with nonce-based security
-        $isLocal = app()->environment('local');
-
-        if ($isLocal) {
-            // Development CSP - still permissive but better structured
-            $csp = [
-                "default-src 'self'",
-                "script-src 'self' 'nonce-{$nonce}' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
-                "style-src 'self' 'nonce-{$nonce}' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com localhost:* *.test",
-                "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data: localhost:* *.test",
-                "img-src 'self' data: https: blob: localhost:* *.test https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com",
-                "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://maps.googleapis.com ws: wss: localhost:* *.test",
-                "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
-                "form-action 'self' https://checkout.stripe.com",
-                "base-uri 'self'",
-                "object-src 'none'",
-            ];
-        } else {
-            // Production CSP (secure - no unsafe-inline)
-            $csp = [
-                "default-src 'self'",
-                "script-src 'self' 'nonce-{$nonce}' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com",
-                "style-src 'self' 'nonce-{$nonce}' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com",
-                "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data:",
-                "img-src 'self' data: https: blob: https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com",
-                "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://maps.googleapis.com",
-                "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
-                "frame-ancestors 'none'",
-                "form-action 'self' https://checkout.stripe.com",
-                "base-uri 'self'",
-                "object-src 'none'",
-                "upgrade-insecure-requests",
-            ];
-        }
+        // Simple CSP without nonces - allows unsafe-inline for compatibility
+        $csp = [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com localhost:* *.test",
+            "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data: localhost:* *.test",
+            "img-src 'self' data: https: blob: localhost:* *.test https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com",
+            "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://maps.googleapis.com ws: wss: localhost:* *.test",
+            "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
+            "form-action 'self' https://checkout.stripe.com",
+            "base-uri 'self'",
+            "object-src 'none'",
+            "frame-ancestors 'none'",
+        ];
 
         // Apply CSP header
         $cspHeader = implode('; ', $csp);

@@ -7,7 +7,20 @@ if (!function_exists('csp_nonce')) {
      */
     function csp_nonce(): string
     {
-        return app('view')->shared('cspNonce') ?? '';
+        // Try to get from view shared data
+        $factory = app('view');
+        $shared = $factory->getShared();
+        
+        if (isset($shared['cspNonce'])) {
+            return $shared['cspNonce'];
+        }
+        
+        // Fallback: try to get from request attributes
+        if (request()->attributes->has('csp_nonce')) {
+            return request()->attributes->get('csp_nonce');
+        }
+        
+        return '';
     }
 }
 

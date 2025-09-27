@@ -91,12 +91,10 @@
     </div>
 
     <script>
-        <script>
         function retryPayment() {
             // Redirect to signed payment checkout URL
             window.location.href = '{{ $retryPaymentUrl }}';
         }
-    </script>
     </script>
 </body>
 </html>
