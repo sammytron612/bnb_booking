@@ -22,7 +22,7 @@ class ContentSecurityPolicy
             return $response;
         }
 
-        // Content Security Policy - enhanced with Trusted Types for XSS protection
+        // Content Security Policy - allows necessary external resources
         $csp = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
@@ -35,8 +35,6 @@ class ContentSecurityPolicy
             "base-uri 'self'",
             "object-src 'none'",
             "frame-ancestors 'none'",
-            "require-trusted-types-for 'script'",
-            "trusted-types default",
         ];
 
         // Apply CSP header
