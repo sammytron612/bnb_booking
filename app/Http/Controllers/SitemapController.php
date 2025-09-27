@@ -18,10 +18,10 @@ class SitemapController extends Controller
         $sitemap .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
         // Main sitemap
-        $sitemap .= $this->addSitemapUrl(route('sitemap.main'), Carbon::now());
+        $sitemap .= $this->addSitemapUrl(route('api.sitemap.main'), Carbon::now());
 
         // Venues sitemap
-        $sitemap .= $this->addSitemapUrl(route('sitemap.venues'), Carbon::now());
+        $sitemap .= $this->addSitemapUrl(route('api.sitemap.venues'), Carbon::now());
 
         $sitemap .= '</sitemapindex>';
 
@@ -43,10 +43,16 @@ class SitemapController extends Controller
                 'lastmod' => Carbon::now()->toISOString()
             ],
             [
-                'url' => route('contact'),
+                'url' => route('home') . '#contact',
                 'priority' => '0.8',
                 'changefreq' => 'monthly',
-                'lastmod' => Carbon::now()->subDays(30)->toISOString()
+                'lastmod' => Carbon::now()->toISOString()
+            ],
+            [
+                'url' => route('home') . '#about-seaham',
+                'priority' => '0.7',
+                'changefreq' => 'monthly',
+                'lastmod' => Carbon::now()->toISOString()
             ],
             // Add more static pages as needed
         ];
@@ -60,7 +66,7 @@ class SitemapController extends Controller
     public function venues()
     {
         $venues = Venue::where('booking_enabled', true)
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         $urls = [];
@@ -69,7 +75,7 @@ class SitemapController extends Controller
                 'url' => route('venue.show', $venue->route),
                 'priority' => '0.9',
                 'changefreq' => 'weekly',
-                'lastmod' => $venue->updated_at->toISOString(),
+                'lastmod' => Carbon::now()->toISOString(),
                 'images' => $venue->propertyImages->map(function ($image) use ($venue) {
                     return [
                         'loc' => asset(ltrim($image->location, '/')),

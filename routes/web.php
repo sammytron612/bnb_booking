@@ -55,35 +55,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 });
-// Public API for calendar dates (no sensitive data)
-Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
-
-// iCal API routes
-Route::get('/api/ical/venue/{venueId}/calendars', [App\Http\Controllers\IcalController::class, 'getVenueCalendars'])->name('ical.venue.calendars');
-Route::get('/api/ical/fetch', [App\Http\Controllers\IcalController::class, 'fetchIcalData'])->name('ical.fetch');
-Route::get('/api/ical/combined', [App\Http\Controllers\IcalController::class, 'getCombinedBookingData'])->name('ical.combined');
-
-// iCal export route for external calendar sync (Airbnb, Booking.com, Outlook, etc.)
-Route::get('/api/ical/export/{venue_id}', [App\Http\Controllers\IcalController::class, 'exportVenueCalendar'])
-    ->name('ical.export')
-    ->where('venue_id', '[0-9]+');
-
-
-
-
-// Handle OPTIONS requests for CORS (Outlook compatibility)
-Route::options('/api/ical/export/{venue_id}', function () {
-    return response('', 200)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        ->header('Access-Control-Max-Age', '86400');
-})->where('venue_id', '[0-9]+');
-
-// Sitemap routes
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.index');
-Route::get('/sitemap-main.xml', [App\Http\Controllers\SitemapController::class, 'main'])->name('sitemap.main');
-Route::get('/sitemap-venues.xml', [App\Http\Controllers\SitemapController::class, 'venues'])->name('sitemap.venues');
 
 // Test route for debugging iCal integration
 /*Route::get('/test/ical/{venueId?}', function($venueId = 1) {
@@ -160,19 +131,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
-
-// Sitemap routes
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
-Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
-
-// Dynamic robots.txt
-Route::get('/robots.txt', function () {
-    $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
-
-    return response($content)
-        ->header('Content-Type', 'text/plain');
-})->name('robots');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
