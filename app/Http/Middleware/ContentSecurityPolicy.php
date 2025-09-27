@@ -121,9 +121,9 @@ class ContentSecurityPolicy
     private function isLighthouseRequest(Request $request): bool
     {
         $userAgent = $request->header('User-Agent', '');
-        
+
         // Check for performance testing headers
-        if ($request->hasHeader('X-Lighthouse-Test') || 
+        if ($request->hasHeader('X-Lighthouse-Test') ||
             $request->get('lighthouse') === '1' ||
             $request->hasHeader('X-PageSpeed-Insights')) {
             return true;
