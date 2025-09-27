@@ -40,24 +40,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Additional Security Headers
+    | Security Headers Configuration
     |--------------------------------------------------------------------------
     |
+    | Application-level security headers (Apache handles HSTS)
     | Each header can be individually enabled/disabled
     |
     */
 
     'headers' => [
+        // Standard security headers
         'x_frame_options' => env('SECURITY_X_FRAME_OPTIONS', true),
         'x_content_type_options' => env('SECURITY_X_CONTENT_TYPE_OPTIONS', true),
         'x_xss_protection' => env('SECURITY_X_XSS_PROTECTION', true),
         'referrer_policy' => env('SECURITY_REFERRER_POLICY', true),
-        'permissions_policy' => env('SECURITY_PERMISSIONS_POLICY', false), // Disabled by default
 
-        // Cross-Origin headers for better isolation
+        // Cross-origin isolation headers
         'cross_origin_resource_policy' => env('SECURITY_CORP', true),
-        'cross_origin_embedder_policy' => env('SECURITY_COEP', false), // Can break third-party embeds
+        'cross_origin_embedder_policy' => env('SECURITY_COEP', false), // Disabled - can break integrations
         'cross_origin_opener_policy' => env('SECURITY_COOP', true),
+
+        // Permissions policy (disabled by default)
+        'permissions_policy' => env('SECURITY_PERMISSIONS_POLICY', false),
     ],
 
     /*

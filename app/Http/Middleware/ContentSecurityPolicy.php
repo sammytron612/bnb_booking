@@ -9,21 +9,20 @@ use Symfony\Component\HttpFoundation\Response;
 class ContentSecurityPolicy
 {
     /**
-     * Handle an incoming request with CSP headers
+     * Handle an incoming request with security headers
      *
-     * FEATURE FLAG: Can be disabled via config('security.csp.enabled')
-     * EMERGENCY DISABLE: Set CSP_ENABLED=false in .env
+     * Apache handles HSTS - this middleware focuses on CSP and other application headers
      */
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);
 
-        // SAFETY: Check if CSP is enabled via config (can be disabled instantly)
-        if (!config('security.csp.enabled', false)) {
+        // Skip if CSP is disabled
+        if (!config('security.csp.enabled', true)) {
             return $response;
         }
 
-        // Simple CSP without nonces - allows unsafe-inline for compatibility
+        // Content Security Policy - allows necessary external resources
         $csp = [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://www.googletagmanager.com https://www.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
@@ -40,44 +39,25 @@ class ContentSecurityPolicy
 
         // Apply CSP header
         $cspHeader = implode('; ', $csp);
-
-        // SAFETY: Use report-only mode initially if configured
         if (config('security.csp.report_only', false)) {
             $response->headers->set('Content-Security-Policy-Report-Only', $cspHeader);
         } else {
             $response->headers->set('Content-Security-Policy', $cspHeader);
         }
 
-        // Additional security headers (also configurable)
-        if (config('security.headers.x_frame_options', true)) {
-            $response->headers->set('X-Frame-Options', 'DENY');
-        }
+        // Security headers (Apache handles HSTS)
+        $response->headers->set('X-Frame-Options', 'DENY');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        if (config('security.headers.x_content_type_options', true)) {
-            $response->headers->set('X-Content-Type-Options', 'nosniff');
-        }
+        // Cross-origin isolation headers
+        $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
 
-        if (config('security.headers.x_xss_protection', true)) {
-            $response->headers->set('X-XSS-Protection', '1; mode=block');
-        }
-
-        if (config('security.headers.referrer_policy', true)) {
-            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        }
-
-        // Cross Origin Resource Policy (CORP) - prevents cross-origin resource loading
-        if (config('security.headers.cross_origin_resource_policy', true)) {
-            $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
-        }
-
-        // Cross Origin Embedder Policy (COEP) - additional isolation (can break third-party embeds)
+        // COEP disabled by default - can break Stripe/Google integrations
         if (config('security.headers.cross_origin_embedder_policy', false)) {
             $response->headers->set('Cross-Origin-Embedder-Policy', 'unsafe-none');
-        }
-
-        // Cross Origin Opener Policy (COOP) - prevents window references
-        if (config('security.headers.cross_origin_opener_policy', true)) {
-            $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
         }
 
         return $response;
