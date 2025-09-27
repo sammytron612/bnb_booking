@@ -71,7 +71,7 @@ class ContentSecurityPolicy
     private function addCacheHeaders(Request $request, Response $response): void
     {
         $path = $request->path();
-        
+
         // Skip cache headers for Lighthouse testing - check user agent
         $userAgent = $request->header('User-Agent', '');
         if (str_contains($userAgent, 'Chrome-Lighthouse')) {
