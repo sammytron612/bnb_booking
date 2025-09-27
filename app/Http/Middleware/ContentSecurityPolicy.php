@@ -45,8 +45,7 @@ class ContentSecurityPolicy
             $response->headers->set('Content-Security-Policy', $cspHeader);
         }
 
-        // Security headers (Apache handles HSTS)
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Security headers (Apache handles HSTS and X-Frame-Options)
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
