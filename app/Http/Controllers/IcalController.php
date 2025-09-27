@@ -89,4 +89,47 @@ class IcalController extends Controller
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Cache-Control', 'public, max-age=3600');
     }
+
+    /**
+     * Export venue bookings as iCal feed for external platform sync
+     */
+    public function exportVenueCalendar(Request $request, $venue_id)
+    {
+        $venue = \App\Models\Venue::findOrFail($venue_id);
+
+        // Get all confirmed and pending bookings for the venue
+        $bookings = \App\Models\Booking::where('venue_id', $venue_id)
+            ->whereIn('status', ['confirmed', 'pending'])
+            ->orderBy('check_in')
+            ->get();
+
+        $ical = "BEGIN:VCALENDAR\r\n";
+        $ical .= "VERSION:2.0\r\n";
+        $ical .= "PRODID:-//Eileen BnB//Venue Calendar//EN\r\n";
+        $ical .= "CALSCALE:GREGORIAN\r\n";
+        $ical .= "X-WR-CALNAME:" . $venue->venue_name . " - Bookings\r\n";
+        $ical .= "X-WR-CALDESC:Blocked dates for " . $venue->venue_name . "\r\n";
+
+        foreach ($bookings as $booking) {
+            $ical .= "BEGIN:VEVENT\r\n";
+            $ical .= "UID:booking-" . $booking->id . "@eileenbnb.com\r\n";
+            $ical .= "DTSTART;VALUE=DATE:" . $booking->check_in->format('Ymd') . "\r\n";
+            $ical .= "DTEND;VALUE=DATE:" . $booking->check_out->format('Ymd') . "\r\n";
+            $ical .= "DTSTAMP:" . now()->format('Ymd\THis\Z') . "\r\n";
+            $ical .= "SUMMARY:BOOKED: " . $venue->venue_name . "\r\n";
+            $ical .= "DESCRIPTION:Guest: " . $booking->first_name . " " . $booking->last_name . "\\nStatus: " . ucfirst($booking->status) . "\r\n";
+            $ical .= "STATUS:CONFIRMED\r\n";
+            $ical .= "END:VEVENT\r\n";
+        }
+
+        $ical .= "END:VCALENDAR\r\n";
+
+        $filename = strtolower(str_replace(' ', '-', $venue->venue_name)) . '-calendar.ics';
+
+        return response($ical)
+            ->header('Content-Type', 'text/calendar; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Cache-Control', 'no-cache, must-revalidate');
+    }
 }
