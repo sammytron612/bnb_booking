@@ -638,6 +638,20 @@
                             @endif
                         </button>
                     </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <button wire:click="sortByField('is_paid')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
+                            <span>Payment</span>
+                            @if($sortBy === 'is_paid')
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    @if($sortDirection === 'asc')
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                    @else
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    @endif
+                                </svg>
+                            @endif
+                        </button>
+                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -666,6 +680,13 @@
                                 {{ ucfirst($booking->status) }}
                             </span>
                         </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                @if($booking->is_paid) bg-green-100 text-green-800
+                                @else bg-red-100 text-red-800 @endif">
+                                {{ $booking->is_paid ? 'Paid' : 'Unpaid' }}
+                            </span>
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button wire:click="editBooking({{ $booking->id }})" class="text-white  bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-lg p-2 mr-3">Edit</button>
                             <button wire:click="deleteBooking({{ $booking->id }})" class="text-white bg-red-600 hover:bg-red-700 hover:cursor-pointer rounded-lg p-2" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
@@ -673,7 +694,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="px-6 py-4 text-center text-gray-500">No bookings found</td>
+                        <td colspan="11" class="px-6 py-4 text-center text-gray-500">No bookings found</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -735,9 +756,9 @@
                         <!-- Payment Status Field -->
                         <div>
                             <label for="editPayment" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-                            <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">Unpaid</option>
-                                <option value="1">Paid</option>
+                            <select wire:model.live="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="0" {{ $editPayment == '0' ? 'selected' : '' }}>Unpaid</option>
+                                <option value="1" {{ $editPayment == '1' ? 'selected' : '' }}>Paid</option>
                             </select>
                             @error('editPayment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -752,8 +773,8 @@
                 </div>
 
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="closeEditModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-                    <button wire:click="saveBooking" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
+                    <button wire:click="closeEditModal" class="hover:cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
+                    <button wire:click="saveBooking" class="hover:curso-pointer px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
                 </div>
             </div>
         </div>

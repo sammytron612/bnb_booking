@@ -91,13 +91,41 @@ class BookingsTable extends Component
             'editPayment' => 'required|in:0,1',
         ]);
 
+        // Debug: Log what we're trying to save
+        \Log::info('Saving booking payment status', [
+            'booking_id' => $this->selectedBooking->id,
+            'editPayment' => $this->editPayment,
+            'validated_editPayment' => $validated['editPayment'],
+            'is_paid_value' => $validated['editPayment'] === "1",
+            'is_paid_int' => (int) $validated['editPayment']
+        ]);
+
         // Get fresh model from database and update it
         $booking = Booking::find($this->selectedBooking->id);
+
+        // Use explicit boolean conversion
+        $isPaid = $validated['editPayment'] === "1" || $validated['editPayment'] === 1;
+
+        // Update non-guarded fields first
         $booking->update([
             'status' => $validated['editStatus'],
-            'notes' => $validated['editNotes'],
-            'is_paid' => $validated['editPayment'] === "1"
+            'notes' => $validated['editNotes']
         ]);
+
+        // Explicitly set the guarded is_paid field
+        $booking->is_paid = $isPaid;
+        $booking->save();
+
+        // Debug: Verify the update worked
+        $booking->refresh();
+        \Log::info('After update', [
+            'booking_id' => $booking->id,
+            'is_paid_in_db' => $booking->is_paid,
+            'is_paid_type' => gettype($booking->is_paid)
+        ]);
+
+        // Refresh the booking to show updated values
+        $booking->refresh();
 
         $this->showEditModal = false;
         $this->selectedBooking = null;
@@ -105,6 +133,9 @@ class BookingsTable extends Component
         $this->editNotes = '';
         $this->editPayment = "0";
         $this->successMessage = 'Booking updated successfully.';
+
+        // Force component refresh to update the display
+        $this->dispatch('$refresh');
     }
 
     public function clearSuccessMessage()
