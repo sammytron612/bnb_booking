@@ -89,7 +89,7 @@
                     <div class="relative">
                         @if($day['booking_count'] > 0)
                             @if($day['has_double_booking'])
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger animate-pulse"
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
                                      data-tooltip-id="tooltip-week1-{{ $loop->index }}">
                             @else
@@ -226,7 +226,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm"></div>
                         @endif
 
 
@@ -251,7 +251,7 @@
                     <div class="relative">
                         @if($day['booking_count'] > 0)
                             @if($day['has_double_booking'])
-                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger animate-pulse"
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="⚠️ DOUBLE BOOKING CONFLICT! {{ $day['booking_count'] }} booking(s)"
                                      data-tooltip-id="tooltip-week2-{{ $loop->index }}">
                             @else
@@ -388,7 +388,7 @@
 
                         <!-- Today indicator -->
                         @if($day['is_today'])
-                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm animate-pulse"></div>
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white shadow-sm"></div>
                         @endif
 
 
@@ -400,7 +400,7 @@
         <!-- Legend -->
         <div class="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
             <div class="flex items-center">
-                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-1 animate-pulse"></div>
+                <div class="w-3 h-3 bg-yellow-500 rounded-full mr-1"></div>
                 Today
             </div>
 

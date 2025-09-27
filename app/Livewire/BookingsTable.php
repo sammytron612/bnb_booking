@@ -141,31 +141,6 @@ class BookingsTable extends Component
             // Combine both types of bookings
             $dayBookings = $dayDbBookings->merge($dayExternalBookings);
 
-            // Check for double bookings (multiple bookings at same venue on same date)
-            $venueBookingCounts = $dayBookings->groupBy('venue_id')->map(function ($venueBookings) {
-                return $venueBookings->count();
-            });
-            $hasDoubleBooking = $venueBookingCounts->contains(function ($count) {
-                return $count > 1;
-            });
-
-            // Get venues with double bookings for detailed info
-            $doubleBookingVenues = collect();
-            if ($hasDoubleBooking) {
-                $doubleBookingVenues = $dayBookings->groupBy('venue_id')
-                    ->filter(function ($venueBookings) {
-                        return $venueBookings->count() > 1;
-                    })
-                    ->map(function ($venueBookings, $venueId) {
-                        return [
-                            'venue_id' => $venueId,
-                            'venue_name' => $venueBookings->first()->venue->venue_name ?? 'Unknown Venue',
-                            'booking_count' => $venueBookings->count(),
-                            'bookings' => $venueBookings
-                        ];
-                    });
-            }
-
             // Get check-ins for this specific date (database)
             $checkInsDb = Booking::with('venue')
                 ->whereDate('check_in', $date->format('Y-m-d'))
@@ -200,8 +175,6 @@ class BookingsTable extends Component
                 'check_in_count' => $checkIns->count(),
                 'check_outs' => $checkOuts,
                 'check_out_count' => $checkOuts->count(),
-                'has_double_booking' => $hasDoubleBooking,
-                'double_booking_venues' => $doubleBookingVenues,
                 'is_today' => $date->isToday(),
                 'is_weekend' => $date->isWeekend()
             ]);
