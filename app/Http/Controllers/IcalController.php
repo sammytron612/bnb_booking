@@ -12,8 +12,16 @@ class IcalController extends Controller
     /**
      * Export venue calendar in iCal format for external services like Airbnb
      */
-    public function exportVenueCalendar($venue_id)
+    public function exportVenueCalendar(Request $request, $venue_id)
     {
+        // Handle CORS preflight OPTIONS request
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        }
+
         $venue = Venue::find($venue_id);
 
         if (!$venue) {

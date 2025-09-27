@@ -39,17 +39,9 @@ Route::get('/ical/fetch', [IcalController::class, 'fetchIcalData'])->name('api.i
 Route::get('/ical/combined', [IcalController::class, 'getCombinedBookingData'])->name('api.ical.combined');
 
 // iCal export route for external calendar sync (Airbnb, Booking.com, Outlook, etc.)
-Route::get('/ical/export/{venue_id}', [IcalController::class, 'exportVenueCalendar'])
+Route::match(['GET', 'OPTIONS'], '/ical/export/{venue_id}', [IcalController::class, 'exportVenueCalendar'])
     ->name('api.ical.export')
     ->where('venue_id', '[0-9]+');
-
-// Handle OPTIONS requests for CORS (Outlook compatibility)
-Route::options('/ical/export/{venue_id}', function () {
-    return response('')
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-        ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-})->where('venue_id', '[0-9]+');
 
 // Public booking data API for calendar integration
 Route::get('/booked-dates', function (Request $request) {
