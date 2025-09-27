@@ -180,9 +180,7 @@ class BookingController extends Controller
             // Skip past bookings
             if ($booking->check_out < Carbon::today()) {
                 continue;
-            }
-
-            $checkInDate = Carbon::parse($booking->check_in);
+            }            $checkInDate = Carbon::parse($booking->check_in);
             $checkOutDate = Carbon::parse($booking->check_out);
 
             // Add check-in date
@@ -243,7 +241,10 @@ class BookingController extends Controller
                 $icalData = $this->fetchIcalData($feed->url);
                 if ($icalData) {
                     $events = $this->parseIcalEvents($icalData, $feed->venue, $feed);
-                    $externalBookings = $externalBookings->merge($events);
+                    // Use push instead of merge to avoid collection key conflicts
+                    foreach ($events as $event) {
+                        $externalBookings->push($event);
+                    }
                 }
             }
         } catch (\Exception $e) {
@@ -289,9 +290,7 @@ class BookingController extends Controller
                         'check_out' => $currentEvent['end_date'],
                         'venue_id' => $venue->id,
                         'source' => $feed ? $feed->source : 'External'
-                    ];
-
-                    $events->push($booking);
+                    ];                    $events->push($booking);
                 }
                 $currentEvent = null;
             } elseif ($currentEvent !== null && strpos($line, ':') !== false) {
