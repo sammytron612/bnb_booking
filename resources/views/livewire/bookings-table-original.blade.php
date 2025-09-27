@@ -161,11 +161,16 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show no bookings style with checkout badge when only checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer group mobile-tooltip-trigger"
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week1-{{ $loop->index }}">
-                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-amber-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
 
                                     <!-- Check-out indicator -->
                                     <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
@@ -264,10 +269,10 @@
                                     @endif
 
                                     @if($day['check_out_count'] > 0)
-                                        <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
-                                            <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
+                                        <div class="mb-2 p-2 bg-red-800 rounded border-l-2 border-red-400">
+                                            <div class="font-medium text-red-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
-                                                <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
+                                                <div class="text-red-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
                                     @endif
@@ -297,11 +302,16 @@
                             </div>
                         @else
                             @if($day['check_out_count'] > 0)
-                                <!-- Show no bookings style with checkout badge when only checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 cursor-pointer group mobile-tooltip-trigger"
+                                <!-- Show checkout card when no bookings but checkouts exist -->
+                                <div class="relative hover:z-[70] bg-gradient-to-br from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week2-{{ $loop->index }}">
-                                    <div class="text-gray-400 text-xs font-medium">No bookings</div>
+                                    <div class="text-white text-xs font-bold">
+                                        {{ $day['check_out_count'] }}
+                                    </div>
+                                    <div class="text-amber-100 text-xs">
+                                        {{ $day['check_out_count'] === 1 ? 'checkout' : 'checkouts' }}
+                                    </div>
 
                                     <!-- Check-out indicator -->
                                     <div class="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md">
@@ -314,14 +324,38 @@
                                             {{ $day['date']->format('l, F j, Y') }}
                                         </div>
 
+                                    @if($day['check_out_count'] > 0)
                                         <div class="mb-2 p-2 bg-amber-800 rounded border-l-2 border-amber-400">
                                             <div class="font-medium text-amber-300">✗ {{ $day['check_out_count'] }} Check-out{{ $day['check_out_count'] > 1 ? 's' : '' }}</div>
                                             @foreach($day['check_outs'] as $checkout)
                                                 <div class="text-amber-200 text-xs mt-1">{{ $checkout->name }} - {{ $checkout->venue->venue_name }}</div>
                                             @endforeach
                                         </div>
-
-                                        <!-- Arrow pointing down (connects to card below) -->
+                                    @endif
+                                    @foreach($day['bookings'] as $booking)
+                                        <div class="mb-2 p-2 bg-gray-800 rounded border-l-2 border-blue-400">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <div class="font-medium text-white">{{ $booking->name }}</div>
+                                                    <div class="text-gray-300 text-xs">{{ $booking->venue->venue_name }}</div>
+                                                </div>
+                                                <div class="font-mono text-xs text-blue-300">{{ $booking->getDisplayBookingId() }}</div>
+                                            </div>
+                                            <div class="text-gray-400 text-xs mt-1">
+                                                {{ \Carbon\Carbon::parse($booking->check_in)->format('M j') }} - {{ \Carbon\Carbon::parse($booking->check_out)->format('M j') }}
+                                                ({{ $booking->nights }} {{ $booking->nights === 1 ? 'night' : 'nights' }})
+                                            </div>
+                                            <div class="text-green-400 text-xs mt-1 font-medium">
+                                                £{{ number_format($booking->total_price, 2) }}
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <!-- Arrow pointing down (connects to card below) -->
+                                    <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
+                                        <div class="border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-gray-900"></div>
+                                    </div>
+                                </div>
+                            </div>                                        <!-- Arrow pointing down (connects to card below) -->
                                         <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
                                             <div class="border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900"></div>
                                         </div>
@@ -357,8 +391,8 @@
                 Check-ins <span class="ml-1 text-green-600">↓</span>
             </div>
             <div class="flex items-center">
-                <div class="w-3 h-3 bg-amber-500 rounded-full mr-1"></div>
-                Check-outs <span class="ml-1 text-amber-600">↑</span>
+                <div class="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
+                Check-outs <span class="ml-1 text-red-600">↑</span>
             </div>
             <div class="flex items-center">
                 <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
@@ -661,9 +695,8 @@
             </div>
         </div>
     @endif
-</div>
 
-<script>
+    <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile tooltip functionality
     let activeTooltip = null;
@@ -794,5 +827,5 @@ document.addEventListener('DOMContentLoaded', function() {
         subtree: true
     });
 });
-</script>
-
+    </script>
+</div>

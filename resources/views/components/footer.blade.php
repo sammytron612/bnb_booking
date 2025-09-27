@@ -94,8 +94,8 @@
                 <p>&copy; {{ date('Y') }} KLW design. All rights reserved.</p>
             </div>
             <div class="flex items-center space-x-6 text-gray-400 text-sm">
-                <a href="{{ route('privacy-policy') }}" class="hover:text-white transition-colors" wire:navigate>Privacy Policy</a>/
-                <a href="{{ route('terms-of-service') }}" class="hover:text-white transition-colors" wire:navigate>Terms of Service</a>/
+                <a href="{{ route('privacy-policy') }}" class="hover:text-white transition-colors" wire:navigate>Privacy Policy</a>
+                <a href="{{ route('terms-of-service') }}" class="hover:text-white transition-colors" wire:navigate>Terms of Service</a>
                 <a href="{{ route('cookie-policy') }}" class="hover:text-white transition-colors" wire:navigate>Cookie Policy</a>
             </div>
         </div>
