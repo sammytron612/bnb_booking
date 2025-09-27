@@ -6,7 +6,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\SitemapController;
+
 use App\Models\Venue;
 
 // Load auth routes first to prevent conflicts
@@ -17,6 +17,19 @@ Route::get('/', function () {
     \Log::info('Homepage loaded with ' . $venues->count() . ' venues');
     return view('home', compact('venues'));
 })->name('home');
+
+// Legal pages
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/terms-of-service', function () {
+    return view('terms-of-service');
+})->name('terms-of-service');
+
+Route::get('/cookie-policy', function () {
+    return view('cookie-policy');
+})->name('cookie-policy');
 
 // Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {
@@ -89,15 +102,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
 
-// Sitemap routes
-Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
-Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
-
-// Dynamic robots.txt
-Route::get('/robots.txt', function () {
-    $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
-
-    return response($content)
-        ->header('Content-Type', 'text/plain');
-})->name('robots');
+// Security: Block common scanning attempts
+Route::get('/flux/{any?}', function () {
+    abort(404);
+})->where('any', '.*')->name('flux.blocked');
