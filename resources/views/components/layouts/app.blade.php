@@ -3,5 +3,7 @@
         {{ $slot }}
     </flux:main>
 
-    <x-footer />
+    <x-slot:footer>
+        <x-footer />
+    </x-slot:footer>
 </x-layouts.app.header>
