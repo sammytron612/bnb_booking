@@ -171,8 +171,8 @@
                     </p>
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <p class="font-medium text-gray-800">Seaham Coastal Retreats</p>
-                        <p class="text-gray-700">Email: <a href="mailto:{{ env('OWNER_EMAIL') }}" class="text-blue-600 hover:text-blue-800">{{ env('OWNER_EMAIL') }}</a></p>
-                        <p class="text-gray-700">Phone: <a href="tel:{{ env('OWNER_PHONE_NO') }}" class="text-blue-600 hover:text-blue-800">{{ env('OWNER_PHONE_NO') }}</a></p>
+                        <p class="text-gray-700">Email: <a href="mailto:{{ config('app.owner_email') }}" class="text-blue-600 hover:text-blue-800">{{ config('app.owner_email') }}</a></p>
+                        <p class="text-gray-700">Phone: <a href="tel:{{ config('app.owner_phone_no') }}" class="text-blue-600 hover:text-blue-800">{{ config('app.owner_phone_no') }}</a></p>
                         <p class="text-gray-700">Address: Seaham, County Durham, United Kingdom</p>
                     </div>
                 </section>
