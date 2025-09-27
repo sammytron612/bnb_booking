@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-DcBYHKUY.css",
+    "file": "assets/app-DGYDPVmB.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "names": [
@@ -14,7 +14,7 @@
     "isEntry": true
   },
   "resources/js/booking-modal.js": {
-    "file": "assets/booking-modal-OWKhdoI2.js",
+    "file": "assets/booking-modal-C8khc51Q.js",
     "name": "booking-modal",
     "src": "resources/js/booking-modal.js",
     "isEntry": true

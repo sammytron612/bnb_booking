@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\IcalController;
+use App\Http\Controllers\BookingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,28 +45,8 @@ Route::match(['GET', 'OPTIONS'], '/ical/export/{venue_id}', [IcalController::cla
     ->where('venue_id', '[0-9]+');
 
 // Test iCal data for import testing
-Route::get('/test-calendar.ics', [IcalController::class, 'getTestIcalData'])->name('api.ical.test');
+Route::get('/airbnb-test-calendar.ics', [IcalController::class, 'getAirbnbTestIcalData'])->name('api.ical.airbnb.test');
+Route::get('/booking-com-test-calendar.ics', [IcalController::class, 'getBookingComTestIcalData'])->name('api.ical.booking-com.test');
 
-// Public booking data API for calendar integration
-Route::get('/booked-dates', function (Request $request) {
-    $venueId = $request->get('venue_id');
-
-    if (!$venueId) {
-        return response()->json(['error' => 'venue_id parameter required'], 400);
-    }
-
-    $bookedDates = \App\Models\Booking::where('venue_id', $venueId)
-        ->where('status', '!=', 'cancelled')
-        ->select('check_in', 'check_out')
-        ->get()
-        ->map(function ($booking) {
-            return [
-                'start' => $booking->check_in->format('Y-m-d'),
-                'end' => $booking->check_out->format('Y-m-d'),
-            ];
-        });
-
-    return response()->json($bookedDates)
-        ->header('Access-Control-Allow-Origin', '*')
-        ->header('Cache-Control', 'public, max-age=3600');
-})->name('api.booked.dates');
+// Public booking data API for calendar integration (no caching for real-time updates)
+Route::get('/booked-dates', [\App\Http\Controllers\BookingController::class, 'getBookedDates'])->name('api.booked.dates');

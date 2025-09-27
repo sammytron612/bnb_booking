@@ -210,7 +210,7 @@ class BookingController extends Controller
         sort($fullyBookedDates);
         sort($bookedDates);
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'checkInDates' => $checkInDates,
             'checkOutDates' => $checkOutDates,
@@ -218,6 +218,13 @@ class BookingController extends Controller
             'bookedDates' => $bookedDates, // For backward compatibility
             'count' => count($fullyBookedDates)
         ]);
+
+        // Force no caching for booking data to ensure real-time updates
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
+
+        return $response;
     }
 
     /**
