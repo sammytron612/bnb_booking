@@ -774,7 +774,7 @@
 
                 <div class="mt-6 flex justify-end space-x-3">
                     <button wire:click="closeEditModal" class="hover:cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-                    <button wire:click="saveBooking" class="hover:curso-pointer px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
+                    <button wire:click="saveBooking" class="hover:cursor-pointer px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
                 </div>
             </div>
         </div>
