@@ -1,5 +1,5 @@
 <!-- Booking Modal -->
-    @props(['price', 'venueId', 'themeColor' => 'blue'])
+    @props(['price', 'venueId'])
     <div
         id="bookingModal"
         class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4"

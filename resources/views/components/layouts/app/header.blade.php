@@ -1,11 +1,10 @@
 @props(['title' => null, 'seoData' => null])
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         @include('partials.head', ['seoData' => $seoData])
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800 flex flex-col">
+    <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:header container sticky class="border-b border-gray-200 bg-gradient-to-r from-slate-50 via-blue-50 to-slate-100 dark:from-slate-800 dark:via-slate-700 dark:to-slate-800 dark:border-slate-600 backdrop-blur-sm shadow-xl py-4 z-50">
             <flux:sidebar.toggle class="lg:hidden text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-100 transition-colors" icon="bars-2" inset="left" />
 
@@ -91,11 +90,8 @@
 
         </flux:sidebar>
 
-        <main class="flex-grow">
-            {{ $slot }}
-        </main>
+        {{ $slot }}
 
-        <x-footer />
 
         @fluxScripts
     </body>
