@@ -63,6 +63,11 @@ Route::get('/api/ical/export/{venue_id}', [App\Http\Controllers\IcalController::
     ->name('ical.export')
     ->where('venue_id', '[0-9]+');
 
+// Direct download route for Outlook (alternative method)
+Route::get('/download/calendar/{venue_id}.ics', [App\Http\Controllers\IcalController::class, 'exportVenueCalendar'])
+    ->name('ical.download')
+    ->where('venue_id', '[0-9]+');
+
 // Handle OPTIONS requests for CORS (Outlook compatibility)
 Route::options('/api/ical/export/{venue_id}', function () {
     return response('', 200)
