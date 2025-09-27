@@ -13,12 +13,6 @@ return new class extends Migration
     {
         Schema::create('ical', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('venue_id')->constrained()->onDelete('cascade');
-            $table->text('url'); // iCal URL
-            $table->string('source'); // e.g., "airbnb", "booking.com"
-            $table->string('name'); // Display name like "Airbnb Calendar - The Light House"
-            $table->boolean('active')->default(true);
-            $table->timestamp('last_synced_at')->nullable();
             $table->timestamps();
         });
     }

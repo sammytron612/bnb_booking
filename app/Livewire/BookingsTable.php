@@ -3,11 +3,8 @@
 namespace App\Livewire;
 
 use App\Models\Booking;
-use App\Models\Ical;
-use App\Http\Controllers\IcalController;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Illuminate\Http\Request;
 
 class BookingsTable extends Component
 {
@@ -21,8 +18,6 @@ class BookingsTable extends Component
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
     public $calendarOffset = 0; // Track calendar navigation offset
-    public $syncing = false; // Track sync status
-    public $lastSyncTime = null;
 
     // Form fields for editing
     public $editStatus = '';
@@ -34,12 +29,6 @@ class BookingsTable extends Component
         'sortBy' => ['except' => 'check_in'],
         'sortDirection' => ['except' => 'asc'],
     ];
-
-    public function mount()
-    {
-        // Sync external bookings on page load
-        $this->syncExternalBookings();
-    }
 
     public function updatedSearch()
     {
@@ -130,28 +119,53 @@ class BookingsTable extends Component
         $days = collect();
         $startDate = now()->addDays($this->calendarOffset);
 
+        // Get external bookings once for all dates
+        $externalBookings = $this->getExternalBookings();
+
         for ($i = 0; $i < 14; $i++) {
             $date = $startDate->copy()->addDays($i);
 
-            // Get bookings for this date
-            $dayBookings = Booking::with('venue')->where(function ($query) use ($date) {
+            // Get database bookings for this date
+            $dayDbBookings = Booking::with('venue')->where(function ($query) use ($date) {
                 $query->where('check_in', '<=', $date->format('Y-m-d'))
                       ->where('check_out', '>', $date->format('Y-m-d'));
             })
             ->where('status', '!=', 'cancelled')
             ->get();
 
-            // Get check-ins for this specific date
-            $checkIns = Booking::with('venue')
+            // Get external bookings for this date
+            $dayExternalBookings = $externalBookings->filter(function ($booking) use ($date) {
+                return $booking->check_in <= $date && $booking->check_out > $date;
+            });
+
+            // Combine both types of bookings
+            $dayBookings = $dayDbBookings->merge($dayExternalBookings);
+
+            // Get check-ins for this specific date (database)
+            $checkInsDb = Booking::with('venue')
                 ->whereDate('check_in', $date->format('Y-m-d'))
                 ->where('status', '!=', 'cancelled')
                 ->get();
 
-            // Get check-outs for this specific date
-            $checkOuts = Booking::with('venue')
+            // Get check-ins for this specific date (external)
+            $checkInsExternal = $externalBookings->filter(function ($booking) use ($date) {
+                return $booking->check_in->format('Y-m-d') === $date->format('Y-m-d');
+            });
+
+            $checkIns = $checkInsDb->merge($checkInsExternal);
+
+            // Get check-outs for this specific date (database)
+            $checkOutsDb = Booking::with('venue')
                 ->whereDate('check_out', $date->format('Y-m-d'))
                 ->where('status', '!=', 'cancelled')
                 ->get();
+
+            // Get check-outs for this specific date (external)
+            $checkOutsExternal = $externalBookings->filter(function ($booking) use ($date) {
+                return $booking->check_out->format('Y-m-d') === $date->format('Y-m-d');
+            });
+
+            $checkOuts = $checkOutsDb->merge($checkOutsExternal);
 
             $days->push([
                 'date' => $date,
@@ -169,63 +183,119 @@ class BookingsTable extends Component
         return $days;
     }
 
-    /**
-     * Sync external bookings from iCal feeds
-     */
-    public function syncExternalBookings()
+    private function getExternalBookings()
     {
-        $this->syncing = true;
-
+        $externalBookings = collect();
+        
         try {
             // Get all active iCal feeds
-            $activeFeeds = Ical::where('active', true)->with('venue')->get();
-
-            if ($activeFeeds->count() > 0) {
-                $icalController = new IcalController();
-                $request = new Request();
-
-                // Trigger sync for all feeds
-                $response = $icalController->fetchIcalData($request);
-
-                $this->lastSyncTime = now()->format('H:i');
-
-                // Flash success message
-                session()->flash('message', 'External bookings synced successfully at ' . $this->lastSyncTime);
+            $icalFeeds = \App\Models\Ical::where('active', true)->with('venue')->get();
+            
+            foreach ($icalFeeds as $feed) {
+                $icalData = $this->fetchIcalData($feed->url);
+                if ($icalData) {
+                    $events = $this->parseIcalEvents($icalData, $feed->venue);
+                    $externalBookings = $externalBookings->merge($events);
+                }
             }
         } catch (\Exception $e) {
-            // Flash error message
-            session()->flash('error', 'Failed to sync external bookings: ' . $e->getMessage());
-        } finally {
-            $this->syncing = false;
+            \Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
+        }
+        
+        return $externalBookings;
+    }
+    
+    private function fetchIcalData($url)
+    {
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 10,
+                    'user_agent' => 'Eileen BnB Calendar Sync/1.0'
+                ]
+            ]);
+            
+            return file_get_contents($url, false, $context);
+        } catch (\Exception $e) {
+            return null;
         }
     }
-
-    /**
-     * Manual sync trigger
-     */
-    public function refreshExternalBookings()
+    
+    private function parseIcalEvents($icalData, $venue)
     {
-        $this->syncExternalBookings();
-        $this->resetPage(); // Refresh the booking list
+        $events = collect();
+        $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
+        
+        $currentEvent = null;
+        
+        foreach ($lines as $line) {
+            $line = trim($line);
+            
+            if ($line === 'BEGIN:VEVENT') {
+                $currentEvent = [];
+            } elseif ($line === 'END:VEVENT' && $currentEvent !== null) {
+                if (isset($currentEvent['start_date']) && isset($currentEvent['end_date'])) {
+                    // Create a booking-like object for display using Booking model
+                    $booking = new Booking([
+                        'venue_id' => $venue->id,
+                        'booking_id' => 'EXT-' . strtoupper(substr(md5($currentEvent['uid'] ?? uniqid()), 0, 6)),
+                        'name' => 'External Booking',
+                        'email' => 'external@booking.com',
+                        'phone' => '',
+                        'check_in' => $currentEvent['start_date'],
+                        'check_out' => $currentEvent['end_date'],
+                        'total_price' => 0,
+                        'status' => 'confirmed',
+                        'notes' => 'External: ' . ($currentEvent['summary'] ?? ''),
+                        'nights' => $currentEvent['start_date']->diffInDays($currentEvent['end_date']),
+                        'pay_method' => 'external',
+                        'is_paid' => true
+                    ]);
+                    
+                    // Set a fake ID and mark as external
+                    $booking->id = 'ext-' . uniqid();
+                    $booking->venue = $venue;
+                    $booking->setAttribute('is_external', true);
+                    $booking->exists = false; // Don't try to save this to database
+                    
+                    $events->push($booking);
+                }
+                $currentEvent = null;
+            } elseif ($currentEvent !== null && strpos($line, ':') !== false) {
+                [$key, $value] = explode(':', $line, 2);
+                
+                if (strpos($key, 'DTSTART') === 0) {
+                    $currentEvent['start_date'] = $this->parseIcalDate($value);
+                } elseif (strpos($key, 'DTEND') === 0) {
+                    $currentEvent['end_date'] = $this->parseIcalDate($value);
+                } elseif ($key === 'UID') {
+                    $currentEvent['uid'] = $value;
+                } elseif ($key === 'SUMMARY') {
+                    $currentEvent['summary'] = $value;
+                }
+            }
+        }
+        
+        return $events;
     }
-
-    /**
-     * Get sync status for display
-     */
-    public function getSyncStatus()
+    
+    private function parseIcalDate($dateString)
     {
-        $icalFeeds = Ical::where('active', true)->get();
-
-        return [
-            'total_feeds' => $icalFeeds->count(),
-            'last_sync' => $icalFeeds->max('last_synced_at'),
-            'has_errors' => $icalFeeds->whereNotNull('last_error')->count() > 0
-        ];
+        if (strlen($dateString) === 8) {
+            return \Carbon\Carbon::createFromFormat('Ymd', $dateString);
+        } elseif (strlen($dateString) === 15 && substr($dateString, -1) === 'Z') {
+            return \Carbon\Carbon::createFromFormat('Ymd\THis\Z', $dateString);
+        } elseif (strlen($dateString) === 15) {
+            return \Carbon\Carbon::createFromFormat('Ymd\THis', $dateString);
+        }
+        
+        return \Carbon\Carbon::parse($dateString);
     }
 
     public function render()
     {
-        $bookings = Booking::with('venue')
+        // Get database bookings only (for the table)
+        $paginatedBookings = Booking::with('venue')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -243,14 +313,10 @@ class BookingsTable extends Component
             ->paginate($this->perPage);
 
         $calendarData = $this->getCalendarData();
-        $syncStatus = $this->getSyncStatus();
 
         return view('livewire.bookings-table', [
-            'bookings' => $bookings,
-            'calendarData' => $calendarData,
-            'syncStatus' => $syncStatus,
-            'syncing' => $this->syncing,
-            'lastSyncTime' => $this->lastSyncTime
+            'bookings' => $paginatedBookings,
+            'calendarData' => $calendarData
         ]);
     }
 }

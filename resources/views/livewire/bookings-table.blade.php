@@ -2,9 +2,7 @@
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
     @if (session('success'))
-        <div class="mb-4 rounded border border-green-200 bg-gr                       <div class="relative hover:z-[70] bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 rounded-lg p-3 cursor-pointer group shadow-sm hover:shadow-md transform hover:scale-105 mobile-tooltip-trigger"
-                                 title="{{ $day['booking_count'] }} booking(s)"
-                                 data-tooltip-id="tooltip-week2-{{ $loop->index }}">-50 text-green-800 px-4 py-2">
+        <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-800 px-4 py-2">
             {{ session('success') }}
         </div>
     @endif
