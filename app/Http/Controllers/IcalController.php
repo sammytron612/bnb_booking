@@ -15,7 +15,7 @@ class IcalController extends Controller
     public function exportVenueCalendar($venue_id)
     {
         $venue = Venue::find($venue_id);
-        
+
         if (!$venue) {
             abort(404, 'Venue not found');
         }
