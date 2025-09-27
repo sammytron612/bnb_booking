@@ -14,6 +14,7 @@ return [
 
     'csp' => [
         'enabled' => env('CSP_ENABLED', true),
+        'report_only' => env('CSP_REPORT_ONLY', false),
     ],
     /* */
     /*
