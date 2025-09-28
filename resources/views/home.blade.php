@@ -5,7 +5,7 @@
         'description' => 'Discover luxury coastal apartments in Seaham County Durham. Two stunning apartments minutes from the dramatic Seaham coastline, where industrial heritage meets natural beauty and seaglass treasures wash ashore daily.',
         'keywords' => 'Seaham holiday rentals, coastal accommodation, seaside holidays, luxury holiday homes, Durham coast, sea views, vacation rentals, The Light House apartment, Saras apartment, Seaglass, Sea Glass',
         'type' => 'website',
-        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : null,
+        'image' => $featuredImage ? $featuredImage->secure_url : null,
         'imageAlt' => 'Seaham Coastal Retreats - Luxury Holiday Accommodation'
     ];
 @endphp

@@ -6,6 +6,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SecureImageController;
 
 use App\Models\Venue;
 
@@ -30,6 +31,18 @@ Route::get('/terms-of-service', function () {
 Route::get('/cookie-policy', function () {
     return view('cookie-policy');
 })->name('cookie-policy');
+
+// Secure image serving routes
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/images/property/{filename}', [SecureImageController::class, 'servePublicImage'])
+        ->where('filename', '[a-zA-Z0-9._-]+\.(jpg|jpeg|png|gif|webp)')
+        ->name('secure.image.public');
+
+    Route::get('/admin/images/property/{filename}', [SecureImageController::class, 'servePropertyImage'])
+        ->where('filename', '[a-zA-Z0-9._-]+\.(jpg|jpeg|png|gif|webp)')
+        ->middleware('auth')
+        ->name('secure.image.admin');
+});
 
 // Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {

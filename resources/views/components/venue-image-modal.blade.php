@@ -59,7 +59,7 @@
                 @if($images)
                     @foreach($images as $index => $image)
                         <img
-                            src="{{ $image->location }}"
+                            src="{{ $image->secure_url }}"
                             alt="{{ $image->title }}"
                             class="w-16 h-16 object-cover rounded cursor-pointer opacity-60 hover:opacity-100 transition-opacity {{ $index === 0 ? 'ring-2 ring-white opacity-100' : '' }}"
                             data-modal-thumb="{{ $galleryId }}"
@@ -75,7 +75,7 @@
         <script type="application/json" data-gallery-images="{{ $galleryId }}">
             {!! json_encode($images->map(function($image) {
                 return [
-                    'src' => $image->location,
+                    'src' => $image->secure_url,
                     'alt' => $image->title
                 ];
             })) !!}

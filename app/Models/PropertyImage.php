@@ -20,6 +20,22 @@ class PropertyImage extends Model
     ];
 
     /**
+     * Get the secure URL for this image
+     */
+    public function getSecureUrlAttribute()
+    {
+        return secure_image_url($this->location);
+    }
+
+    /**
+     * Get the secure admin URL for this image
+     */
+    public function getSecureAdminUrlAttribute()
+    {
+        return secure_image_url($this->location, true);
+    }
+
+    /**
      * Get the venue that owns the property image.
      */
     public function venue()

@@ -16,7 +16,7 @@
         if ($featuredImage) {
             $venueImages = [
                 [
-                    'src' => $featuredImage->location,
+                    'src' => $featuredImage->secure_url,
                     'alt' => $venue->venue_name . ' - ' . $featuredImage->title
                 ]
             ];
@@ -25,7 +25,7 @@
             $firstImage = $venue->propertyImages->first();
             $venueImages = $firstImage ? [
                 [
-                    'src' => $firstImage->location,
+                    'src' => $firstImage->secure_url,
                     'alt' => $venue->venue_name . ' - ' . $firstImage->title
                 ]
             ] : [];
