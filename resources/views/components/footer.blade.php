@@ -21,8 +21,6 @@
                 <ul class="space-y-2 text-gray-300">
                     <li><a href="{{ route('venue.show', ['route' => 'light-house']) }}" class="hover:text-white transition-colors" wire:navigate>The Light House</a></li>
                     <li><a href="{{ route('venue.show', ['route' => 'saras']) }}" class="hover:text-white transition-colors" wire:navigate>Sara's</a></li>
-                    <li><a href="#about" class="hover:text-white transition-colors">About Seaham</a></li>
-                    <li><a href="#contact" class="hover:text-white transition-colors">Contact Us</a></li>
                 </ul>
             </div>
 
