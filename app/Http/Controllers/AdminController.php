@@ -12,10 +12,7 @@ class AdminController extends Controller
     /**
      * Create a new controller instance.
      */
-    public function __construct()
-    {
-        $this->middleware(['auth']);
-    }
+
     public function index()
     {
         // Explicit authentication check as failsafe
