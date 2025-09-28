@@ -150,7 +150,7 @@ One of the most outstanding features in Seaham is St. Mary the Virgin Church. Lo
                                     </div>
                                     <div class="border-l-4 border-yellow-500 pl-4">
                                         <h4 class="font-semibold text-gray-900 dark:text-white">Local Festivals</h4>
-                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Experience Seaham's vibrant community through events like the Seaham Food Festival and the annual Seaglass Festival.</p>
+                                        <p class="text-gray-600 dark:text-gray-300 text-sm">Experience Seaham's vibrant community through events like the Seaham Food Festival.</p>
                                     </div>
                                     <div class="border-l-4 border-yellow-900 pl-4">
                                         <h4 class="font-semibold text-gray-900 dark:text-white">Seaham Hotel & Spa</h4>

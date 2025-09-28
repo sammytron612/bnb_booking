@@ -48,9 +48,8 @@
                 >
                 @endif
             </div>
-
             <!-- Image Counter -->
-            <div class="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
+            <div class="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
                 <span id="modal-counter-{{ $galleryId }}">1 / {{ $images ? $images->count() : 0 }}</span>
             </div>
 
