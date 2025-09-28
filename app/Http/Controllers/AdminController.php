@@ -9,8 +9,20 @@ use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     */
+    public function __construct()
+    {
+        $this->middleware(['auth']);
+    }
     public function index()
     {
+        // Explicit authentication check as failsafe
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
         return view('admin.index');
     }
     public function bookings()

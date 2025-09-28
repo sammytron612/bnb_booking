@@ -112,6 +112,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Test/debug routes for admin use only
     Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
+
+    // Authentication test route
+    Route::get('/auth-test', function() {
+        return response()->json([
+            'authenticated' => auth()->check(),
+            'user' => auth()->user()?->email ?? 'Not logged in',
+            'middleware_applied' => 'YES - This route is in auth middleware group'
+        ]);
+    })->name('admin.auth.test');
 });
 
 // Security: Block common scanning attempts
