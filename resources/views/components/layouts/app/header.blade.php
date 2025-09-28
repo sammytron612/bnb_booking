@@ -23,7 +23,7 @@
                 </div>
             </a>
 
-            <flux:navbar class="-mb-px max-lg:hidden z-9999">
+            <flux:navbar class="-mb-px max-lg:hidden">
                 <flux:navbar.item :href="route('home')" :current="request()->routeIs('home')" wire:navigate class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
                     Home
                 </flux:navbar.item>
