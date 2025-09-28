@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
 
 <!-- Font Loading with Performance Optimization -->
-<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet" media="print" rel=preconnect onload="this.media='all'">
 <noscript><link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600&display=swap" rel="stylesheet"></noscript>
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
