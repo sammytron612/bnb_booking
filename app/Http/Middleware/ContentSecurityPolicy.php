@@ -33,20 +33,10 @@ class ContentSecurityPolicy
             return;
         }
 
-        // Apply configurable security headers
-        if (env('SECURITY_X_CONTENT_TYPE_OPTIONS', true)) {
-            $response->headers->set('X-Content-Type-Options', 'nosniff');
-        }
-
-        if (env('SECURITY_X_XSS_PROTECTION', true)) {
-            $response->headers->set('X-XSS-Protection', '1; mode=block');
-        }
-
-        if (env('SECURITY_REFERRER_POLICY', true)) {
-            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        }
-
-        // Skip Cross-Origin headers for Lighthouse testing
+        // Apply basic security headers
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->headers->set('X-XSS-Protection', '1; mode=block');
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');        // Skip Cross-Origin headers for Lighthouse testing
         if (!$this->isLighthouseRequest($request)) {
             $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
             $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
