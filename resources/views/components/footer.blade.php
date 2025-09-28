@@ -7,7 +7,7 @@
                 <h3 class="text-xl font-bold mb-4">Seaham Coastal Retreats</h3>
                 <p class="text-gray-300 mb-4">
                     Experience the beauty of Seaham's coastline with our carefully selected holiday accommodations.
-                    From cozy cottages to stunning sea views, we offer the perfect escape for your coastal getaway.
+                    We offer the perfect escape for your coastal getaway.
                 </p>
                 <div class="text-gray-400 text-sm">
                     <p>Seaham, County Durham</p>
