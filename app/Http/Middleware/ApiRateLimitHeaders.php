@@ -22,11 +22,11 @@ class ApiRateLimitHeaders
             // Add informative headers about API usage
             $response->headers->set('X-API-Version', '1.0');
             $response->headers->set('X-API-Rate-Limit-Info', 'Rate limits vary by endpoint. Check documentation for details.');
-            
+
             // Add security headers for API responses
             $response->headers->set('X-Content-Type-Options', 'nosniff');
             $response->headers->set('X-Frame-Options', 'DENY');
-            
+
             // If it's a rate limit error, make it more informative
             if ($response->getStatusCode() === 429) {
                 $content = json_decode($response->getContent(), true);

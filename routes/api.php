@@ -26,7 +26,7 @@ Route::middleware(['throttle:api-public'])->group(function () {
     Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('api.sitemap.index');
     Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('api.sitemap.main');
     Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('api.sitemap.venues');
-    
+
     // Dynamic robots.txt (no sessions, no cookies)
     Route::get('/robots.txt', function () {
         $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/api/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
