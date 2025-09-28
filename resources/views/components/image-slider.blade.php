@@ -23,7 +23,7 @@
       <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0 transition-opacity duration-700 ease-in-out" data-slide="{{ $i }}">
         <img src="{{ $img[0] }}" alt="{{ $img[1] ?? 'Slide '.($i+1) }}" class="w-full h-full {{ $fitClass }} select-none" draggable="false"
              @if($i === 0 || $i === 1) loading="eager" @else loading="lazy" @endif
-             decoding="async" />
+             decoding="async" fetchpriority=high />
         @if(!empty($img[1]))
           <div class="absolute bottom-6 left-6 text-white text-xl font-medium drop-shadow">{{ $img[1] }}</div>
         @endif
