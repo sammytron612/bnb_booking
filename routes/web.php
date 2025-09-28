@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SecureImageController;
+use App\Http\Controllers\SitemapController;
 
 use App\Models\Venue;
 
@@ -112,6 +113,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Test/debug routes for admin use only
     Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
+});
+
+// Sitemap routes - Public access with rate limiting
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
+    Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+    Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
+
+    Route::get('/robots.txt', function () {
+        $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
+        return response($content)->header('Content-Type', 'text/plain');
+    })->name('robots');
 });
 
 // Security: Block common scanning attempts
