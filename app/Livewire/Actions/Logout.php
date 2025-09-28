@@ -17,6 +17,10 @@ class Logout
         Session::invalidate();
         Session::regenerateToken();
 
-        return redirect('/');
+        $response = redirect('/');
+
+        // Explicitly clear session cookies to handle strict same-site issues
+        return $response->withCookie(cookie()->forget(config('session.cookie')))
+                        ->withCookie(cookie()->forget('XSRF-TOKEN'));
     }
 }
