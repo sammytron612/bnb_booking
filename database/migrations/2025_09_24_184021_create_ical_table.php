@@ -13,12 +13,6 @@ return new class extends Migration
     {
         Schema::create('ical', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('venue_id')->constrained('venues');
-            $table->string('url');
-            $table->string('source'); // e.g., 'Airbnb', 'Booking.com', etc.
-            $table->string('name');
-            $table->boolean('active')->default(true);
-            $table->timestamp('last_synced_at')->nullable();
             $table->timestamps();
         });
     }

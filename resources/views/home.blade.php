@@ -59,7 +59,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaham Harbour</h3>
                     <p class="text-gray-600 dark:text-gray-300">
-                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining and coffee.
+                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.
                     </p>
                 </div>
                 <div class="p-2 md:p-6">
@@ -113,9 +113,7 @@
                             </h3>
                             <p class="text-gray-700 text-center md:text-left dark:text-gray-300 leading-relaxed">
                                 <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
-                                The town's coastline is a treasure trove for beachcombers and photographers. Seaham Beach is famous for its sea glass, remnants of the town's glass bottle industry that have been polished by the waves into colorful gems. These unique finds have inspired a local craft movement, with artists creating jewelry and décor that celebrate Seaham's maritime legacy.
-                                Beyond the shore, Seaham is embracing regeneration. New housing developments, improved transport links, and community initiatives are breathing fresh life into the town. Yet, it remains deeply connected to its past, with historic buildings like <a href="https://www.nationalchurchestrust.org/church/st-mary-virgin-seaham" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow">St Mary the Virgin Church</a>, one of the oldest in the region, offering a glimpse into centuries of local history.
-                                More on Seaham's rich history can be found<a href="https://www.seaham.gov.uk" class="font-bold hover:font-extrabold hover:text-blue-800 transition-all duration-200" target="_blank " rel="nofollow"> here</a>.
+                                With ongoing regeneration projects and a growing arts scene, Seaham is becoming a hub for creativity and community spirit. Whether you're exploring its history or enjoying the sea breeze, Seaham invites visitors to experience a unique blend of tradition and tranquility, making it a true gem of the North East coast.
                             </p>
                         </div>
 

@@ -468,17 +468,10 @@ function initializeBookingCalendar() {
     // Load booked dates from Laravel database
     async function loadBookedDatesFromDatabase(venueId = null) {
         try {
-            const timestamp = Date.now();
-            const url = venueId ? `/api/booked-dates?venue_id=${venueId}&_t=${timestamp}` : `/api/booked-dates?_t=${timestamp}`;
+            const url = venueId ? `/api/booked-dates?venue_id=${venueId}` : '/api/booked-dates';
             console.log('Fetching booked dates from:', url);
 
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                }
-            });
+            const response = await fetch(url);
             console.log('Response status:', response.status);
 
             if (!response.ok) {
@@ -489,8 +482,6 @@ function initializeBookingCalendar() {
             console.log('API Response:', data);
 
             if (data.success) {
-                console.log('API Response:', data);
-
                 // Clear existing data
                 checkInDates.clear();
                 checkOutDates.clear();

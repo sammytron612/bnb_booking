@@ -28,19 +28,12 @@ class ContentSecurityPolicy
      */
     private function addSecurityHeaders(Response $response, Request $request): void
     {
-        // Emergency disable override
-        if (config('app.env') !== 'production' && env('SECURITY_EMERGENCY_DISABLE', false)) {
-            return;
-        }
-
-        // Apply basic security headers
+        // ALWAYS apply these basic security headers (even for 404s)
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');        // Skip Cross-Origin headers for Lighthouse testing
-        if (!$this->isLighthouseRequest($request)) {
-            $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
-            $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
-        }
+        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->headers->set('Cross-Origin-Resource-Policy', 'same-origin');
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
 
         // COEP disabled by default - can break Stripe/Google integrations
         if (config('security.headers.cross_origin_embedder_policy', false)) {
@@ -60,15 +53,13 @@ class ContentSecurityPolicy
         }
 
         // Content Security Policy - only for HTML responses
-        $developmentDomains = app()->environment('local', 'testing') ? ' localhost:* *.test' : '';
-
         $csp = [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://maps.googleapis.com ws: wss:{$developmentDomains}",
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com{$developmentDomains}",
-            "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data:{$developmentDomains}",
-            "img-src 'self' data: https: blob: https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com https://*.google-analytics.com{$developmentDomains}",
-            "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://maps.googleapis.com ws: wss:{$developmentDomains}",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://checkout.stripe.com https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://maps.googleapis.com localhost:* ws: wss:",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://maps.googleapis.com localhost:* *.test",
+            "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net data: localhost:* *.test",
+            "img-src 'self' data: https: blob: localhost:* *.test https://maps.googleapis.com https://maps.gstatic.com https://www.google-analytics.com https://*.google-analytics.com",
+            "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://maps.googleapis.com ws: wss: localhost:* *.test",
             "frame-src https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://www.google.com https://maps.google.com https://www.googletagmanager.com",
             "form-action 'self' https://checkout.stripe.com",
             "base-uri 'self'",

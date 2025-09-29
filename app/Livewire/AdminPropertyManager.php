@@ -8,8 +8,6 @@ use App\Models\Venue;
 use App\Models\PropertyImage;
 use App\Models\Amenity;
 use Illuminate\Support\Facades\Storage;
-use App\Rules\SecureFileUpload;
-use Illuminate\Support\Str;
 
 class AdminPropertyManager extends Component
 {
@@ -128,21 +126,16 @@ class AdminPropertyManager extends Component
     public function uploadImages()
     {
         $this->validate([
-            'newImages.*' => [new \App\Rules\SecureFileUpload()],
+            'newImages.*' => 'image|max:2048', // 2MB Max
         ]);
 
         if ($this->selectedVenue && $this->newImages) {
             foreach ($this->newImages as $image) {
-                // Generate secure filename
-                $extension = $image->getClientOriginalExtension();
-                $secureFilename = Str::random(40) . '_' . time() . '.' . strtolower($extension);
-
-                // Store in private storage
-                $path = $image->storeAs('property-images', $secureFilename, 'private');
+                $path = $image->store('property-images', 'public');
 
                 PropertyImage::create([
                     'property_id' => $this->selectedVenue->id,
-                    'location' => $secureFilename, // Store just filename for secure serving
+                    'location' => '/storage/' . $path,
                     'title' => 'Property Image',
                     'featured' => false,
                 ]);
@@ -161,9 +154,9 @@ class AdminPropertyManager extends Component
         $image = PropertyImage::find($imageId);
 
         if ($image) {
-            // Delete file from private storage
-            $path = 'property-images/' . $image->location;
-            Storage::disk('private')->delete($path);
+            // Delete file from storage
+            $path = str_replace('/storage/', '', $image->location);
+            Storage::disk('public')->delete($path);
 
             // Delete from database
             $image->delete();

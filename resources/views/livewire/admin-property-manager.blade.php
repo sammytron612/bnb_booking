@@ -286,7 +286,7 @@
                                     <!-- Image Display -->
                                     <div class="relative group mb-3">
                                         <img
-                                            src="{{ $image->secure_admin_url }}"
+                                            src="{{ $image->location }}"
                                             alt="{{ $image->title }}"
                                             class="w-full h-48 object-cover rounded-lg {{ $image->featured ? 'ring-4 ring-yellow-400' : '' }}"
                                         >

@@ -48,8 +48,9 @@
                 >
                 @endif
             </div>
+
             <!-- Image Counter -->
-            <div class="absolute bottom-32 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
+            <div class="absolute bottom-24 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm">
                 <span id="modal-counter-{{ $galleryId }}">1 / {{ $images ? $images->count() : 0 }}</span>
             </div>
 
@@ -58,7 +59,7 @@
                 @if($images)
                     @foreach($images as $index => $image)
                         <img
-                            src="{{ $image->secure_url }}"
+                            src="{{ $image->location }}"
                             alt="{{ $image->title }}"
                             class="w-16 h-16 object-cover rounded cursor-pointer opacity-60 hover:opacity-100 transition-opacity {{ $index === 0 ? 'ring-2 ring-white opacity-100' : '' }}"
                             data-modal-thumb="{{ $galleryId }}"
@@ -74,7 +75,7 @@
         <script type="application/json" data-gallery-images="{{ $galleryId }}">
             {!! json_encode($images->map(function($image) {
                 return [
-                    'src' => $image->secure_url,
+                    'src' => $image->location,
                     'alt' => $image->title
                 ];
             })) !!}

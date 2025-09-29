@@ -6,25 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
-use App\Services\BookingServices\ExternalCalendarService;
-use App\Services\BookingServices\BookingValidationService;
-use App\Services\BookingServices\BookingQueryService;
 
 class BookingController extends Controller
 {
-    protected $externalCalendarService;
-    protected $bookingValidationService;
-    protected $bookingQueryService;
-
-    public function __construct(
-        ExternalCalendarService $externalCalendarService,
-        BookingValidationService $bookingValidationService,
-        BookingQueryService $bookingQueryService
-    ) {
-        $this->externalCalendarService = $externalCalendarService;
-        $this->bookingValidationService = $bookingValidationService;
-        $this->bookingQueryService = $bookingQueryService;
-    }
     /**
      * Store a new booking
      */
@@ -60,50 +44,6 @@ class BookingController extends Controller
             ], 422);
         }
 
-        // Check database bookings for conflicts (allowing same-day turnover)
-        $conflictingBookings = Booking::where('venue_id', $request->venue_id)
-            ->where('status', '!=', 'cancelled')
-            ->where('check_in', '<', $checkOut)     // Existing starts before new ends
-            ->where('check_out', '>', $checkIn)     // Existing ends after new starts
-            ->exists();
-
-        if ($conflictingBookings) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Selected dates are not available due to existing booking. Please choose different dates.',
-                'error_code' => 'DATABASE_BOOKING_CONFLICT'
-            ], 422);
-        }
-
-        //  CRITICAL: Check external calendar bookings (Airbnb, Booking.com, etc.)
-        try {
-            $externalBookings = $this->externalCalendarService->getExternalBookings($request->venue_id);
-
-            foreach ($externalBookings as $externalBooking) {
-                $extCheckIn = Carbon::parse($externalBooking->check_in);
-                $extCheckOut = Carbon::parse($externalBooking->check_out);
-
-                // Check for overlap with external bookings
-                if (($checkIn < $extCheckOut) && ($checkOut > $extCheckIn)) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Selected dates are not available due to external booking (' . ($externalBooking->source ?? 'External') . '). Please choose different dates.',
-                        'error_code' => 'EXTERNAL_BOOKING_CONFLICT',
-                        'conflict_source' => $externalBooking->source ?? 'External'
-                    ], 422);
-                }
-            }
-        } catch (\Exception $e) {
-            \Log::error('External booking validation failed: ' . $e->getMessage(), [
-                'venue_id' => $request->venue_id,
-                'check_in' => $request->depart,
-                'check_out' => $request->leave
-            ]);
-
-            // Continue with booking if external validation fails (graceful degradation)
-            // But log the issue for investigation
-        }
-
         try {
             $booking = Booking::create([
                 'name' => $request->name,
@@ -125,13 +65,6 @@ class BookingController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            \Log::error('Booking creation failed: ' . $e->getMessage(), [
-                'venue_id' => $request->venue_id,
-                'check_in' => $request->depart,
-                'check_out' => $request->leave,
-                'user_data' => $request->only(['name', 'email'])
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create booking. Please try again.'
@@ -144,7 +77,11 @@ class BookingController extends Controller
      */
     public function getBookingsForVenue($venue_id)
     {
-        $bookings = $this->bookingQueryService->getBookingsForVenue($venue_id);
+        $bookings = Booking::where('venue_id', $venue_id)
+            ->with('venue')
+            ->orderBy('check_in', 'asc')
+            ->get();
+
         return response()->json($bookings);
     }
 
@@ -153,7 +90,12 @@ class BookingController extends Controller
      */
     public function getUpcomingBookings()
     {
-        $bookings = $this->bookingQueryService->getUpcomingBookings();
+        $bookings = Booking::where('status', '!=', 'cancelled')
+            ->where('check_out', '>=', Carbon::today())
+            ->with('venue')
+            ->select('check_in', 'check_out', 'venue_id')
+            ->get();
+
         return response()->json($bookings);
     }
 
@@ -189,20 +131,196 @@ class BookingController extends Controller
     {
         $venueId = $request->query('venue_id'); // Optional venue filter
 
-        // Use the service to get booked dates data
-        $data = $this->bookingQueryService->getBookedDatesData($venueId);
+        // Get confirmed and pending bookings (exclude cancelled)
+        $bookingsQuery = Booking::where('status', '!=', 'cancelled')
+            ->where('check_out', '>=', Carbon::today()) // Only future/current bookings
+            ->with('venue')
+            ->select('check_in', 'check_out', 'venue_id');
 
-        $response = response()->json($data);
+        // Filter by venue if specified
+        if ($venueId) {
+            $bookingsQuery->where('venue_id', $venueId);
+        }
 
-        // Force no caching for booking data to ensure real-time updates
-        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-        $response->headers->set('Pragma', 'no-cache');
-        $response->headers->set('Expires', 'Thu, 01 Jan 1970 00:00:00 GMT');
+        $bookings = $bookingsQuery->get();
 
-        return $response;
+        // Get external bookings from iCal feeds
+        $externalBookings = $this->getExternalBookings($venueId);
+
+        $checkInDates = [];      // Dates when guests check in (bookings start)
+        $checkOutDates = [];     // Dates when guests check out (bookings end)
+        $fullyBookedDates = [];  // Dates that are completely unavailable
+        $bookedDates = [];       // All booked dates (for backward compatibility)
+
+        // Process database bookings
+        foreach ($bookings as $booking) {
+            $checkInDate = Carbon::parse($booking->check_in);
+            $checkOutDate = Carbon::parse($booking->check_out);
+
+            // Add check-in date (guests arrive this day at 3pm)
+            $checkInDates[] = $checkInDate->format('Y-m-d');
+
+            // Add check-out date (guests leave this day at 11am)
+            $checkOutDates[] = $checkOutDate->format('Y-m-d');
+
+            // Add all nights when property is occupied
+            // From check-in date up to (but not including) check-out date
+            // This represents the nights guests are staying
+            $current = $checkInDate->copy();
+            while ($current < $checkOutDate) {
+                $dateStr = $current->format('Y-m-d');
+                $fullyBookedDates[] = $dateStr;
+                $bookedDates[] = $dateStr; // For backward compatibility
+                $current->addDay();
+            }
+        }
+
+        // Process external bookings
+        foreach ($externalBookings as $booking) {
+            // Skip past bookings
+            if ($booking->check_out < Carbon::today()) {
+                continue;
+            }
+
+            $checkInDate = Carbon::parse($booking->check_in);
+            $checkOutDate = Carbon::parse($booking->check_out);
+
+            // Add check-in date
+            $checkInDates[] = $checkInDate->format('Y-m-d');
+
+            // Add check-out date
+            $checkOutDates[] = $checkOutDate->format('Y-m-d');
+
+            // Add all nights when property is occupied
+            $current = $checkInDate->copy();
+            while ($current < $checkOutDate) {
+                $dateStr = $current->format('Y-m-d');
+                $fullyBookedDates[] = $dateStr;
+                $bookedDates[] = $dateStr; // For backward compatibility
+                $current->addDay();
+            }
+        }
+
+        // Remove duplicates and sort all arrays
+        $checkInDates = array_unique($checkInDates);
+        $checkOutDates = array_unique($checkOutDates);
+        $fullyBookedDates = array_unique($fullyBookedDates);
+        $bookedDates = array_unique($bookedDates);
+
+        sort($checkInDates);
+        sort($checkOutDates);
+        sort($fullyBookedDates);
+        sort($bookedDates);
+
+        return response()->json([
+            'success' => true,
+            'checkInDates' => $checkInDates,
+            'checkOutDates' => $checkOutDates,
+            'fullyBookedDates' => $fullyBookedDates,
+            'bookedDates' => $bookedDates, // For backward compatibility
+            'count' => count($fullyBookedDates)
+        ]);
     }
 
+    /**
+     * Get external bookings from iCal feeds
+     */
+    public function getExternalBookings($venueId = null)
+    {
+        $externalBookings = collect();
 
+        try {
+            // Get active iCal feeds
+            $icalFeeds = \App\Models\Ical::where('active', true)->with('venue');
 
+            if ($venueId) {
+                $icalFeeds = $icalFeeds->where('venue_id', $venueId);
+            }
 
+            $icalFeeds = $icalFeeds->get();
+
+            foreach ($icalFeeds as $feed) {
+                $icalData = $this->fetchIcalData($feed->url);
+                if ($icalData) {
+                    $events = $this->parseIcalEvents($icalData, $feed->venue);
+                    $externalBookings = $externalBookings->merge($events);
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
+        }
+
+        return $externalBookings;
+    }
+
+    private function fetchIcalData($url)
+    {
+        try {
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 10,
+                    'user_agent' => 'Eileen BnB Calendar Sync/1.0'
+                ]
+            ]);
+
+            return file_get_contents($url, false, $context);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    private function parseIcalEvents($icalData, $venue)
+    {
+        $events = collect();
+        $lines = explode("\r\n", str_replace(["\r\n", "\r", "\n"], "\r\n", $icalData));
+
+        $currentEvent = null;
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+
+            if ($line === 'BEGIN:VEVENT') {
+                $currentEvent = [];
+            } elseif ($line === 'END:VEVENT' && $currentEvent !== null) {
+                if (isset($currentEvent['start_date']) && isset($currentEvent['end_date'])) {
+                    // Create a booking-like object
+                    $booking = (object)[
+                        'check_in' => $currentEvent['start_date'],
+                        'check_out' => $currentEvent['end_date'],
+                        'venue_id' => $venue->id,
+                    ];
+
+                    $events->push($booking);
+                }
+                $currentEvent = null;
+            } elseif ($currentEvent !== null && strpos($line, ':') !== false) {
+                [$key, $value] = explode(':', $line, 2);
+
+                if (strpos($key, 'DTSTART') === 0) {
+                    $currentEvent['start_date'] = $this->parseIcalDate($value);
+                } elseif (strpos($key, 'DTEND') === 0) {
+                    $currentEvent['end_date'] = $this->parseIcalDate($value);
+                } elseif ($key === 'UID') {
+                    $currentEvent['uid'] = $value;
+                } elseif ($key === 'SUMMARY') {
+                    $currentEvent['summary'] = $value;
+                }
+            }
+        }
+
+        return $events;
+    }
+
+    private function parseIcalDate($dateString)
+    {
+        if (strlen($dateString) === 8) {
+            return Carbon::createFromFormat('Ymd', $dateString);
+        } elseif (strlen($dateString) === 15 && substr($dateString, -1) === 'Z') {
+            return Carbon::createFromFormat('Ymd\THis\Z', $dateString);
+        } elseif (strlen($dateString) === 15) {
+            return Carbon::createFromFormat('Ymd\THis', $dateString);
+        }
+
+        return Carbon::parse($dateString);
+    }
 }

@@ -21,15 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ContentSecurityPolicy::class,
         ]);
 
-        // Apply rate limit headers to all API requests
-        $middleware->api(append: [
-            \App\Http\Middleware\ApiRateLimitHeaders::class,
-        ]);
-
         // Create alias for easier reference
         $middleware->alias([
             'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
-            'api.headers' => \App\Http\Middleware\ApiRateLimitHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

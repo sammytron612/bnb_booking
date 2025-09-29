@@ -21,25 +21,15 @@
 
                     <h3 class="text-xl font-medium text-gray-800 mb-3">Personal Information</h3>
                     <p class="text-gray-700 leading-relaxed mb-4">
-                        <strong>We do not store any personal data other than name, email address, and phone number.</strong>
-                        All payment card details are stored and processed by our secure online payment provider, Stripe.
-                    </p>
-                    <p class="text-gray-700 leading-relaxed mb-4">
-                        When you make a booking or contact us, we collect:
+                        When you make a booking or contact us, we may collect:
                     </p>
                     <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6">
                         <li>Name, email address, and phone number</li>
-                        <li>Booking dates and property preferences</li>
+                        <li>Postal address and billing information</li>
+                        <li>Payment card details (processed securely via Stripe)</li>
+                        <li>Booking preferences and special requirements</li>
                         <li>Communication history with our team</li>
                     </ul>
-
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                        <p class="text-blue-800 font-medium mb-2">🔒 Payment Security</p>
-                        <p class="text-blue-700 text-sm">
-                            All payment card details are processed and stored exclusively by Stripe, a PCI DSS Level 1 certified and compliant payment processor.
-                            We never see, store, or have access to your card details on our servers.
-                        </p>
-                    </div>
 
                     <h3 class="text-xl font-medium text-gray-800 mb-3">Automatically Collected Information</h3>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
@@ -65,10 +55,10 @@
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Information Sharing and Disclosure</h2>
                     <p class="text-gray-700 leading-relaxed mb-4">
-                        We do not sell, trade, or rent your personal information to third parties.
+                        We do not sell, trade, or rent your personal information to third parties. We may share your information only in these circumstances:
                     </p>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                        <li><strong>Service Providers:</strong> Stripe for payment processing</li>
+                        <li><strong>Service Providers:</strong> Stripe for payment processing, email services for communications</li>
                         <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
                         <li><strong>Property Management:</strong> With cleaning and maintenance services as needed for your stay</li>
                     </ul>
@@ -76,23 +66,11 @@
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Data Security</h2>
-                    <p class="text-gray-700 leading-relaxed mb-4">
+                    <p class="text-gray-700 leading-relaxed">
                         We implement appropriate security measures to protect your personal information against unauthorized access,
-                        alteration, disclosure, or destruction. Our data security approach includes:
+                        alteration, disclosure, or destruction. Payment information is processed using SSL encryption and handled by
+                        PCI DSS compliant payment processors.
                     </p>
-                    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-                        <li><strong>Minimal Data Storage:</strong> We only store essential contact information (name, email, phone)</li>
-                        <li><strong>Secure Payment Processing:</strong> All payment data is handled exclusively by Stripe (PCI DSS Level 1 certified)</li>
-                        <li><strong>SSL Encryption:</strong> All data transmission is encrypted using industry-standard SSL/TLS</li>
-                        <li><strong>Secure Infrastructure:</strong> Enterprise-grade security headers and protection measures</li>
-                    </ul>
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <p class="text-green-800 font-medium mb-2">🛡️ Your Payment Data is Safe</p>
-                        <p class="text-green-700 text-sm">
-                            By using Stripe for payment processing, your card details never touch our servers. This "zero-storage"
-                            approach provides maximum security and compliance with payment industry standards.
-                        </p>
-                    </div>
                 </section>
 
                 <section class="mb-8">

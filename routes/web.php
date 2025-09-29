@@ -6,8 +6,6 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\SecureImageController;
-use App\Http\Controllers\SitemapController;
 
 use App\Models\Venue;
 
@@ -32,18 +30,6 @@ Route::get('/terms-of-service', function () {
 Route::get('/cookie-policy', function () {
     return view('cookie-policy');
 })->name('cookie-policy');
-
-// Secure image serving routes
-Route::middleware(['throttle:60,1'])->group(function () {
-    Route::get('/images/property/{filename}', [SecureImageController::class, 'servePublicImage'])
-        ->where('filename', '[a-zA-Z0-9._-]+\.(jpg|jpeg|png|gif|webp)')
-        ->name('secure.image.public');
-
-    Route::get('/admin/images/property/{filename}', [SecureImageController::class, 'servePropertyImage'])
-        ->where('filename', '[a-zA-Z0-9._-]+\.(jpg|jpeg|png|gif|webp)')
-        ->middleware('auth')
-        ->name('secure.image.admin');
-});
 
 // Dynamic venue route using the route field from the database
 Route::get('/venue/{route}', function ($route) {
@@ -73,7 +59,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 });
-
+// Public API for calendar dates (no sensitive data)
+Route::get('/api/booked-dates', [BookingController::class, 'getBookedDates'])->name('bookings.bookedDates');
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
@@ -115,19 +102,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
 
-// Sitemap routes - Public access with rate limiting
-Route::middleware(['throttle:60,1'])->group(function () {
-    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.index');
-    Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
-    Route::get('/sitemap-venues.xml', [SitemapController::class, 'venues'])->name('sitemap.venues');
-
-    Route::get('/robots.txt', function () {
-        $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
-        return response($content)->header('Content-Type', 'text/plain');
-    })->name('robots');
-});
-
 // Security: Block common scanning attempts
 Route::get('/flux/{any?}', function () {
-    abort(code: 404);
+    abort(404);
 })->where('any', '.*')->name('flux.blocked');

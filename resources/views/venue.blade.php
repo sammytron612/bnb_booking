@@ -5,7 +5,7 @@
         'description' => $venue->description2 ?? $venue->description1,
         'keywords' => 'Seaham holiday rental, ' . $venue->venue_name . ', coastal accommodation, seaside holiday, luxury apartment, Durham coast, sea views, vacation rental, Seaglass, Sea Glass',
         'type' => 'website',
-        'image' => $featuredImage ? $featuredImage->secure_url : null,
+        'image' => $featuredImage ? asset(ltrim($featuredImage->location, '/')) : null,
         'imageAlt' => $venue->venue_name . ' - Holiday Rental in Seaham',
         'venue' => $venue,
         'reviews' => $reviews ?? collect(),
@@ -49,7 +49,7 @@
                      data-modal-trigger="{{$venue->venue_name}}-gallery"
                      data-image-index="{{ $allImages->search($featuredImage) }}">
                     <img
-                        src="{{ $featuredImage->secure_url }}"
+                        src="{{ $featuredImage->location }}"
                         alt="{{ $featuredImage->title }}"
                         class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     >
@@ -69,7 +69,7 @@
                          data-modal-trigger="{{$venue->venue_name}}-gallery"
                          data-image-index="{{ $allImages->search($image) }}">
                         <img
-                            src="{{ $image->secure_url }}"
+                            src="{{ $image->location }}"
                             alt="{{ $image->title }}"
                             class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             loading="lazy"
