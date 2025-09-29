@@ -23,8 +23,8 @@ foreach ($icals as $ical) {
 echo "\n=== Testing External Bookings Fetch ===\n";
 
 try {
-    $controller = new \App\Http\Controllers\BookingController();
-    $externalBookings = $controller->getExternalBookings();
+    $externalCalendarService = $app->make(\App\Services\BookingServices\ExternalCalendarService::class);
+    $externalBookings = $externalCalendarService->getExternalBookings();
 
     echo "Found " . $externalBookings->count() . " external bookings:\n";
 

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Services\BookingServices\ExternalCalendarService;
 
 class BookingsTable extends Component
 {
@@ -252,9 +253,9 @@ class BookingsTable extends Component
         $externalBookings = collect();
 
         try {
-            // Use the BookingController API to get external bookings
-            $controller = new \App\Http\Controllers\BookingController();
-            $rawExternalBookings = $controller->getExternalBookings();
+            // Use the ExternalCalendarService directly
+            $externalCalendarService = app(ExternalCalendarService::class);
+            $rawExternalBookings = $externalCalendarService->getExternalBookings();
 
 
 
