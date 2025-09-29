@@ -59,7 +59,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaham Harbour</h3>
                     <p class="text-gray-600 dark:text-gray-300">
-                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.
+                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining and coffee.
                     </p>
                 </div>
                 <div class="p-2 md:p-6">
