@@ -290,9 +290,9 @@ class BookingsTable extends Component
         $externalBookings = collect();
 
         try {
-            // Use the ExternalCalendarService directly (with venue filtering)
+            // Use the ExternalCalendarService directly
             $externalCalendarService = app(ExternalCalendarService::class);
-            $rawExternalBookings = $externalCalendarService->getExternalBookings($this->selectedVenueId);
+            $rawExternalBookings = $externalCalendarService->getExternalBookings();
 
 
 
@@ -342,9 +342,6 @@ class BookingsTable extends Component
         return $externalBookings;
     }    public function render()
     {
-        // Load available venues for filtering buttons
-        $this->availableVenues = \App\Models\Venue::orderBy('venue_name')->get();
-
         // Get database bookings only (for the table)
         $paginatedBookings = Booking::with('venue')
             ->when($this->search, function ($query) {
