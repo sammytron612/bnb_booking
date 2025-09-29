@@ -119,6 +119,19 @@
                             </p>
                         </div>
 
+                        <!-- Seaham's Seaglass Section -->
+                        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-md">
+                            <h3 class="text-2xl font-bold text-teal-600 dark:text-teal-400 mb-4 flex items-center justify-center">
+                                Seaham's Famous Seaglass: Nature's Hidden Treasure
+                            </h3>
+                            <p class="text-gray-700 text-center md:text-left dark:text-gray-300 leading-relaxed">
+                                <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/seaglass_collection.jpg') }}" alt="Seaham seaglass collection" loading="lazy" width="256" height="256" decoding="async">
+                                Seaham's coastline is world-renowned for producing some of the finest seaglass on Earth. This natural phenomenon began in the Victorian era when the Seaham Bottle Works dumped millions of glass bottles directly into the North Sea. Over the past 150 years, the relentless waves have transformed this industrial waste into smooth, frosted gems that wash ashore daily.
+                                What makes Seaham seaglass truly special is its incredible variety and rarity. Collectors travel from around the globe to hunt for the coveted <strong>Seaham blues</strong> - rare pieces from Victorian poison bottles and Vicks VapoRub jars. The famous <strong>cornflower blue</strong> and <strong>codd bottle blue</strong> are among the most sought-after colors in the seaglass collecting world.
+                                Beyond the blues, Seaham's beaches yield an rainbow of colors including emerald greens from beer bottles, pure whites from milk glass, and occasional reds from ship's lanterns. Each piece tells a story of Seaham's industrial heritage, polished to perfection by decades of tumbling in the North Sea. Join the daily treasure hunters at dawn for the best finds, when fresh seaglass is revealed by the receding tide.
+                            </p>
+                        </div>
+
                         <!-- Attractions Section -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-6 shadow-md">
                             <h3 class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-6 flex items-center justify-center">
