@@ -20,6 +20,10 @@ class BookingsTable extends Component
     public ?Booking $selectedBooking = null;
     public $calendarOffset = 0; // Track calendar navigation offset
 
+    // Venue filtering properties
+    public $selectedVenueId = null; // null = "All Venues"
+    public $availableVenues = [];
+
     // Form fields for editing
     public $editStatus = '';
     public $editNotes = '';
@@ -115,6 +119,13 @@ class BookingsTable extends Component
         }
     }
 
+    public function selectVenue($venueId)
+    {
+        $this->selectedVenueId = $venueId; // null for "All Venues"
+        // Reset calendar offset when changing venues
+        $this->calendarOffset = 0;
+    }
+
     public function getCalendarData()
     {
         $days = collect();
@@ -128,21 +139,27 @@ class BookingsTable extends Component
         for ($i = 0; $i < 14; $i++) {
             $date = $startDate->copy()->addDays($i);
 
-            // Get database bookings for this date
+            // Get database bookings for this date (with venue filtering)
             $dayDbBookings = Booking::with('venue')->where(function ($query) use ($date) {
                 $query->where('check_in', '<=', $date->format('Y-m-d'))
                       ->where('check_out', '>', $date->format('Y-m-d'));
             })
             ->where('status', '!=', 'cancelled')
+            ->when($this->selectedVenueId, function ($query) {
+                $query->where('venue_id', $this->selectedVenueId);
+            })
             ->get();
 
-            // Get external bookings for this date
+            // Get external bookings for this date (with venue filtering)
             $dayExternalBookings = $externalBookings->filter(function ($booking) use ($date) {
                 $checkIn = \Carbon\Carbon::parse($booking->check_in);
                 $checkOut = \Carbon\Carbon::parse($booking->check_out);
                 $matches = $checkIn->lte($date) && $checkOut->gt($date);
 
-
+                // Apply venue filtering
+                if ($this->selectedVenueId && $booking->venue_id != $this->selectedVenueId) {
+                    return false;
+                }
 
                 return $matches;
             });
@@ -157,15 +174,25 @@ class BookingsTable extends Component
 
 
 
-            // Get check-ins for this specific date (database)
+            // Get check-ins for this specific date (database with venue filtering)
             $checkInsDb = Booking::with('venue')
                 ->whereDate('check_in', $date->format('Y-m-d'))
                 ->where('status', '!=', 'cancelled')
+                ->when($this->selectedVenueId, function ($query) {
+                    $query->where('venue_id', $this->selectedVenueId);
+                })
                 ->get();
 
-            // Get check-ins for this specific date (external)
+            // Get check-ins for this specific date (external with venue filtering)
             $checkInsExternal = $externalBookings->filter(function ($booking) use ($date) {
-                return $booking->check_in->format('Y-m-d') === $date->format('Y-m-d');
+                $dateMatch = $booking->check_in->format('Y-m-d') === $date->format('Y-m-d');
+
+                // Apply venue filtering
+                if ($this->selectedVenueId && $booking->venue_id != $this->selectedVenueId) {
+                    return false;
+                }
+
+                return $dateMatch;
             });
 
             // Combine check-ins manually to avoid ID collision issues
@@ -174,15 +201,25 @@ class BookingsTable extends Component
                 $checkIns->push($extCheckIn);
             }
 
-            // Get check-outs for this specific date (database)
+            // Get check-outs for this specific date (database with venue filtering)
             $checkOutsDb = Booking::with('venue')
                 ->whereDate('check_out', $date->format('Y-m-d'))
                 ->where('status', '!=', 'cancelled')
+                ->when($this->selectedVenueId, function ($query) {
+                    $query->where('venue_id', $this->selectedVenueId);
+                })
                 ->get();
 
-            // Get check-outs for this specific date (external)
+            // Get check-outs for this specific date (external with venue filtering)
             $checkOutsExternal = $externalBookings->filter(function ($booking) use ($date) {
-                return $booking->check_out->format('Y-m-d') === $date->format('Y-m-d');
+                $dateMatch = $booking->check_out->format('Y-m-d') === $date->format('Y-m-d');
+
+                // Apply venue filtering
+                if ($this->selectedVenueId && $booking->venue_id != $this->selectedVenueId) {
+                    return false;
+                }
+
+                return $dateMatch;
             });
 
             // Combine check-outs manually to avoid ID collision issues
@@ -253,9 +290,9 @@ class BookingsTable extends Component
         $externalBookings = collect();
 
         try {
-            // Use the ExternalCalendarService directly
+            // Use the ExternalCalendarService directly (with venue filtering)
             $externalCalendarService = app(ExternalCalendarService::class);
-            $rawExternalBookings = $externalCalendarService->getExternalBookings();
+            $rawExternalBookings = $externalCalendarService->getExternalBookings($this->selectedVenueId);
 
 
 
@@ -305,6 +342,9 @@ class BookingsTable extends Component
         return $externalBookings;
     }    public function render()
     {
+        // Load available venues for filtering buttons
+        $this->availableVenues = \App\Models\Venue::orderBy('venue_name')->get();
+
         // Get database bookings only (for the table)
         $paginatedBookings = Booking::with('venue')
             ->when($this->search, function ($query) {

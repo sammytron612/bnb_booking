@@ -73,6 +73,29 @@
             </div>
         </div>
 
+        <!-- Venue Filter Buttons -->
+        <div class="mb-4 flex flex-wrap gap-2 justify-center sm:justify-start">
+            <button
+                wire:click="selectVenue(null)"
+                class="hover:cursor-pointer inline-flex items-center px-3 py-2 border {{ $selectedVenueId === null ? 'border-blue-500 bg-blue-100 text-blue-700' : 'border-gray-300 bg-white text-gray-700' }} shadow-sm text-sm font-medium rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-150">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                All Venues
+            </button>
+
+            @foreach($availableVenues as $venue)
+                <button
+                    wire:click="selectVenue({{ $venue->id }})"
+                    class="hover:cursor-pointer inline-flex items-center px-3 py-2 border {{ $selectedVenueId == $venue->id ? 'border-green-500 bg-green-100 text-green-700' : 'border-gray-300 bg-white text-gray-700' }} shadow-sm text-sm font-medium rounded-md hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-150">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    {{ $venue->venue_name }}
+                </button>
+            @endforeach
+        </div>
+
         <!-- First Week (Days 0-6) -->
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
             @foreach($calendarData->take(7) as $day)
