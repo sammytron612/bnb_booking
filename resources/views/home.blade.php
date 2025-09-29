@@ -55,11 +55,11 @@
             <div class="grid md:grid-cols-3 gap-8">
                 <div class="p-2 md:p-6">
                     <div class="flex items-center justify-center mx-auto mb-4">
-                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seaglass2.jpg') }}" alt="Seaham Seaglass" loading="lazy" width="256" height="256" decoding="async">
+                        <img class="w-64 h-64 object-cover rounded-lg shadow-md" src="{{ url('storage/seahamharbour.jpg') }}" alt="Seaham Harbour" loading="lazy" width="256" height="256" decoding="async">
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaglass Hunting</h3>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaham Harbour</h3>
                     <p class="text-gray-600 dark:text-gray-300">
-                        Seaham's world-famous seaglass beaches offer daily treasures. Hunt for rare blues, greens, and frosted whites along our unique coastline shaped by Victorian glass dumping.
+                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.
                     </p>
                 </div>
                 <div class="p-2 md:p-6">
