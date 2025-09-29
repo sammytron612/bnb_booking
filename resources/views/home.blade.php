@@ -138,7 +138,7 @@
                                         <h4 class="font-semibold text-gray-900 dark:text-white">Durham Heritage Coast</h4>
                                         <p class="text-gray-600 dark:text-gray-300 text-sm">Explore stunning cliff walks and breathtaking views along this designated Area of Outstanding Natural Beauty.</p>
                                     </div>
-                                    <div class="border-l-4 border-purple-200 pl-4">
+                                    <div class="border-l-4 border-teal-500 pl-4">
                                         <h4 class="font-semibold text-gray-900 dark:text-white">St Mary the Virgin Church</h4>
                                         <p class="text-gray-600 dark:text-gray-300 text-sm">
 One of the most outstanding features in Seaham is St. Mary the Virgin Church. Located to the north of Seaham this old Anglo Saxon church has roots thought to date back to the 7th century. The Church is recognised as one of the 20 oldest surviving churches in the whole country.</p>
