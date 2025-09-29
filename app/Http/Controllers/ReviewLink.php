@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\URL;
 use App\Models\Booking;
 use App\Mail\ReviewLink as ReviewLinkMail;
@@ -110,7 +110,7 @@ class ReviewLink extends Controller
         // Dispatch the jobs for testing
         \App\Jobs\SendCheckinReminders::dispatch();
         \App\Jobs\SendReviewLinkEmails::dispatch();
-        
+
         return response()->json([
             'message' => 'Email jobs dispatched successfully',
             'jobs' => [

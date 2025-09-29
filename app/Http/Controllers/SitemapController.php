@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+
 use App\Models\Venue;
-use App\Models\Review;
 use Carbon\Carbon;
 
 class SitemapController extends Controller
