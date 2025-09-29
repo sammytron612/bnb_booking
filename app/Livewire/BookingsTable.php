@@ -35,6 +35,11 @@ class BookingsTable extends Component
         'sortDirection' => ['except' => 'asc'],
     ];
 
+    public function mount()
+    {
+        $this->availableVenues = \App\Models\Venue::orderBy('venue_name')->get();
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
