@@ -34,6 +34,7 @@ class CleanupAbandonedBookings extends Command
         $this->info("Looking for abandoned bookings older than {$hoursOld} hours (before {$cutoffTime->format('Y-m-d H:i:s')})...");
 
         // Find bookings that should be cleaned up
+        // This catches both webhook failures (pending) and normal expiry (payment_expired)
         $abandonedBookings = Booking::where('is_paid', false)
             ->whereIn('status', ['pending', 'payment_expired'])
             ->where('created_at', '<', $cutoffTime)
