@@ -118,7 +118,7 @@ class WebhookService
                 $booking,
                 $session['payment_intent'],
                 'stripe_checkout',
-                $session
+                (array) $session  // Convert object to array
             );
 
             Log::info('PaymentSuccessService completed', [
