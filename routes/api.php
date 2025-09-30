@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\IcalController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Api\BookingApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,5 +55,5 @@ Route::middleware(['throttle:ical'])->group(function () {
 
 // Public booking data API - Strict rate limiting (high-value data, prevent abuse)
 Route::middleware(['throttle:api-strict'])->group(function () {
-    Route::get('/booked-dates', [BookingController::class, 'getBookedDates'])->name('api.booked.dates');
+    Route::get('/booked-dates', [BookingApiController::class, 'getBookedDates'])->name('api.booked.dates');
 });

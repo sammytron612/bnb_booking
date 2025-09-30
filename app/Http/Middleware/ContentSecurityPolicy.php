@@ -99,10 +99,11 @@ class ContentSecurityPolicy
             $response->headers->set('Cache-Control', 'public, max-age=3600');
             $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
         }
-        // Regular pages - short caching
+        // Regular pages - NO caching to prevent session issues
         else {
-            $response->headers->set('Cache-Control', 'public, max-age=1800');
-            $response->headers->set('Expires', gmdate('D, d M Y H:i:s \G\M\T', time() + 1800));
+            $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
         }
     }
 

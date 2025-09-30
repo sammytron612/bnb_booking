@@ -483,7 +483,14 @@ function initializeBookingCalendar() {
             const url = venueId ? `/api/booked-dates?venue_id=${venueId}` : '/api/booked-dates';
             console.log('Fetching booked dates from:', url);
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'omit', // Don't send cookies/session data to avoid CSRF issues
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
             console.log('Response status:', response.status);
 
             if (!response.ok) {
