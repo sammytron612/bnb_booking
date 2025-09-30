@@ -179,8 +179,6 @@ One of the most outstanding features in Seaham is St. Mary the Virgin Church. Lo
                 </div>
             </section>
         </div>
-
-
     </div>
 </x-layouts.app>
 
