@@ -219,7 +219,9 @@ class BookingController extends Controller
             'fullyBookedDates' => $fullyBookedDates,
             'bookedDates' => $bookedDates, // For backward compatibility
             'count' => count($fullyBookedDates)
-        ]);
+        ])->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+          ->header('Pragma', 'no-cache')
+          ->header('Expires', '0');
     }
 
     /**

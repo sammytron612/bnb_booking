@@ -72,8 +72,15 @@ function isOrphanedDate(date) {
         const checkDate = addDays(date, i);
         const checkKey = fmt(checkDate);
 
-        // Can't start a booking if any day in the minimum stay period is fully booked
-        if (fullyBookedDates.has(checkKey)) {
+        // Can start a booking if:
+        // 1. Date is completely free, OR
+        // 2. Date is a check-out date (same-day turnover possible), OR
+        // 3. Date is a check-in date (same-day turnover possible - guests arrive later)
+        const isAvailableForCheckIn = !fullyBookedDates.has(checkKey) ||
+                                     checkOutDates.has(checkKey) ||
+                                     checkInDates.has(checkKey);
+
+        if (!isAvailableForCheckIn) {
             canStartBooking = false;
             break;
         }
@@ -85,8 +92,15 @@ function isOrphanedDate(date) {
         const checkDate = addDays(date, -i);
         const checkKey = fmt(checkDate);
 
-        // Can't end a booking if any day in the minimum stay period is fully booked
-        if (fullyBookedDates.has(checkKey)) {
+        // Can end a booking if:
+        // 1. Date is completely free, OR
+        // 2. Date is a check-out date (same-day turnover possible), OR
+        // 3. Date is a check-in date (same-day turnover possible - guests arrive later)
+        const isAvailableForCheckIn = !fullyBookedDates.has(checkKey) ||
+                                     checkOutDates.has(checkKey) ||
+                                     checkInDates.has(checkKey);
+
+        if (!isAvailableForCheckIn) {
             canEndBooking = false;
             break;
         }
@@ -94,9 +108,7 @@ function isOrphanedDate(date) {
 
     // Date is orphaned if you can neither start nor end a booking there
     return !canStartBooking && !canEndBooking;
-}
-
-// Wait for DOM to be ready
+}// Wait for DOM to be ready
 function initializeBookingCalendar() {
     // Get elements with null checks
     const titleEl = document.getElementById('calendarTitle');
