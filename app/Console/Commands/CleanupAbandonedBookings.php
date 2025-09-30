@@ -30,14 +30,26 @@ class CleanupAbandonedBookings extends Command
         $hoursOld = (int) $this->option('hours');
 
         $cutoffTime = Carbon::now()->subHours($hoursOld);
+        $gracePeriodCutoff = Carbon::now()->subHours($hoursOld + 24); // Extra 24h for payment_expired
 
-        $this->info("Looking for abandoned bookings older than {$hoursOld} hours (before {$cutoffTime->format('Y-m-d H:i:s')})...");
+        $this->info("Looking for abandoned bookings...");
+        $this->info("- Pending bookings older than {$hoursOld} hours (webhook failures)");
+        $this->info("- Payment_expired bookings older than " . ($hoursOld + 24) . " hours (grace period after email)");
 
         // Find bookings that should be cleaned up
         // This catches both webhook failures (pending) and normal expiry (payment_expired)
         $abandonedBookings = Booking::where('is_paid', false)
-            ->whereIn('status', ['pending', 'payment_expired'])
-            ->where('created_at', '<', $cutoffTime)
+            ->where(function ($query) use ($cutoffTime, $gracePeriodCutoff) {
+                // Webhook failures: pending bookings older than specified hours
+                $query->where('status', 'pending')
+                      ->where('created_at', '<', $cutoffTime);
+            })
+            ->orWhere(function ($query) use ($gracePeriodCutoff) {
+                // Normal flow: payment_expired bookings get 24h grace period after email sent
+                $query->where('status', 'payment_expired')
+                      ->where('is_paid', false)
+                      ->where('updated_at', '<', $gracePeriodCutoff);
+            })
             ->get();
 
         if ($abandonedBookings->isEmpty()) {
