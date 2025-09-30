@@ -55,8 +55,9 @@ Route::get('/saras', function () {
 // Booking routes - Protected with authentication for admin access
 Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
 Route::middleware(['auth'])->group(function () {
-    Route::get('/bookings/venue/{venue_id}', [BookingController::class, 'getBookingsForVenue'])->name('bookings.venue');
-    Route::get('/bookings/upcoming', [BookingController::class, 'getUpcomingBookings'])->name('bookings.upcoming');
+    // Redundant booking routes removed - functionality moved to BookingApiController
+    // - /bookings/venue/{venue_id} → use /api/booked-dates?venue_id={id} instead
+    // - /bookings/upcoming → use /api/booked-dates instead
     Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
 });
 // Public API for calendar dates moved to api.php to avoid CSRF conflicts

@@ -73,31 +73,17 @@ class BookingController extends Controller
     }
 
     /**
-     * Get all bookings for a specific venue
+     * REMOVED: getBookingsForVenue() and getUpcomingBookings()
+     *
+     * These methods were redundant - functionality replaced by:
+     * BookingApiController@getBookedDates() which provides:
+     * - More comprehensive date processing
+     * - iCal integration (external calendars)
+     * - Proper date categorization (checkIn/checkOut/fullyBooked)
+     * - Better caching and performance
+     *
+     * Use /api/booked-dates?venue_id={id} instead
      */
-    public function getBookingsForVenue($venue_id)
-    {
-        $bookings = Booking::where('venue_id', $venue_id)
-            ->with('venue')
-            ->orderBy('check_in', 'asc')
-            ->get();
-
-        return response()->json($bookings);
-    }
-
-    /**
-     * Get upcoming bookings (for calendar blocking)
-     */
-    public function getUpcomingBookings()
-    {
-        $bookings = Booking::whereIn('status', ['confirmed', 'pending'])
-            ->where('check_out', '>=', Carbon::today())
-            ->with('venue')
-            ->select('check_in', 'check_out', 'venue_id')
-            ->get();
-
-        return response()->json($bookings);
-    }
 
     /**
      * Update booking status

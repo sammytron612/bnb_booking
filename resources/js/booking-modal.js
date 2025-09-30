@@ -445,8 +445,9 @@ function initializeBookingCalendar() {
         });
     }
 
-    // --- iCal parsing ---
+    // --- iCal parsing --- COMMENTED OUT (server-side processing)
     // Parse a subset of iCal to get date ranges from VEVENT DTSTART/DTEND (date-only formats)
+    /*
     function parseIcs(icsText) {
         const lines = icsText.replace(/\r/g,'').split('\n');
         const events = [];
@@ -476,6 +477,7 @@ function initializeBookingCalendar() {
         }
         return added.length;
     }
+    */
 
     // Load booked dates from Laravel database
     async function loadBookedDatesFromDatabase(venueId = null) {
@@ -550,7 +552,8 @@ function initializeBookingCalendar() {
         }
     }
 
-    // Modified iCal loading function
+    // Modified iCal loading function - COMMENTED OUT (server-side processing)
+    /*
     async function loadIcalFromUrl(url) {
         const status = document.getElementById('icalStatus');
         if (status) status.textContent = 'Loading iCal from URL…';
@@ -568,6 +571,7 @@ function initializeBookingCalendar() {
             return 0;
         }
     }
+    */
 
     // Load all booked dates (database + iCal)
     async function loadAllBookedDates(venueId = null) {
@@ -577,10 +581,11 @@ function initializeBookingCalendar() {
         // Load from database first
         await loadBookedDatesFromDatabase(venueId);
 
-        // Optionally load from iCal (if you have a valid URL)
-        // Uncomment the lines below if you want to use iCal integration
-        // const icalUrl = 'https://your-actual-ical-url.ics';
-        // await loadIcalFromUrl(icalUrl);
+        // iCal integration REMOVED - all processing done server-side via /api/booked-dates
+        // The server automatically combines:
+        // - Database bookings (confirmed/pending)
+        // - External iCal feeds (from 'ical' table)
+        // No client-side iCal parsing needed anymore
 
         // Re-render calendar with updated booked dates
         renderCalendar();
