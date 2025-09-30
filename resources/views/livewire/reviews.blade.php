@@ -33,7 +33,7 @@
 
                         @if($review->booking)
                             <div class="mt-3 text-sm text-gray-500">
-                                Stay: {{ $review->booking->check_in->format('M j, Y') }} - {{ $review->booking->check_out->format('M j, Y') }}
+                                Stay: {{ $review->booking->date_range }}
                             </div>
                         @endif
 

@@ -59,7 +59,7 @@
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Seaham Harbour</h3>
                     <p class="text-gray-600 dark:text-gray-300">
-                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats, and waterfront dining. The harbour's stone pier provides the perfect vantage point to watch waves deposit fresh seaglass treasures on the beach below.
+                        A charming Victorian harbour built in 1828 by the 3rd Marquess of Londonderry to export coal from local mines. Today, this picturesque harbour offers stunning coastal walks, traditional fishing boats.
                     </p>
                 </div>
                 <div class="p-2 md:p-6">
@@ -113,7 +113,7 @@
                             </h3>
                             <p class="text-gray-700 text-center md:text-left dark:text-gray-300 leading-relaxed">
                                 <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
-                                With ongoing regeneration projects and a growing arts scene, Seaham is becoming a hub for creativity and community spirit. Whether you're exploring its history or enjoying the sea breeze, Seaham invites visitors to experience a unique blend of tradition and tranquility, making it a true gem of the North East coast.
+                                With ongoing regeneration projects and a growing arts scene, Seaham is becoming a hub for creativity and community spirit. The town's transformation includes beautiful coastal walks, independent cafes serving locally-sourced produce, and artisan shops celebrating the area's maritime heritage. Visitors can enjoy the award-winning Blue Flag beaches, explore the newly developed town center with its mix of historic architecture and contemporary amenities, or take part in the vibrant festival calendar that brings the community together throughout the year. The famous weekly markets showcase local crafts, fresh seafood, and regional specialties, while the nearby countryside offers excellent walking and cycling routes through rolling farmland and along dramatic clifftops. Whether you're exploring its rich industrial history, hunting for rare seaglass treasures, or simply enjoying the therapeutic sound of waves against limestone cliffs, Seaham invites visitors to experience a unique blend of tradition and tranquility, making it a true gem of the North East coast.
                             </p>
                         </div>
 

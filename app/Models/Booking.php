@@ -146,7 +146,7 @@ class Booking extends Model
      */
     public function getStripeAmountInCents(): int
     {
-        return (int) ($this->stripe_amount * 100);
+        return (int) ($this->total_price * 100);
     }
 
     /**

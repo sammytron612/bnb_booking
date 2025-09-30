@@ -94,7 +94,7 @@ class BookingsTable extends Component
         }
 
         $validated = $this->validate([
-            'editStatus' => 'required|in:pending,confirmed,cancelled',
+            'editStatus' => 'required|in:pending,confirmed,cancelled,payment_expired,abandoned',
             'editNotes' => 'nullable|string|max:2000',
             'editPayment' => 'required|in:0,1',
         ]);
@@ -149,7 +149,7 @@ class BookingsTable extends Component
                 $query->where('check_in', '<=', $date->format('Y-m-d'))
                       ->where('check_out', '>', $date->format('Y-m-d'));
             })
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->when($this->selectedVenueId, function ($query) {
                 $query->where('venue_id', $this->selectedVenueId);
             })
@@ -182,7 +182,7 @@ class BookingsTable extends Component
             // Get check-ins for this specific date (database with venue filtering)
             $checkInsDb = Booking::with('venue')
                 ->whereDate('check_in', $date->format('Y-m-d'))
-                ->where('status', '!=', 'cancelled')
+                ->whereIn('status', ['confirmed', 'pending'])
                 ->when($this->selectedVenueId, function ($query) {
                     $query->where('venue_id', $this->selectedVenueId);
                 })
@@ -209,7 +209,7 @@ class BookingsTable extends Component
             // Get check-outs for this specific date (database with venue filtering)
             $checkOutsDb = Booking::with('venue')
                 ->whereDate('check_out', $date->format('Y-m-d'))
-                ->where('status', '!=', 'cancelled')
+                ->whereIn('status', ['confirmed', 'pending'])
                 ->when($this->selectedVenueId, function ($query) {
                     $query->where('venue_id', $this->selectedVenueId);
                 })

@@ -34,7 +34,7 @@
                 <p><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($booking->check_in)->format('l, F j, Y') }}</p>
                 <p><strong>Check-out:</strong> {{ \Carbon\Carbon::parse($booking->check_out)->format('l, F j, Y') }}</p>
                 <p><strong>Nights:</strong> {{ $booking->nights }}</p>
-                <p><strong>Total Paid:</strong> £{{ number_format($booking->total_price, 2) }}</p>
+                <p><strong>Total Paid:</strong> {{ $booking->formatted_total }}</p>
                 <p><strong>Payment Method:</strong> {{ ucfirst($booking->pay_method) }}</p>
             </div>
 

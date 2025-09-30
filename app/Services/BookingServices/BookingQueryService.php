@@ -32,7 +32,7 @@ class BookingQueryService
     public function getDatabaseBookingsForDateRange(Carbon $startDate, Carbon $endDate, ?int $venueId = null): Collection
     {
         $query = Booking::with('venue')
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->where(function ($q) use ($startDate, $endDate) {
                     // Booking starts within date range
@@ -75,7 +75,7 @@ class BookingQueryService
     {
         // Get database bookings for specific date
         $dbBookings = Booking::with('venue')
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->where('check_in', '<=', $date->format('Y-m-d'))
             ->where('check_out', '>', $date->format('Y-m-d'))
             ->when($venueId, function ($query) use ($venueId) {
@@ -103,7 +103,7 @@ class BookingQueryService
     {
         // Get database check-ins
         $dbCheckIns = Booking::with('venue')
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->whereDate('check_in', $date->format('Y-m-d'))
             ->when($venueId, function ($query) use ($venueId) {
                 $query->where('venue_id', $venueId);
@@ -128,7 +128,7 @@ class BookingQueryService
     {
         // Get database check-outs
         $dbCheckOuts = Booking::with('venue')
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->whereDate('check_out', $date->format('Y-m-d'))
             ->when($venueId, function ($query) use ($venueId) {
                 $query->where('venue_id', $venueId);
@@ -168,7 +168,7 @@ class BookingQueryService
     {
         // Check database bookings
         $dbBooking = Booking::where('venue_id', $venueId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->where('check_in', '<=', $date->format('Y-m-d'))
             ->where('check_out', '>', $date->format('Y-m-d'))
             ->exists();

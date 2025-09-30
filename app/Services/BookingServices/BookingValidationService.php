@@ -55,7 +55,7 @@ class BookingValidationService
     public function getConflictingDatabaseBookings(Carbon $checkIn, Carbon $checkOut, int $venueId, ?int $excludeBookingId = null): Collection
     {
         return Booking::where('venue_id', $venueId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
                 $query->where('id', '!=', $excludeBookingId);
             })
@@ -99,7 +99,7 @@ class BookingValidationService
 
         // Check if there's a checkout on the same day as our checkin
         $sameDayCheckout = Booking::where('venue_id', $venueId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->whereDate('check_out', $checkIn->format('Y-m-d'))
             ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
                 $query->where('id', '!=', $excludeBookingId);
@@ -112,7 +112,7 @@ class BookingValidationService
 
         // Check if there's a checkin on the same day as our checkout
         $sameDayCheckin = Booking::where('venue_id', $venueId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->whereDate('check_in', $checkOut->format('Y-m-d'))
             ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
                 $query->where('id', '!=', $excludeBookingId);
@@ -152,7 +152,7 @@ class BookingValidationService
     {
         // Check database bookings
         $dbBooking = Booking::where('venue_id', $venueId)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['confirmed', 'pending'])
             ->where('check_in', '<=', $date->format('Y-m-d'))
             ->where('check_out', '>', $date->format('Y-m-d'))
             ->exists();

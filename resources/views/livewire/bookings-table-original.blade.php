@@ -441,6 +441,8 @@
             <option value="confirmed">Confirmed</option>
             <option value="pending">Pending</option>
             <option value="cancelled">Cancelled</option>
+            <option value="payment_expired">Payment Expired</option>
+            <option value="abandoned">Abandoned</option>
         </select>
     </div>
 
@@ -599,6 +601,8 @@
                                 @if($booking->status === 'confirmed') bg-green-100 text-green-800
                                 @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
                                 @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
+                                @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
+                                @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
                                 @else bg-gray-100 text-gray-800 @endif">
                                 {{ ucfirst($booking->status) }}
                             </span>
@@ -665,6 +669,8 @@
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="cancelled">Cancelled</option>
+                                <option value="payment_expired">Payment Expired</option>
+                                <option value="abandoned">Abandoned</option>
                             </select>
                             @error('editStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>

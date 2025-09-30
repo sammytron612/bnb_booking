@@ -51,7 +51,7 @@
                     </div>
                     <div class="flex justify-between border-t pt-3">
                         <dt class="text-sm font-medium text-gray-900">Amount Due:</dt>
-                        <dd class="text-sm font-bold text-gray-900">£{{ number_format($booking->total_price, 2) }}</dd>
+                        <dd class="text-sm font-bold text-gray-900">{{ $booking->formatted_total }}</dd>
                     </div>
                 </dl>
             </div>

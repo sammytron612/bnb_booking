@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use App\Services\BookingServices\BookingValidationService;
 
 class BookingForm extends Component
 {
@@ -99,15 +100,84 @@ class BookingForm extends Component
 
     public function submitBooking()
     {
+        // Log that the method is being called
+        \Log::info('submitBooking method called');
+
         // Check if booking is enabled for this venue
         if (!$this->venue || !$this->venue->booking_enabled) {
+            \Log::warning('Booking disabled for venue: ' . ($this->venue ? $this->venue->id : 'null'));
             session()->flash('booking_error', 'Sorry, booking is currently disabled for this property.');
             return;
         }
 
-        $this->validate();
+        // Log validation attempt
+        \Log::info('Attempting validation for booking');
 
         try {
+            $this->validate();
+        } catch (\Exception $e) {
+            \Log::error('Validation failed: ' . $e->getMessage());
+            session()->flash('booking_error', 'Please check your booking details and try again.');
+            return;
+        }
+
+        // SECURITY: Additional server-side validation
+        try {
+            // 1. Validate venue exists and price matches
+            $venue = Venue::findOrFail($this->venueId);
+            if ($this->pricePerNight != $venue->price_per_night) {
+                \Log::warning('Price manipulation detected', [
+                    'venue_id' => $this->venueId,
+                    'submitted_price' => $this->pricePerNight,
+                    'actual_price' => $venue->price_per_night
+                ]);
+                session()->flash('booking_error', 'Invalid pricing. Please refresh and try again.');
+                return;
+            }
+
+            // 2. Calculate server-side values first
+            $calculatedNights = Carbon::parse($this->checkIn)->diffInDays(Carbon::parse($this->checkOut));
+            $calculatedTotal = $calculatedNights * $venue->price_per_night;
+
+            // 3. Use comprehensive validation service (includes external iCal checking)
+            $validationService = app(BookingValidationService::class);
+            $validationErrors = $validationService->validateBookingDates(
+                $this->checkIn,
+                $this->checkOut,
+                $this->venueId
+            );
+
+            if (!empty($validationErrors)) {
+                \Log::warning('Booking validation failed', [
+                    'venue_id' => $this->venueId,
+                    'check_in' => $this->checkIn,
+                    'check_out' => $this->checkOut,
+                    'errors' => $validationErrors
+                ]);
+                session()->flash('booking_error', implode(' ', $validationErrors));
+                return;
+            }
+
+            // 4. Validate calculated totals match server-side calculation
+            if ($this->nights != $calculatedNights || $this->totalPrice != $calculatedTotal) {
+                \Log::warning('Price calculation manipulation detected', [
+                    'venue_id' => $this->venueId,
+                    'submitted_nights' => $this->nights,
+                    'calculated_nights' => $calculatedNights,
+                    'submitted_total' => $this->totalPrice,
+                    'calculated_total' => $calculatedTotal
+                ]);
+                session()->flash('booking_error', 'Invalid calculation. Please refresh and try again.');
+                return;
+            }
+
+            // 5. Validate minimum stay requirement
+            if ($calculatedNights < 2) {
+                session()->flash('booking_error', 'Minimum stay is 2 nights.');
+                return;
+            }
+
+            // All validations passed - create booking with server-calculated values
             $booking = Booking::create([
                 'name' => $this->guestName,
                 'email' => $this->guestEmail,
@@ -115,18 +185,23 @@ class BookingForm extends Component
                 'check_in' => $this->checkIn,
                 'check_out' => $this->checkOut,
                 'venue_id' => $this->venueId,
-                'nights' => $this->nights,
-                'total_price' => $this->totalPrice,
+                'nights' => $calculatedNights, // Use server-calculated value
+                'total_price' => $calculatedTotal, // Use server-calculated value
                 'status' => 'pending',
             ]);
 
             // Generate signed URL for payment checkout (valid for 24 hours)
             $checkoutUrl = URL::temporarySignedRoute('payment.checkout', now()->addHours(24), ['booking' => $booking->id]);
 
-            // Redirect to Stripe checkout
-            return redirect($checkoutUrl);
+            // Log for debugging
+            \Log::info('Booking created with ID: ' . $booking->id);
+            \Log::info('Checkout URL generated: ' . $checkoutUrl);
+
+            // Try using redirectRoute with the URL directly
+            return $this->js('window.location.href = "' . $checkoutUrl . '"');
 
         } catch (\Exception $e) {
+            \Log::error('Booking submission error: ' . $e->getMessage());
             session()->flash('booking_error', 'Sorry, there was an error processing your booking. Please try again.');
         }
     }

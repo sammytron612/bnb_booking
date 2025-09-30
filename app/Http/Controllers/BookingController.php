@@ -90,7 +90,7 @@ class BookingController extends Controller
      */
     public function getUpcomingBookings()
     {
-        $bookings = Booking::where('status', '!=', 'cancelled')
+        $bookings = Booking::whereIn('status', ['confirmed', 'pending'])
             ->where('check_out', '>=', Carbon::today())
             ->with('venue')
             ->select('check_in', 'check_out', 'venue_id')
@@ -105,7 +105,7 @@ class BookingController extends Controller
     public function updateStatus(Request $request, Booking $booking)
     {
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:pending,confirmed,cancelled',
+            'status' => 'required|in:pending,confirmed,cancelled,payment_expired,abandoned',
         ]);
 
         if ($validator->fails()) {

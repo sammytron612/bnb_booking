@@ -28,6 +28,8 @@ class PaymentSuccessService
                 'payment_intent_id' => $paymentIntentId,
                 'pay_method' => $paymentMethod,
                 'paid_at' => now(),
+                'stripe_amount' => $booking->getStripeAmountInCents(),
+                'stripe_currency' => 'gbp',
             ]);
 
             // Log the successful payment

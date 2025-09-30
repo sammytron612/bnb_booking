@@ -502,6 +502,8 @@
             <option value="confirmed">Confirmed</option>
             <option value="pending">Pending</option>
             <option value="cancelled">Cancelled</option>
+            <option value="payment_expired">Payment Expired</option>
+            <option value="abandoned">Abandoned</option>
         </select>
     </div>
 
@@ -654,12 +656,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">£{{ number_format($booking->total_price, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">{{ $booking->formatted_total }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                 @if($booking->status === 'confirmed') bg-green-100 text-green-800
                                 @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
                                 @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
+                                @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
+                                @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
                                 @else bg-gray-100 text-gray-800 @endif">
                                 {{ ucfirst($booking->status) }}
                             </span>
@@ -710,7 +714,7 @@
                         <p><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_in)->format('d/m/Y') }}</p>
                         <p><strong>Check-out:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_out)->format('d/m/Y') }}</p>
                         <p><strong>Nights:</strong> {{ $selectedBooking->nights }}</p>
-                        <p><strong>Total Price:</strong> £{{ number_format($selectedBooking->total_price, 2) }}</p>
+                        <p><strong>Total Price:</strong> {{ $selectedBooking->formatted_total }}</p>
                     </div>
                 </div>
 
@@ -726,6 +730,8 @@
                                 <option value="pending">Pending</option>
                                 <option value="confirmed">Confirmed</option>
                                 <option value="cancelled">Cancelled</option>
+                                <option value="payment_expired">Payment Expired</option>
+                                <option value="abandoned">Abandoned</option>
                             </select>
                             @error('editStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>

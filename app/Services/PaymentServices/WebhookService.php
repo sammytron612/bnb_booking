@@ -7,6 +7,7 @@ use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use App\Services\PaymentServices\PaymentSuccessService;
 use Exception;
@@ -41,6 +42,9 @@ class WebhookService
         switch ($event['type']) {
             case 'checkout.session.completed':
                 return $this->handleCheckoutSessionCompleted($event['data']['object']);
+
+            case 'checkout.session.expired':
+                return $this->handleCheckoutSessionExpired($event['data']['object']);
 
             case 'payment_intent.succeeded':
                 return $this->handlePaymentIntentSucceeded($event['data']['object']);
@@ -210,6 +214,62 @@ class WebhookService
             Log::error('Exception in charge dispute created handler', [
                 'error' => $e->getMessage(),
                 'dispute_id' => $dispute['id'] ?? 'unknown'
+            ]);
+            return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    private function handleCheckoutSessionExpired($session): array
+    {
+        try {
+            $bookingId = $session['metadata']['booking_id'] ?? null;
+
+            Log::warning('Checkout session expired', [
+                'session_id' => $session['id'],
+                'booking_id' => $bookingId,
+                'expires_at' => $session['expires_at'] ?? null
+            ]);
+
+            if ($bookingId) {
+                $booking = Booking::where('booking_id', $bookingId)->first();
+                if ($booking && !$booking->is_paid) {
+                    // Update booking status to indicate payment session expired
+                    $booking->update([
+                        'status' => 'payment_expired',
+                        'notes' => ($booking->notes ? $booking->notes . "\n" : '') .
+                                  'Payment session expired at ' . now()->format('Y-m-d H:i:s')
+                    ]);
+
+                    // Send resume payment email to customer
+                    try {
+                        Mail::to($booking->email)->send(new \App\Mail\PaymentExpired($booking));
+
+                        Log::info('Payment expired email sent', [
+                            'booking_id' => $booking->getBookingReference(),
+                            'booking_display_id' => $booking->getDisplayBookingId(),
+                            'email' => $booking->email
+                        ]);
+                    } catch (Exception $e) {
+                        Log::error('Failed to send payment expired email', [
+                            'booking_id' => $booking->getBookingReference(),
+                            'email' => $booking->email,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+
+                    Log::info('Booking status updated to payment_expired', [
+                        'booking_id' => $booking->getBookingReference(),
+                        'booking_display_id' => $booking->getDisplayBookingId(),
+                        'previous_status' => 'pending'
+                    ]);
+                }
+            }
+
+            return ['status' => 'processed', 'message' => 'Session expiry handled'];
+        } catch (Exception $e) {
+            Log::error('Exception in checkout session expired handler', [
+                'error' => $e->getMessage(),
+                'session_id' => $session['id'] ?? 'unknown'
             ]);
             return ['status' => 'error', 'message' => 'Internal error'];
         }

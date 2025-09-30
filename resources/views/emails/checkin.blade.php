@@ -184,7 +184,7 @@
 
                 <div class="detail-row">
                     <span class="detail-label">Total Amount:</span>
-                    <span class="detail-value price">£{{ number_format($booking->total_price, 2) }}</span>
+                    <span class="detail-value price">{{ $booking->formatted_total }}</span>
                 </div>
             </div>
 

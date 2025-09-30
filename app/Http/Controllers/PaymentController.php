@@ -71,7 +71,13 @@ class PaymentController extends Controller
         }
 
         // Verify booking ID in metadata
-        if (!isset($session->metadata['booking_id']) || $session->metadata['booking_id'] != $booking->id) {
+        if (!isset($session->metadata['booking_id']) || $session->metadata['booking_id'] != $booking->getBookingReference()) {
+            Log::warning('Booking ID mismatch in verification', [
+                'session_booking_id' => $session->metadata['booking_id'] ?? 'not_set',
+                'booking_reference' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'booking_db_id' => $booking->id
+            ]);
             return false;
         }
 
@@ -132,6 +138,9 @@ class PaymentController extends Controller
         }
 
         try {
+            // Set Stripe API key before creating session
+            $this->setStripeKey();
+
             $session = $this->paymentService->createCheckoutSession($booking);
 
             if (!$session) {
@@ -139,10 +148,25 @@ class PaymentController extends Controller
             }
 
             // Store session ID in booking
-            $booking->update([
-                'stripe_session_id' => $session->id,
-                'stripe_amount' => $booking->total_price,
-                'stripe_currency' => 'gbp',
+            Log::info('Updating booking with Stripe session data', [
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'session_id' => $session->id,
+                'amount' => $booking->total_price
+            ]);
+
+            // Set Stripe amount using total_price converted to cents, then back to decimal
+            $booking->setStripeAmountFromCents((int)($booking->total_price * 100));
+            $booking->stripe_session_id = $session->id;
+            $booking->stripe_currency = 'gbp';
+
+            $updateResult = $booking->save();
+
+            Log::info('Booking update result', [
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'update_successful' => $updateResult,
+                'fresh_stripe_session_id' => $booking->fresh()->stripe_session_id
             ]);
 
             // If this is an AJAX request, return JSON
@@ -159,7 +183,8 @@ class PaymentController extends Controller
 
         } catch (Exception $e) {
             Log::error('Failed to create checkout session', [
-                'booking_id' => $booking->booking_id,
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
                 'error' => $e->getMessage()
             ]);
 
@@ -191,7 +216,8 @@ class PaymentController extends Controller
         // Enhanced security check: Ensure session_id matches and verify payment details
         if (!$sessionId || $booking->stripe_session_id !== $sessionId) {
             Log::warning('Payment success accessed with invalid session', [
-                'booking_id' => $booking->id,
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
                 'provided_session_id' => $sessionId,
                 'stored_session_id' => $booking->stripe_session_id,
                 'ip' => $request->ip()
@@ -205,7 +231,8 @@ class PaymentController extends Controller
             // Enhanced payment verification
             if (!$this->verifyStripePayment($session, $booking)) {
                 Log::warning('Payment verification failed', [
-                    'booking_id' => $booking->id,
+                    'booking_id' => $booking->getBookingReference(),
+                    'booking_display_id' => $booking->getDisplayBookingId(),
                     'session_id' => $sessionId,
                     'ip' => $request->ip()
                 ]);
@@ -220,6 +247,8 @@ class PaymentController extends Controller
                     'stripe_payment_intent_id' => $session->payment_intent,
                     'stripe_metadata' => $session->metadata->toArray(),
                     'pay_method' => 'stripe',
+                    'stripe_amount' => $session->amount_total, // Amount in cents
+                    'stripe_currency' => $session->currency, // Should be 'gbp'
                 ];
 
                 // Update email if customer provided one in Stripe checkout - with validation
@@ -228,7 +257,8 @@ class PaymentController extends Controller
                     if ($newEmail && $this->validateEmailChange($booking->email, $newEmail)) {
                         $updateData['email'] = $newEmail;
                         Log::info('Email updated for booking via success page', [
-                            'booking_id' => $booking->id,
+                            'booking_id' => $booking->getBookingReference(),
+                            'booking_display_id' => $booking->getDisplayBookingId(),
                             'old_email' => $booking->email,
                             'new_email' => $newEmail
                         ]);
@@ -320,5 +350,69 @@ class PaymentController extends Controller
         }
 
         return response('', 200);
+    }
+
+    /**
+     * Resume payment for expired booking session
+     */
+    public function resumePayment(Request $request, Booking $booking)
+    {
+        // Validate the signed URL
+        if (!$request->hasValidSignature()) {
+            return redirect()->route('home')->with('error', 'Invalid or expired payment link.');
+        }
+
+        // Check if booking is eligible for payment resumption
+        if ($booking->is_paid) {
+            return redirect()->route('payment.success', ['booking' => $booking->id])
+                ->with('info', 'This booking has already been paid.');
+        }
+
+        if ($booking->status === 'cancelled') {
+            return redirect()->route('home')
+                ->with('error', 'This booking has been cancelled and cannot be paid.');
+        }
+
+        // Check if booking has expired (older than 24 hours from creation)
+        if ($booking->created_at->addHours(24)->isPast()) {
+            return redirect()->route('home')
+                ->with('error', 'This booking has expired. Please make a new reservation.');
+        }
+
+        try {
+            $this->setStripeKey();
+
+            // Create new checkout session for the same booking
+            $session = $this->paymentService->createCheckoutSession($booking);
+
+            if (!$session) {
+                throw new Exception('Failed to create new payment session');
+            }
+
+            // Update booking with new session ID
+            $booking->update([
+                'stripe_session_id' => $session->id,
+                'status' => 'pending', // Reset from payment_expired to pending
+            ]);
+
+            Log::info('Payment session resumed', [
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'new_session_id' => $session->id,
+                'previous_status' => $booking->getOriginal('status')
+            ]);
+
+            // Redirect to Stripe checkout
+            return redirect($session->url);
+
+        } catch (Exception $e) {
+            Log::error('Failed to resume payment session', [
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('home')->with('error', 'Unable to resume payment. Please try making a new booking.');
+        }
     }
 }

@@ -71,6 +71,8 @@ Route::get('/payment/success/{booking}', [PaymentController::class, 'paymentSucc
     ->middleware('throttle:10,1')->name('payment.success');
 Route::get('/payment/cancel/{booking}', [PaymentController::class, 'paymentCancel'])
     ->middleware('throttle:10,1')->name('payment.cancel');
+Route::get('/payment/resume/{booking}', [PaymentController::class, 'resumePayment'])
+    ->middleware('signed', 'throttle:5,1')->name('payment.resume');
 // Webhook endpoint - No signed middleware as Stripe needs direct access
 Route::post('/stripe/webhook', [PaymentController::class, 'webhook'])
     ->middleware('throttle:60,1')->name('stripe.webhook');

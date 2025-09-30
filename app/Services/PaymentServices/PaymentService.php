@@ -14,7 +14,7 @@ class PaymentService
 {
     public function __construct()
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(config('services.stripe.secret_key'));
     }
 
     public function createCheckoutSession(Booking $booking): ?Session
@@ -31,7 +31,7 @@ class PaymentService
                                 'Stay from %s to %s (%d nights)',
                                 $booking->check_in,
                                 $booking->check_out,
-                                $booking->nights
+                                $booking->calculateNights()
                             ),
                         ],
                         'unit_amount' => (int)($booking->total_price * 100), // Convert to pence
@@ -39,36 +39,36 @@ class PaymentService
                     'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                'client_reference_id' => $booking->booking_id,
+                'client_reference_id' => $booking->getBookingReference(),
                 'customer_email' => $booking->email,
-                'success_url' => URL::temporarySignedRoute(
-                    'payment.success',
-                    now()->addHours(1),
-                    ['booking' => $booking->id]
-                ),
-                'cancel_url' => URL::temporarySignedRoute(
-                    'payment.cancel',
-                    now()->addHours(1),
-                    ['booking' => $booking->id]
-                ),
+                'success_url' => route('payment.success', ['booking' => $booking->id]) . '?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => route('payment.cancel', ['booking' => $booking->id]),
                 'metadata' => [
-                    'booking_id' => $booking->booking_id,
+                    'booking_id' => $booking->getBookingReference(),
+                    'booking_display_id' => $booking->getDisplayBookingId(),
                     'venue_name' => $booking->venue->venue_name,
                     'check_in' => $booking->check_in,
                     'check_out' => $booking->check_out,
+                    'payment_amount' => (string)$booking->total_price,
+                    'payment_amount_cents' => (string)$booking->getStripeAmountInCents(),
                 ],
                 'payment_intent_data' => [
                     'metadata' => [
-                        'booking_id' => $booking->booking_id,
+                        'booking_id' => $booking->getBookingReference(),
+                        'booking_display_id' => $booking->getDisplayBookingId(),
                         'venue_id' => $booking->venue_id,
+                        'venue_name' => $booking->venue->venue_name,
                         'customer_name' => $booking->name,
                         'customer_email' => $booking->email,
+                        'payment_amount' => (string)$booking->total_price,
+                        'nights' => (string)$booking->calculateNights(),
                     ],
                 ],
             ]);
 
             Log::info('Stripe checkout session created', [
-                'booking_id' => $booking->booking_id,
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
                 'session_id' => $session->id,
                 'amount' => $booking->total_price
             ]);
@@ -76,7 +76,8 @@ class PaymentService
             return $session;
         } catch (Exception $e) {
             Log::error('Failed to create Stripe checkout session', [
-                'booking_id' => $booking->booking_id,
+                'booking_id' => $booking->getBookingReference(),
+                'booking_display_id' => $booking->getDisplayBookingId(),
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);

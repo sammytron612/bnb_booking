@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('stripe_payment_intent_id')->nullable()->after('is_paid');
             $table->string('stripe_session_id')->nullable()->after('stripe_payment_intent_id');
             $table->decimal('stripe_amount', 10, 2)->nullable()->after('stripe_session_id');
-            $table->string('stripe_currency', 3)->default('usd')->after('stripe_amount');
+            $table->string('stripe_currency', 3)->default('gbp')->after('stripe_amount');
             $table->timestamp('payment_completed_at')->nullable()->after('stripe_currency');
             $table->json('stripe_metadata')->nullable()->after('payment_completed_at');
         });
