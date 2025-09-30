@@ -64,7 +64,7 @@ class IcalController extends Controller
         $ical .= "BEGIN:VEVENT\r\n";
         $ical .= "UID:airbnb-booking-1@eileenbnb.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251001\r\n";
-        $ical .= "DTEND;VALUE=DATE:20251004\r\n";
+        $ical .= "DTEND;VALUE=DATE:20251003\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
         $ical .= "SUMMARY:Airbnb Booking\r\n";
         $ical .= "DESCRIPTION:Test Airbnb booking for import\r\n";
@@ -105,8 +105,8 @@ class IcalController extends Controller
         // Add test events for Booking.com
         $ical .= "BEGIN:VEVENT\r\n";
         $ical .= "UID:booking-com-1@eileenbnb.com\r\n";
-        $ical .= "DTSTART;VALUE=DATE:20251002\r\n";
-        $ical .= "DTEND;VALUE=DATE:20251005\r\n";
+        $ical .= "DTSTART;VALUE=DATE:20251005\r\n";
+        $ical .= "DTEND;VALUE=DATE:20251007\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
         $ical .= "SUMMARY:Booking.com Reservation\r\n";
         $ical .= "DESCRIPTION:Test Booking.com reservation for import\r\n";
