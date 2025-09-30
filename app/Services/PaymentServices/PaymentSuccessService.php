@@ -70,13 +70,26 @@ class PaymentSuccessService
 
     private function sendConfirmationEmails(Booking $booking): void
     {
+        // Check if confirmation email was already sent (prevents duplicates)
+        if ($booking->confirmation_email_sent) {
+            Log::info('Confirmation email already sent, skipping', [
+                'booking_id' => $booking->booking_id,
+                'confirmation_email_sent' => $booking->confirmation_email_sent->format('Y-m-d H:i:s')
+            ]);
+            return;
+        }
+
         try {
             // Send confirmation email to customer
             Mail::to($booking->email)->send(new BookingConfirmation($booking));
 
+            // Mark confirmation email as sent
+            $booking->update(['confirmation_email_sent' => now()]);
+
             Log::info('Booking confirmation email sent to customer', [
                 'booking_id' => $booking->booking_id,
-                'customer_email' => $booking->email
+                'customer_email' => $booking->email,
+                'confirmation_email_sent' => now()->format('Y-m-d H:i:s')
             ]);
         } catch (Exception $e) {
             Log::error('Failed to send booking confirmation email to customer', [
