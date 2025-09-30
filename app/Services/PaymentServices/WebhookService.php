@@ -64,7 +64,18 @@ class WebhookService
     private function handleCheckoutSessionCompleted($session): array
     {
         try {
+            Log::info('Processing checkout.session.completed webhook', [
+                'session_id' => $session['id'],
+                'payment_status' => $session['payment_status'] ?? 'unknown'
+            ]);
+
             $bookingId = $session['client_reference_id'];
+
+            Log::info('Looking for booking', [
+                'client_reference_id' => $bookingId,
+                'session_id' => $session['id']
+            ]);
+
             $booking = Booking::where('booking_id', $bookingId)->first();
 
             if (!$booking) {
@@ -75,6 +86,13 @@ class WebhookService
                 return ['status' => 'error', 'message' => 'Booking not found'];
             }
 
+            Log::info('Booking found', [
+                'booking_id' => $booking->booking_id,
+                'current_status' => $booking->status,
+                'is_paid' => $booking->is_paid,
+                'session_id' => $session['id']
+            ]);
+
             if ($booking->is_paid) {
                 Log::info('Booking already marked as paid', [
                     'booking_id' => $booking->booking_id,
@@ -83,13 +101,31 @@ class WebhookService
                 return ['status' => 'already_processed', 'message' => 'Booking already paid'];
             }
 
+            Log::info('Processing checkout session completed for unpaid booking', [
+                'booking_id' => $booking->booking_id,
+                'session_id' => $session['id'],
+                'current_status' => $booking->status,
+                'is_paid' => $booking->is_paid
+            ]);
+
             // Process the successful payment
+            Log::info('Calling PaymentSuccessService', [
+                'booking_id' => $booking->booking_id,
+                'payment_intent' => $session['payment_intent']
+            ]);
+
             $result = $this->paymentSuccessService->processSuccessfulPayment(
                 $booking,
                 $session['payment_intent'],
                 'stripe_checkout',
                 $session
             );
+
+            Log::info('PaymentSuccessService completed', [
+                'booking_id' => $booking->booking_id,
+                'result_success' => $result['success'] ?? false,
+                'result_message' => $result['message'] ?? 'No message'
+            ]);
 
             if ($result['success']) {
                 Log::info('Checkout session completed successfully', [
@@ -109,9 +145,11 @@ class WebhookService
             Log::error('Exception in checkout session completed handler', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'session_id' => $session['id'] ?? 'unknown'
+                'session_id' => $session['id'] ?? 'unknown',
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ]);
-            return ['status' => 'error', 'message' => 'Internal error'];
+            return ['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()];
         }
     }
 
