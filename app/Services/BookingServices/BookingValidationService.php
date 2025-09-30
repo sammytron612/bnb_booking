@@ -97,53 +97,12 @@ class BookingValidationService
     {
         $errors = [];
 
-        // Check if there's a checkout on the same day as our checkin
-        $sameDayCheckout = Booking::where('venue_id', $venueId)
-            ->whereIn('status', ['confirmed', 'pending'])
-            ->whereDate('check_out', $checkIn->format('Y-m-d'))
-            ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
-                $query->where('id', '!=', $excludeBookingId);
-            })
-            ->exists();
+        // SAME-DAY TURNOVER IS ALLOWED IN HOSPITALITY INDUSTRY
+        // One guest checks out at 11 AM, next guest checks in at 3 PM
+        // This is standard practice and should not be blocked
 
-        if ($sameDayCheckout) {
-            $errors[] = 'Same-day turnover detected. There is a checkout on your check-in date. Please allow time for cleaning and preparation.';
-        }
-
-        // Check if there's a checkin on the same day as our checkout
-        $sameDayCheckin = Booking::where('venue_id', $venueId)
-            ->whereIn('status', ['confirmed', 'pending'])
-            ->whereDate('check_in', $checkOut->format('Y-m-d'))
-            ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
-                $query->where('id', '!=', $excludeBookingId);
-            })
-            ->exists();
-
-        if ($sameDayCheckin) {
-            $errors[] = 'Same-day turnover detected. There is a check-in on your check-out date. Please allow time for cleaning and preparation.';
-        }
-
-        // Also check external calendar bookings for same-day turnover
-        $externalBookings = $this->externalCalendarService->getExternalBookings();
-
-        foreach ($externalBookings as $booking) {
-            if ($booking->venue_id != $venueId) {
-                continue;
-            }
-
-            $extCheckIn = Carbon::parse($booking->check_in);
-            $extCheckOut = Carbon::parse($booking->check_out);
-
-            // Check if external checkout is on our checkin date
-            if ($extCheckOut->format('Y-m-d') === $checkIn->format('Y-m-d')) {
-                $errors[] = 'Same-day turnover detected with external booking. There is an external checkout on your check-in date.';
-            }
-
-            // Check if external checkin is on our checkout date
-            if ($extCheckIn->format('Y-m-d') === $checkOut->format('Y-m-d')) {
-                $errors[] = 'Same-day turnover detected with external booking. There is an external check-in on your check-out date.';
-            }
-        }
+        // Only check for overlapping dates, not same-day turnover
+        // Same-day turnover is actually desired for maximum occupancy
 
         return $errors;
     }

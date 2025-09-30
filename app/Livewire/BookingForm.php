@@ -125,11 +125,24 @@ class BookingForm extends Component
         try {
             // 1. Validate venue exists and price matches
             $venue = Venue::findOrFail($this->venueId);
-            if ($this->pricePerNight != $venue->price_per_night) {
+
+            // Debug price comparison
+            \Log::info('Price comparison debug', [
+                'venue_id' => $this->venueId,
+                'frontend_price' => $this->pricePerNight,
+                'frontend_price_type' => gettype($this->pricePerNight),
+                'database_price' => $venue->price,
+                'database_price_type' => gettype($venue->price),
+                'are_equal' => ($this->pricePerNight == $venue->price),
+                'strict_equal' => ($this->pricePerNight === $venue->price)
+            ]);
+
+            // Use loose comparison to handle string/float differences
+            if ((float)$this->pricePerNight != (float)$venue->price) {
                 \Log::warning('Price manipulation detected', [
                     'venue_id' => $this->venueId,
                     'submitted_price' => $this->pricePerNight,
-                    'actual_price' => $venue->price_per_night
+                    'actual_price' => $venue->price
                 ]);
                 session()->flash('booking_error', 'Invalid pricing. Please refresh and try again.');
                 return;
@@ -137,7 +150,7 @@ class BookingForm extends Component
 
             // 2. Calculate server-side values first
             $calculatedNights = Carbon::parse($this->checkIn)->diffInDays(Carbon::parse($this->checkOut));
-            $calculatedTotal = $calculatedNights * $venue->price_per_night;
+            $calculatedTotal = $calculatedNights * $venue->price;
 
             // 3. Use comprehensive validation service (includes external iCal checking)
             $validationService = app(BookingValidationService::class);
