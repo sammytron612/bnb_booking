@@ -101,7 +101,7 @@ class PaymentSuccessService
 
         try {
             // Send notification email to admin
-            $adminEmail = config('mail.admin_email', 'admin@eileenbnb.com');
+            $adminEmail = config('mail.owner_email', 'admin@eileenbnb.com');
             Mail::to($adminEmail)->send(new NewBooking($booking));
 
             Log::info('New booking notification email sent to admin', [
