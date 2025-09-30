@@ -209,7 +209,7 @@
                         @else
                             @if($day['check_out_count'] > 0)
                                 <!-- Show blank card with checkout icon when no bookings but checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 mobile-tooltip-trigger"
+                                <div class="group relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week1-{{ $loop->index }}">
                                     <div class="text-gray-400 text-xs font-medium">No bookings</div>
@@ -379,7 +379,7 @@
                         @else
                             @if($day['check_out_count'] > 0)
                                 <!-- Show blank card with checkout icon when no bookings but checkouts exist -->
-                                <div class="relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 mobile-tooltip-trigger"
+                                <div class="group relative bg-gray-100 hover:bg-gray-200 transition-colors duration-200 rounded-lg p-3 h-16 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 mobile-tooltip-trigger"
                                      title="{{ $day['check_out_count'] }} checkout(s)"
                                      data-tooltip-id="checkout-tooltip-week2-{{ $loop->index }}">
                                     <div class="text-gray-400 text-xs font-medium">No bookings</div>
