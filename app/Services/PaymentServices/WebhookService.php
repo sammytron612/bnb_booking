@@ -18,7 +18,7 @@ class WebhookService
 
     public function __construct(PaymentSuccessService $paymentSuccessService)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        Stripe::setApiKey(config('services.stripe.secret_key'));
         $this->paymentSuccessService = $paymentSuccessService;
     }
 
