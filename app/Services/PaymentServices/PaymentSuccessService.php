@@ -163,12 +163,29 @@ class PaymentSuccessService
 
             // Update booking with refund information
             // Notes already contain admin's reason, refund_reason will contain webhook/stripe reason
+            Log::info('Before updating booking with refund data', [
+                'booking_id' => $booking->booking_id,
+                'current_refund_amount' => $booking->refund_amount,
+                'new_refund_amount' => $refundAmount,
+                'new_reason' => $reason
+            ]);
+
             $booking->update([
                 'status' => 'refunded',
                 'refund_amount' => $refundAmount,
                 'refund_reason' => $reason,
                 'refunded_at' => now(),
                 'notes' => $booking->notes ? $booking->notes . "\n" . "Refunded: £{$refundAmount} - {$reason}" : "Refunded: £{$refundAmount} - {$reason}"
+            ]);
+
+            // Refresh the booking to confirm update
+            $booking->refresh();
+
+            Log::info('After updating booking with refund data', [
+                'booking_id' => $booking->booking_id,
+                'updated_refund_amount' => $booking->refund_amount,
+                'updated_status' => $booking->status,
+                'updated_reason' => $booking->refund_reason
             ]);
 
             Log::info('Refund processed for booking', [

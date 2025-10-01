@@ -364,11 +364,23 @@ class WebhookService
             ]);
 
             // Call your existing processRefund method
+            Log::info('About to call PaymentSuccessService->processRefund', [
+                'booking_id' => $booking->booking_id,
+                'refund_amount' => $refundAmount,
+                'combined_reason' => $combinedReason
+            ]);
+
             $result = $this->paymentSuccessService->processRefund(
                 $booking,
                 $refundAmount,
                 $combinedReason
             );
+
+            Log::info('PaymentSuccessService->processRefund result', [
+                'booking_id' => $booking->booking_id,
+                'result_success' => $result['success'] ?? 'unknown',
+                'result_message' => $result['message'] ?? 'no message'
+            ]);
 
             if ($result['success']) {
                 Log::info('Refund webhook processed successfully', [
