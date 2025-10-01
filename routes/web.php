@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\BookingController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
 
@@ -52,14 +51,10 @@ Route::get('/saras', function () {
     return redirect()->route('venue.show', ['route' => 'saras']);
 })->name('saras');
 */
-// Booking routes - Protected with authentication for admin access
-Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-Route::middleware(['auth'])->group(function () {
-    // Redundant booking routes removed - functionality moved to BookingApiController
-    // - /bookings/venue/{venue_id} → use /api/booked-dates?venue_id={id} instead
-    // - /bookings/upcoming → use /api/booked-dates instead
-    Route::patch('/bookings/{booking}/status', [BookingController::class, 'updateStatus'])->name('bookings.updateStatus');
-});
+// Booking routes removed - functionality handled by:
+// - Livewire BookingForm component (creation)
+// - Direct model updates via webhooks/commands (status updates)
+// - BookingApiController (calendar data)
 // Public API for calendar dates moved to api.php to avoid CSRF conflicts
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
