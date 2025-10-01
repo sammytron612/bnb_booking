@@ -97,18 +97,20 @@ class RefundsTable extends Component
                 'admin_reason' => $reason
             ]);
 
-            // Add admin's refund reason to notes field immediately
+            // Add admin's refund reason to notes field and database immediately
             $adminNote = "Admin refund request: £{$this->refundAmount} - {$reason}";
             $currentNotes = $this->selectedBooking->notes;
             $updatedNotes = $currentNotes ? $currentNotes . "\n" . $adminNote : $adminNote;
 
             $this->selectedBooking->update([
-                'notes' => $updatedNotes
+                'notes' => $updatedNotes,
+                'refund_reason' => $reason  // Store admin's refund reason
             ]);
 
-            Log::info('Added admin refund note to booking', [
+            Log::info('Added admin refund note and reason to booking', [
                 'booking_id' => $this->selectedBooking->booking_id,
-                'admin_note' => $adminNote
+                'admin_note' => $adminNote,
+                'admin_reason' => $reason
             ]);
 
             // Get the payment service via dependency injection

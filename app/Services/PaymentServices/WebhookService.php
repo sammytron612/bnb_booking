@@ -349,14 +349,25 @@ class WebhookService
 
             // Get refund details from the charge
             $refundData = $charge['refunds']['data'][0] ?? null;
-            $refundReason = $refundData['reason'] ?? 'requested_by_customer';
+            $stripeRefundReason = $refundData['reason'] ?? 'requested_by_customer';
             $refundId = $refundData['id'] ?? null;
+
+            // Create a meaningful reason combining stripe reason and refund type
+            $refundType = $isFullRefund ? 'Full refund' : 'Partial refund';
+            $combinedReason = $refundType . ' processed via Stripe (Reason: ' . $stripeRefundReason . ')';
+
+            Log::info('Refund details extracted', [
+                'stripe_reason' => $stripeRefundReason,
+                'refund_type' => $refundType,
+                'combined_reason' => $combinedReason,
+                'refund_id' => $refundId
+            ]);
 
             // Call your existing processRefund method
             $result = $this->paymentSuccessService->processRefund(
                 $booking,
                 $refundAmount,
-                $isFullRefund ? 'Full refund processed via Stripe' : 'Partial refund processed via Stripe'
+                $combinedReason
             );
 
             if ($result['success']) {

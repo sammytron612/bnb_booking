@@ -51,6 +51,9 @@ class Booking extends Model
         'review_link',
         'check_in_reminder',
         'confirmation_email_sent',
+        'refund_amount',
+        'refund_reason',
+        'refunded_at',
     ];
 
     /**
@@ -63,7 +66,9 @@ class Booking extends Model
         'check_out' => 'date',
         'total_price' => 'decimal:2',
         'stripe_amount' => 'decimal:2',
+        'refund_amount' => 'decimal:2',
         'payment_completed_at' => 'datetime',
+        'refunded_at' => 'datetime',
         'stripe_metadata' => 'array',
         'review_link' => 'date',
         'check_in_reminder' => 'date',

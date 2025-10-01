@@ -162,6 +162,7 @@ class PaymentSuccessService
             DB::beginTransaction();
 
             // Update booking with refund information
+            // Notes already contain admin's reason, refund_reason will contain webhook/stripe reason
             $booking->update([
                 'status' => 'refunded',
                 'refund_amount' => $refundAmount,
@@ -173,7 +174,7 @@ class PaymentSuccessService
             Log::info('Refund processed for booking', [
                 'booking_id' => $booking->booking_id,
                 'refund_amount' => $refundAmount,
-                'reason' => $reason,
+                'webhook_reason' => $reason,
                 'customer_email' => $booking->email
             ]);
 
