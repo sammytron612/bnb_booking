@@ -204,7 +204,7 @@
 
                         <div class="mb-4">
                             <label for="refundReason" class="block text-sm font-medium text-gray-700 mb-1">
-                                Reason for Refund (Optional)
+                                Reason for Refund(Customer will see this message)
                             </label>
                             <textarea id="refundReason"
                                       wire:model="refundReason"
