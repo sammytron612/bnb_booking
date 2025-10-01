@@ -1,4 +1,3 @@
-{{-- resources/views/emails/booking-confirmation.blade.php --}}
 <!DOCTYPE html>
 <html>
 <head>
