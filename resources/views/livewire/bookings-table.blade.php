@@ -807,13 +807,13 @@
                                     </span>
                                 </label>
                                 <select wire:model="editStatus" id="editStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
-                                    <option value="pending">🟡 Pending</option>
-                                    <option value="confirmed">✅ Confirmed</option>
-                                    <option value="cancelled">❌ Cancelled</option>
-                                    <option value="payment_expired">⏰ Payment Expired</option>
-                                    <option value="abandoned">🚫 Abandoned</option>
-                                    <option value="refunded">💸 Refunded</option>
-                                    <option value="partial_refund">💰 Partial Refund</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                    <option value="payment_expired">Payment Expired</option>
+                                    <option value="abandoned">Abandoned</option>
+                                    <option value="refunded">Refunded</option>
+                                    <option value="partial_refund">Partial Refund</option>
                                 </select>
                                 @error('editStatus') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
