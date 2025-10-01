@@ -30,11 +30,12 @@ class SendCheckinReminders implements ShouldQueue
     public function handle(): void
     {
         // Get bookings where check-in is from today to 3 days ahead
-        // So if today is Sept 24th, find check-ins from Sept 24th to Sept 27th
+        // Send reminders for upcoming check-ins within the next 3 days
+        // So if today is Oct 1st, find check-ins from Oct 1st to Oct 4th
         $bookings = Booking::with('venue')
             ->where('check_in', '>=', now()->format('Y-m-d'))             // Today
             ->where('check_in', '<=', now()->addDays(3)->format('Y-m-d')) // 3 days ahead
-            ->whereNull('check_in_reminder')
+            ->whereNull('check_in_reminder')                              // Only bookings without reminders sent
             ->where('status', 'confirmed')                                // Only confirmed bookings
             ->where('is_paid', true)                                      // Only paid bookings
             ->get();
