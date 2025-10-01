@@ -22,7 +22,7 @@ Artisan::command('test:reviews', function () {
 
 // Schedule the email jobs to run daily
 Schedule::job(new SendCheckinReminders())->dailyAt('09:00')->name('send-checkin-reminders');
-Schedule::job(new SendReviewLinkEmails())->dailyAt('09:00')->name('send-review-link-emails');
+Schedule::job(new SendReviewLinkEmails())->dailyAt('11:25')->name('send-review-link-emails');
 
 // Schedule cleanup of abandoned bookings - runs every hour
 Schedule::command('bookings:cleanup-abandoned')->hourly()->name('cleanup-abandoned-bookings');
