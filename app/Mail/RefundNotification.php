@@ -13,15 +13,18 @@ class RefundNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $booking;
+    public $refundAmount;
+    public $refundReason;
+
     /**
      * Create a new message instance.
      */
-    public function __construct(
-        public $booking,
-        public $refundAmount,
-        public $refundReason
-    ) {
-        //
+    public function __construct($booking, $refundAmount, $refundReason)
+    {
+        $this->booking = $booking;
+        $this->refundAmount = $refundAmount;
+        $this->refundReason = $refundReason;
     }
 
     /**
@@ -40,7 +43,12 @@ class RefundNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.refund-notification',
+            with: [
+                'booking' => $this->booking,
+                'refundAmount' => $this->refundAmount,
+                'refundReason' => $this->refundReason,
+            ]
         );
     }
 

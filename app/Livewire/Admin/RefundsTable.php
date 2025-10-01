@@ -114,37 +114,64 @@ class RefundsTable extends Component
             // Get the payment service via dependency injection
             $paymentService = app(PaymentService::class);
 
-            // Call Stripe API to process the refund
+            // Call Stripe API to process the refund (convert amount to cents)
+            // Ensure we're working with a proper decimal number, then convert to integer cents
+            $refundAmountInPounds = number_format((float)$this->refundAmount, 2, '.', '');
+            $refundAmountInCents = (int)(round((float)$refundAmountInPounds * 100));
+
+            Log::info('Refund amount conversion', [
+                'input_raw' => $this->refundAmount,
+                'input_type' => gettype($this->refundAmount),
+                'pounds_formatted' => $refundAmountInPounds,
+                'cents_calculated' => $refundAmountInCents,
+                'booking_id' => $this->selectedBooking->booking_id
+            ]);
+
             $result = $paymentService->processRefund(
                 $this->selectedBooking->stripe_payment_intent_id,
-                $this->refundAmount,
-                $reason
+                $refundAmountInCents
             );
 
-            if ($result['success']) {
+            if ($result) {
                 Log::info('Refund initiated successfully with Stripe via Livewire', [
                     'booking_id' => $this->selectedBooking->booking_id,
-                    'stripe_refund_id' => $result['refund_id'],
                     'amount' => $this->refundAmount
                 ]);
 
                 // Send refund notification email to customer
                 try {
-                    Mail::to($this->selectedBooking->email)->send(
-                        new RefundNotification($this->selectedBooking, $this->refundAmount, $reason)
-                    );
+                    Log::info('Attempting to send refund notification email', [
+                        'booking_id' => $this->selectedBooking->booking_id,
+                        'customer_email' => $this->selectedBooking->email,
+                        'customer_name' => $this->selectedBooking->name,
+                        'refund_amount' => $this->refundAmount,
+                        'refund_reason' => $reason,
+                        'mail_driver' => config('mail.default'),
+                        'booking_has_venue' => !is_null($this->selectedBooking->venue),
+                        'venue_name' => $this->selectedBooking->venue->venue_name ?? 'No venue loaded'
+                    ]);
 
-                    Log::info('Refund notification email sent via Livewire', [
+                    // Create and send the email
+                    $refundNotification = new RefundNotification($this->selectedBooking, $this->refundAmount, $reason);
+                    Mail::to($this->selectedBooking->email)->send($refundNotification);
+
+                    Log::info('Refund notification email sent successfully', [
                         'booking_id' => $this->selectedBooking->booking_id,
                         'email' => $this->selectedBooking->email,
                         'amount' => $this->refundAmount
                     ]);
+
+                    session()->flash('success', 'Refund processed successfully and notification email sent to customer.');
                 } catch (\Exception $emailException) {
-                    Log::error('Failed to send refund notification email via Livewire', [
+                    Log::error('Failed to send refund notification email', [
                         'booking_id' => $this->selectedBooking->booking_id,
                         'email' => $this->selectedBooking->email,
-                        'error' => $emailException->getMessage()
+                        'error_message' => $emailException->getMessage(),
+                        'error_file' => $emailException->getFile(),
+                        'error_line' => $emailException->getLine(),
+                        'error_trace' => $emailException->getTraceAsString()
                     ]);
+                    session()->flash('warning', 'Refund processed successfully, but failed to send notification email to customer. Check logs for details.');
                     // Don't fail the refund process if email fails
                 }
 
@@ -158,11 +185,12 @@ class RefundsTable extends Component
             } else {
                 Log::error('Failed to initiate refund with Stripe via Livewire', [
                     'booking_id' => $this->selectedBooking->booking_id,
-                    'error' => $result['error']
+                    'payment_intent_id' => $this->selectedBooking->stripe_payment_intent_id,
+                    'amount' => $this->refundAmount
                 ]);
 
                 session()->flash('error',
-                    'Failed to process refund: ' . $result['error']
+                    'Failed to process refund. Please check the logs for more details.'
                 );
             }
 
