@@ -111,49 +111,27 @@ class PaymentService
         }
     }
 
-    public function processRefund(string $paymentIntentId, float $amount, string $reason = null): array
+    public function processRefund(string $paymentIntentId, ?int $amount = null): bool
     {
         try {
-            // Convert pounds to pence for Stripe
-            $amountInPence = (int)($amount * 100);
-
-            $refundData = [
+            $refund = \Stripe\Refund::create([
                 'payment_intent' => $paymentIntentId,
-                'amount' => $amountInPence,
-            ];
-
-            if ($reason) {
-                $refundData['reason'] = 'requested_by_customer';
-                $refundData['metadata'] = ['admin_reason' => $reason];
-            }
-
-            $refund = \Stripe\Refund::create($refundData);
-
-            Log::info('Refund processed successfully via Stripe API', [
-                'payment_intent_id' => $paymentIntentId,
-                'refund_id' => $refund->id,
-                'amount_pounds' => $amount,
-                'amount_pence' => $amountInPence,
-                'reason' => $reason
+                'amount' => $amount, // null for full refund
             ]);
 
-            return [
-                'success' => true,
+            Log::info('Refund processed successfully', [
+                'payment_intent_id' => $paymentIntentId,
                 'refund_id' => $refund->id,
                 'amount' => $amount
-            ];
-
-        } catch (Exception $e) {
-            Log::error('Failed to process refund via Stripe API', [
-                'payment_intent_id' => $paymentIntentId,
-                'amount' => $amount,
-                'error' => $e->getMessage()
             ]);
 
-            return [
-                'success' => false,
+            return true;
+        } catch (Exception $e) {
+            Log::error('Failed to process refund', [
+                'payment_intent_id' => $paymentIntentId,
                 'error' => $e->getMessage()
-            ];
+            ]);
+            return false;
         }
     }
 }

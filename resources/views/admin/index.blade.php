@@ -2,20 +2,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Page Header -->
         <div class="mb-8">
-            <div class="flex justify-between items-center mb-2">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    Admin Dashboard
-                </h1>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition-colors">
-                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                        </svg>
-                        Logout
-                    </button>
-                </form>
-            </div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Admin Dashboard
+            </h1>
             <p class="text-gray-600 dark:text-gray-300">
                 Manage your bed & breakfast operations from here
             </p>
@@ -101,34 +90,6 @@
                     </p>
                     <a href="{{ route('admin.reviews') }}" class="inline-flex items-center text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300 font-medium text-sm">
                         View Reviews
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Refunds Card -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
-                <div class="p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
-                            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path>
-                            </svg>
-                        </div>
-                        <span class="text-2xl font-bold text-red-600 dark:text-red-400">
-                            {{ \App\Models\Booking::where('status', 'refunded')->count() }}
-                        </span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                        Refunds
-                    </h3>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                        Process customer refunds and cancellations
-                    </p>
-                    <a href="{{ route('admin.refunds') }}" class="inline-flex items-center text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 font-medium text-sm">
-                        Manage Refunds
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>

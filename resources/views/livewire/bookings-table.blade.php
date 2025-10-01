@@ -2,16 +2,7 @@
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
     @if (session('success'))
-        <div class="mb-4 rounded bord                                            <div class="text-xs text-gray-300">
-                                                {{ \Carbon\Carbon::parse($booking->check_in)->format('M j') }} - {{ \Carbon\Carbon::parse($booking->check_out)->format('M j') }}
-                                                ({{ $booking->nights }} {{ $booking->nights === 1 ? 'night' : 'nights' }})
-                                            </div>
-                                            <div class="text-green-400 text-xs mt-1 font-medium">
-                                                £{{ number_format($this->getNetAmount($booking), 2) }}
-                                                @if($booking->refund_amount > 0)
-                                                    <span class="text-red-400">(refunded: £{{ number_format((float)$booking->refund_amount, 2) }})</span>
-                                                @endif
-                                            </div>er-green-200 bg-green-50 text-green-800 px-4 py-2">
+        <div class="mb-4 rounded border-green-200 bg-green-50 text-green-800 px-4 py-2">
             {{ session('success') }}
         </div>
     @endif

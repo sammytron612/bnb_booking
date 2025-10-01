@@ -2,7 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Booking;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -14,18 +13,12 @@ class RefundNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $booking;
-    public $refundAmount;
-    public $refundReason;
-
     /**
      * Create a new message instance.
      */
-    public function __construct(Booking $booking, float $refundAmount, string $refundReason = null)
+    public function __construct()
     {
-        $this->booking = $booking;
-        $this->refundAmount = $refundAmount;
-        $this->refundReason = $refundReason;
+        //
     }
 
     /**
@@ -34,7 +27,7 @@ class RefundNotification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Refund Confirmation - Booking ' . $this->booking->getDisplayBookingId(),
+            subject: 'Refund Notification',
         );
     }
 
@@ -44,7 +37,7 @@ class RefundNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.refund-notification',
+            view: 'view.name',
         );
     }
 

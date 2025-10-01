@@ -161,13 +161,9 @@ class PaymentSuccessService
         try {
             DB::beginTransaction();
 
-            // Determine if it's a full or partial refund
-            $isPartialRefund = $refundAmount < (float) $booking->total_price;
-            $refundStatus = $isPartialRefund ? 'partial_refund' : 'refunded';
-
             // Update booking with refund information
             $booking->update([
-                'status' => $refundStatus,
+                'status' => 'refunded',
                 'refund_amount' => $refundAmount,
                 'refund_reason' => $reason,
                 'refunded_at' => now(),
@@ -177,9 +173,6 @@ class PaymentSuccessService
             Log::info('Refund processed for booking', [
                 'booking_id' => $booking->booking_id,
                 'refund_amount' => $refundAmount,
-                'total_amount' => $booking->total_price,
-                'is_partial_refund' => $isPartialRefund,
-                'status' => $refundStatus,
                 'reason' => $reason,
                 'customer_email' => $booking->email
             ]);

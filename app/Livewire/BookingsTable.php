@@ -18,7 +18,7 @@ class BookingsTable extends Component
     public $statusFilter = '';
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
-    public $calendarOffset = 0; // Track calendar navigation offset
+        public $calendarOffset = 0; // Track calendar navigation offset
 
     // Venue filtering properties
     public $selectedVenueId = null; // null = "All Venues"
@@ -94,7 +94,7 @@ class BookingsTable extends Component
         }
 
         $validated = $this->validate([
-            'editStatus' => 'required|in:pending,confirmed,cancelled,payment_expired,abandoned',
+            'editStatus' => 'required|in:pending,confirmed,cancelled,payment_expired,abandoned,refunded,partial_refund',
             'editNotes' => 'nullable|string|max:2000',
             'editPayment' => 'required|in:0,1',
         ]);
@@ -349,13 +349,8 @@ class BookingsTable extends Component
 
     public function getNetAmount($booking)
     {
-        if (!$booking || !isset($booking->total_price)) {
-            return 0;
-        }
-
         $totalPrice = (float) $booking->total_price;
         $refundAmount = (float) ($booking->refund_amount ?? 0);
-
         return $totalPrice - $refundAmount;
     }
 
