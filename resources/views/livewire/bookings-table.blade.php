@@ -2,7 +2,16 @@
     <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
     @if (session('success'))
-        <div class="mb-4 rounded border border-green-200 bg-green-50 text-green-800 px-4 py-2">
+        <div class="mb-4 rounded bord                                            <div class="text-xs text-gray-300">
+                                                {{ \Carbon\Carbon::parse($booking->check_in)->format('M j') }} - {{ \Carbon\Carbon::parse($booking->check_out)->format('M j') }}
+                                                ({{ $booking->nights }} {{ $booking->nights === 1 ? 'night' : 'nights' }})
+                                            </div>
+                                            <div class="text-green-400 text-xs mt-1 font-medium">
+                                                £{{ number_format($this->getNetAmount($booking), 2) }}
+                                                @if($booking->refund_amount > 0)
+                                                    <span class="text-red-400">(refunded: £{{ number_format((float)$booking->refund_amount, 2) }})</span>
+                                                @endif
+                                            </div>er-green-200 bg-green-50 text-green-800 px-4 py-2">
             {{ session('success') }}
         </div>
     @endif
@@ -656,7 +665,14 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">{{ $booking->formatted_total }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="text-green-600">£{{ number_format($this->getNetAmount($booking), 2) }}</div>
+                            @if($booking->refund_amount > 0)
+                                <div class="text-xs text-gray-500">
+                                    (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
+                                </div>
+                            @endif
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                                 @if($booking->status === 'confirmed') bg-green-100 text-green-800

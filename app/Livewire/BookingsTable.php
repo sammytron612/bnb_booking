@@ -345,7 +345,21 @@ class BookingsTable extends Component
 
 
         return $externalBookings;
-    }    public function render()
+    }
+
+    public function getNetAmount($booking)
+    {
+        if (!$booking || !isset($booking->total_price)) {
+            return 0;
+        }
+
+        $totalPrice = (float) $booking->total_price;
+        $refundAmount = (float) ($booking->refund_amount ?? 0);
+
+        return $totalPrice - $refundAmount;
+    }
+
+    public function render()
     {
         // Get database bookings only (for the table)
         $paginatedBookings = Booking::with('venue')
