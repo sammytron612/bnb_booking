@@ -55,6 +55,9 @@ class WebhookService
             case 'charge.dispute.created':
                 return $this->handleChargeDisputeCreated($event['data']['object']);
 
+            case 'charge.refunded':
+                return $this->handleChargeRefunded($event['data']['object']);
+
             default:
                 Log::info('Unhandled Stripe webhook event', ['type' => $event['type']]);
                 return ['status' => 'ignored', 'message' => 'Event type not handled'];
@@ -310,6 +313,81 @@ class WebhookService
                 'session_id' => $session['id'] ?? 'unknown'
             ]);
             return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    private function handleChargeRefunded($charge): array
+    {
+        try {
+            Log::info('Processing charge.refunded webhook', [
+                'charge_id' => $charge['id'],
+                'payment_intent_id' => $charge['payment_intent'],
+                'amount_refunded' => $charge['amount_refunded']
+            ]);
+
+            // Find booking by payment_intent_id
+            $booking = Booking::where('stripe_payment_intent_id', $charge['payment_intent'])->first();
+
+            if (!$booking) {
+                Log::warning('Booking not found for refunded charge', [
+                    'payment_intent_id' => $charge['payment_intent'],
+                    'charge_id' => $charge['id']
+                ]);
+                return ['status' => 'error', 'message' => 'Booking not found'];
+            }
+
+            // Convert from cents to pounds
+            $refundAmount = $charge['amount_refunded'] / 100;
+            $isFullRefund = $charge['amount_refunded'] === $charge['amount'];
+
+            Log::info('Found booking for refund', [
+                'booking_id' => $booking->booking_id,
+                'booking_display_id' => $booking->getDisplayBookingId(),
+                'refund_amount' => $refundAmount,
+                'is_full_refund' => $isFullRefund
+            ]);
+
+            // Get refund details from the charge
+            $refundData = $charge['refunds']['data'][0] ?? null;
+            $refundReason = $refundData['reason'] ?? 'requested_by_customer';
+            $refundId = $refundData['id'] ?? null;
+
+            // Call your existing processRefund method
+            $result = $this->paymentSuccessService->processRefund(
+                $booking,
+                $refundAmount,
+                $isFullRefund ? 'Full refund processed via Stripe' : 'Partial refund processed via Stripe'
+            );
+
+            if ($result['success']) {
+                Log::info('Refund webhook processed successfully', [
+                    'booking_id' => $booking->booking_id,
+                    'booking_display_id' => $booking->getDisplayBookingId(),
+                    'refund_amount' => $refundAmount,
+                    'is_full_refund' => $isFullRefund,
+                    'refund_id' => $refundId
+                ]);
+
+                return ['status' => 'success', 'message' => 'Refund processed successfully'];
+            } else {
+                Log::error('Failed to process refund in database', [
+                    'booking_id' => $booking->booking_id,
+                    'refund_amount' => $refundAmount,
+                    'error' => $result['error'] ?? 'Unknown error'
+                ]);
+
+                return ['status' => 'error', 'message' => 'Failed to update database: ' . ($result['error'] ?? 'Unknown error')];
+            }
+
+        } catch (Exception $e) {
+            Log::error('Exception in charge refunded handler', [
+                'error' => $e->getMessage(),
+                'payment_intent_id' => $charge['payment_intent'] ?? 'unknown',
+                'charge_id' => $charge['id'] ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return ['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()];
         }
     }
 }
