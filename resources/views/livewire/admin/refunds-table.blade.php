@@ -83,22 +83,26 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">
                                     Total: £{{ number_format($booking->total_price, 2) }}
                                 </div>
                                 @if($booking->refund_amount > 0)
-                                    <div class="text-sm text-red-600">
-                                        Refunded: £{{ number_format($booking->refund_amount, 2) }}
-                                    </div>
                                     @php
                                         $remaining = $booking->total_price - $booking->refund_amount;
                                     @endphp
-                                    @if($remaining > 0)
-                                        <div class="text-sm text-green-600">
-                                            Remaining: £{{ number_format($remaining, 2) }}
-                                        </div>
-                                    @endif
+                                    <div class="text-sm text-green-600 font-medium">
+                                        £{{ number_format($remaining, 2) }} paid
+                                    </div>
+                                    <div class="text-sm text-red-600 font-medium">
+                                        £{{ number_format($booking->refund_amount, 2) }} refunded
+                                    </div>
+                                @else
+                                    <div class="text-sm text-green-600">
+                                        Fully paid
+                                    </div>
                                 @endif
+                            </td>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
