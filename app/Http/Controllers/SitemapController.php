@@ -12,11 +12,11 @@ class SitemapController extends Controller
     {
         $sitemaps = [
             [
-                'loc' => route('sitemap.main'),
+                'loc' => route('api.sitemap.main'),
                 'lastmod' => Carbon::now()->toISOString()
             ],
             [
-                'loc' => route('sitemap.venues'),
+                'loc' => route('api.sitemap.venues'),
                 'lastmod' => Carbon::now()->toISOString()
             ]
         ];
