@@ -43,11 +43,11 @@
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Check-in:</dt>
-                        <dd class="text-sm text-gray-900">{{ $booking->check_in->format('M j, Y') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('M j, Y') }}</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Check-out:</dt>
-                        <dd class="text-sm text-gray-900">{{ $booking->check_out->format('M j, Y') }}</dd>
+                        <dd class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('M j, Y') }}</dd>
                     </div>
                     <div class="flex justify-between">
                         <dt class="text-sm font-medium text-gray-500">Nights:</dt>

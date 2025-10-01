@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            //
+            $table->decimal('refund_amount', 10, 2)->nullable()->after('total_price');
+            $table->string('refund_reason')->nullable()->after('refund_amount');
+            $table->timestamp('refunded_at')->nullable()->after('refund_reason');
         });
     }
 
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            //
+            $table->dropColumn(['refund_amount', 'refund_reason', 'refunded_at']);
         });
     }
 };

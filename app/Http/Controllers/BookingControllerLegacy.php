@@ -7,7 +7,7 @@ use App\Models\Booking;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 
-class BookingController extends Controller
+class BookingControllerLegacy extends Controller
 {
     /**
      * Store a new booking
