@@ -21,7 +21,7 @@ Artisan::command('test:reviews', function () {
 })->purpose('Run review emails manually');
 
 // Schedule the email jobs to run daily
-Schedule::job(new SendCheckinReminders())->dailyAt('10:26')->name('send-checkin-reminders');
+Schedule::job(new SendCheckinReminders())->dailyAt('10:38')->name('send-checkin-reminders');
 Schedule::job(new SendReviewLinkEmails())->dailyAt('09:00')->name('send-review-link-emails');
 
 // Schedule cleanup of abandoned bookings - runs every hour
