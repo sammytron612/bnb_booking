@@ -664,8 +664,14 @@
                                 @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
                                 @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
                                 @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
+                                @elseif($booking->status === 'refunded') bg-red-100 text-red-800
+                                @elseif($booking->status === 'partial_refund') bg-orange-100 text-orange-800
                                 @else bg-gray-100 text-gray-800 @endif">
-                                {{ ucfirst($booking->status) }}
+                                @if($booking->status === 'partial_refund')
+                                    Partial Refund
+                                @else
+                                    {{ ucfirst($booking->status) }}
+                                @endif
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -732,6 +738,8 @@
                                 <option value="cancelled">Cancelled</option>
                                 <option value="payment_expired">Payment Expired</option>
                                 <option value="abandoned">Abandoned</option>
+                                <option value="refunded">Refunded</option>
+                                <option value="partial_refund">Partial Refund</option>
                             </select>
                             @error('editStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
@@ -739,10 +747,32 @@
                         <!-- Payment Status Field -->
                         <div>
                             <label for="editPayment" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-                            <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="0">Unpaid</option>
-                                <option value="1">Paid</option>
-                            </select>
+                            @if($selectedBooking && ($selectedBooking->status === 'refunded' || $selectedBooking->status === 'partial_refund'))
+                                <div class="w-full px-3 py-2 border border-red-300 rounded-md bg-red-50">
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span class="text-red-800 font-medium">
+                                            @if($selectedBooking->status === 'partial_refund')
+                                                Partial Refund
+                                            @else
+                                                Refunded
+                                            @endif
+                                        </span>
+                                    </div>
+                                    @if($selectedBooking->stripe_payment_intent_id)
+                                        <div class="text-sm text-red-600 mt-1">
+                                            Payment Intent: {{ $selectedBooking->stripe_payment_intent_id }}
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="0">Unpaid</option>
+                                    <option value="1">Paid</option>
+                                </select>
+                            @endif
                             @error('editPayment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                         </div>
 

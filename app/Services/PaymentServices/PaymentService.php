@@ -111,27 +111,49 @@ class PaymentService
         }
     }
 
-    public function processRefund(string $paymentIntentId, ?int $amount = null): bool
+    public function processRefund(string $paymentIntentId, float $amount, string $reason = null): array
     {
         try {
-            $refund = \Stripe\Refund::create([
-                'payment_intent' => $paymentIntentId,
-                'amount' => $amount, // null for full refund
-            ]);
+            // Convert pounds to pence for Stripe
+            $amountInPence = (int)($amount * 100);
 
-            Log::info('Refund processed successfully', [
+            $refundData = [
+                'payment_intent' => $paymentIntentId,
+                'amount' => $amountInPence,
+            ];
+
+            if ($reason) {
+                $refundData['reason'] = 'requested_by_customer';
+                $refundData['metadata'] = ['admin_reason' => $reason];
+            }
+
+            $refund = \Stripe\Refund::create($refundData);
+
+            Log::info('Refund processed successfully via Stripe API', [
                 'payment_intent_id' => $paymentIntentId,
                 'refund_id' => $refund->id,
-                'amount' => $amount
+                'amount_pounds' => $amount,
+                'amount_pence' => $amountInPence,
+                'reason' => $reason
             ]);
 
-            return true;
+            return [
+                'success' => true,
+                'refund_id' => $refund->id,
+                'amount' => $amount
+            ];
+
         } catch (Exception $e) {
-            Log::error('Failed to process refund', [
+            Log::error('Failed to process refund via Stripe API', [
                 'payment_intent_id' => $paymentIntentId,
+                'amount' => $amount,
                 'error' => $e->getMessage()
             ]);
-            return false;
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
         }
     }
 }

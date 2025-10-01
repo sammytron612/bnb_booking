@@ -44,9 +44,8 @@
                     <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6">
                         <li>All prices are in British Pounds (GBP) and include VAT where applicable</li>
                         <li>Prices may vary based on season, length of stay, and demand</li>
-                        <li>Payment is processed securely through Stripe, which is PCI DSS Level 1 compliant</li>
-                        <li>We only collect and store your name, email address, and phone number</li>
-                        <li>No credit card information is stored on our servers - all payment data is securely handled by Stripe</li>
+                        <li>Payment is processed securely through Stripe</li>
+                        <li>We do not store credit card information - only your name, email, and phone number</li>
                         <li>Additional charges may apply for extra services or damages</li>
                     </ul>
 
@@ -138,31 +137,10 @@
 
                 <section class="mb-8">
                     <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Privacy and Data Protection</h2>
-                    <p class="text-gray-700 leading-relaxed mb-4">
-                        Your privacy is important to us. We are committed to protecting your personal information and handling it responsibly.
-                    </p>
-
-                    <h3 class="text-xl font-medium text-gray-800 mb-3">Data We Collect</h3>
-                    <p class="text-gray-700 leading-relaxed mb-3">
-                        We only collect the essential information needed to process your booking:
-                    </p>
-                    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-                        <li>Your name (for booking identification and communication)</li>
-                        <li>Email address (for booking confirmations and communication)</li>
-                        <li>Phone number (for check-in coordination and emergency contact)</li>
-                    </ul>
-
-                    <h3 class="text-xl font-medium text-gray-800 mb-3">Payment Security</h3>
-                    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
-                        <li>No credit card information is stored on our servers</li>
-                        <li>All payment processing is handled by Stripe, which is PCI DSS Level 1 compliant</li>
-                        <li>Stripe maintains the highest level of payment security certification</li>
-                        <li>Your financial information is encrypted and protected at all times</li>
-                    </ul>
-
                     <p class="text-gray-700 leading-relaxed">
-                        For complete details about how we collect, use, and protect your personal information, please review our
-                        <a href="{{ route('privacy-policy') }}" class="text-blue-600 hover:text-blue-800 underline">Privacy Policy</a>.
+                        Your privacy is important to us. Please review our
+                        <a href="{{ route('privacy-policy') }}" class="text-blue-600 hover:text-blue-800 underline">Privacy Policy</a>
+                        to understand how we collect, use, and protect your personal information.
                     </p>
                 </section>
 

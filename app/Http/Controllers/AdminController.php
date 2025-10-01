@@ -18,6 +18,11 @@ class AdminController extends Controller
         return view('admin.bookings');
     }
 
+    public function refunds()
+    {
+        return view('admin.refunds-livewire');
+    }
+
     public function reviews()
     {
         return view('admin.reviews');
