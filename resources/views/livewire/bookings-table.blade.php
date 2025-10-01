@@ -778,7 +778,14 @@
                                 </div>
                                 <div class="flex items-center">
                                     <span class="w-20 text-sm font-medium text-gray-500">Total:</span>
-                                    <span class="text-green-600 font-bold text-lg">{{ $selectedBooking->formatted_total }}</span>
+                                    <div>
+                                        <span class="text-green-600 font-bold text-lg">£{{ number_format($this->getNetAmount($selectedBooking), 2) }}</span>
+                                        @if($selectedBooking->refund_amount > 0)
+                                            <div class="text-xs text-gray-500 mt-1">
+                                                (£{{ number_format((float)$selectedBooking->total_price, 2) }} - £{{ number_format((float)$selectedBooking->refund_amount, 2) }})
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
