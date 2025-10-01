@@ -130,4 +130,9 @@ class AdminController extends Controller
     {
         return view('admin.properties');
     }
+
+    public function refunds()
+    {
+        return view('admin.refunds-livewire');
+    }
 }

@@ -91,6 +91,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
+    Route::get('/refunds', [AdminController::class, 'refunds'])->name('refunds');
     Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
     Route::get('/properties', [AdminController::class, 'properties'])->name('properties');
 
