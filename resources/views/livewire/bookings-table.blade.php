@@ -703,98 +703,185 @@
     <!-- Edit Booking Modal -->
     @if($showEditModal && $selectedBooking)
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-9999">
-            <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Edit Booking - {{ $selectedBooking->getDisplayBookingId() }}</h3>
-                    <button wire:click="closeEditModal" class="text-gray-500 hover:text-gray-700">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-2">Guest Information</h4>
-                        <p><strong>Name:</strong> {{ $selectedBooking->name }}</p>
-                        <p><strong>Email:</strong> {{ $selectedBooking->email }}</p>
-                        <p><strong>Phone:</strong> {{ $selectedBooking->phone }}</p>
-                    </div>
-
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-2">Booking Details</h4>
-                        <p><strong>Venue:</strong> {{ $selectedBooking->venue->venue_name }}</p>
-                        <p><strong>Check-in:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_in)->format('d/m/Y') }}</p>
-                        <p><strong>Check-out:</strong> {{ \Carbon\Carbon::parse($selectedBooking->check_out)->format('d/m/Y') }}</p>
-                        <p><strong>Nights:</strong> {{ $selectedBooking->nights }}</p>
-                        <p><strong>Total Price:</strong> {{ $selectedBooking->formatted_total }}</p>
-                    </div>
-                </div>
-
-                <!-- Edit Form -->
-                <div class="border-t border-gray-200 pt-6">
-                    <h4 class="font-semibold text-gray-900 mb-4">Edit Booking Information</h4>
-
-                    <div class="space-y-4">
-                        <!-- Status Field -->
+            <div class="bg-white rounded-xl shadow-2xl p-0 max-w-4xl w-full mx-4 max-h-[95vh] overflow-hidden">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b">
+                    <div class="flex justify-between items-center">
                         <div>
-                            <label for="editStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                            <select wire:model="editStatus" id="editStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="cancelled">Cancelled</option>
-                                <option value="payment_expired">Payment Expired</option>
-                                <option value="abandoned">Abandoned</option>
-                                <option value="refunded">Refunded</option>
-                                <option value="partial_refund">Partial Refund</option>
-                            </select>
-                            @error('editStatus') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            <h3 class="text-xl font-bold text-white">Edit Booking</h3>
+                            <p class="text-blue-100 text-sm">{{ $selectedBooking->getDisplayBookingId() }}</p>
                         </div>
+                        <button wire:click="closeEditModal" class="text-white hover:text-blue-200 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
-                        <!-- Payment Status Field -->
-                        <div>
-                            <label for="editPayment" class="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-                            @if($selectedBooking && ($selectedBooking->status === 'refunded' || $selectedBooking->status === 'partial_refund'))
-                                <div class="w-full px-3 py-2 border border-red-300 rounded-md bg-red-50">
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        <span class="text-red-800 font-medium">
-                                            @if($selectedBooking->status === 'partial_refund')
-                                                Partial Refund
-                                            @else
-                                                Refunded
-                                            @endif
-                                        </span>
-                                    </div>
-                                    @if($selectedBooking->stripe_payment_intent_id)
-                                        <div class="text-sm text-red-600 mt-1">
-                                            Payment Intent: {{ $selectedBooking->stripe_payment_intent_id }}
-                                        </div>
-                                    @endif
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
+                    <!-- Guest & Booking Information Cards -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <!-- Guest Information Card -->
+                        <div class="bg-gray-50 rounded-lg p-5">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-blue-100 p-2 rounded-lg mr-3">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
                                 </div>
-                            @else
-                                <select wire:model="editPayment" id="editPayment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                    <option value="0">Unpaid</option>
-                                    <option value="1">Paid</option>
-                                </select>
-                            @endif
-                            @error('editPayment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                <h4 class="font-bold text-gray-900 text-lg">Guest Information</h4>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <span class="w-16 text-sm font-medium text-gray-500">Name:</span>
+                                    <span class="text-gray-900 font-medium">{{ $selectedBooking->name }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-16 text-sm font-medium text-gray-500">Email:</span>
+                                    <span class="text-gray-900">{{ $selectedBooking->email }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-16 text-sm font-medium text-gray-500">Phone:</span>
+                                    <span class="text-gray-900">{{ $selectedBooking->phone }}</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Notes Field -->
-                        <div>
-                            <label for="editNotes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                            <textarea wire:model="editNotes" id="editNotes" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Add any notes about this booking..."></textarea>
-                            @error('editNotes') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        <!-- Booking Details Card -->
+                        <div class="bg-gray-50 rounded-lg p-5">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-green-100 p-2 rounded-lg mr-3">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                </div>
+                                <h4 class="font-bold text-gray-900 text-lg">Booking Details</h4>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <span class="w-20 text-sm font-medium text-gray-500">Venue:</span>
+                                    <span class="text-gray-900 font-medium">{{ $selectedBooking->venue->venue_name }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 text-sm font-medium text-gray-500">Check-in:</span>
+                                    <span class="text-gray-900">{{ \Carbon\Carbon::parse($selectedBooking->check_in)->format('d/m/Y') }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 text-sm font-medium text-gray-500">Check-out:</span>
+                                    <span class="text-gray-900">{{ \Carbon\Carbon::parse($selectedBooking->check_out)->format('d/m/Y') }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 text-sm font-medium text-gray-500">Nights:</span>
+                                    <span class="text-gray-900 font-medium">{{ $selectedBooking->nights }}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="w-20 text-sm font-medium text-gray-500">Total:</span>
+                                    <span class="text-green-600 font-bold text-lg">{{ $selectedBooking->formatted_total }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Form Section -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-orange-100 p-2 rounded-lg mr-3">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </div>
+                            <h4 class="font-bold text-gray-900 text-lg">Edit Booking Information</h4>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Status Field -->
+                            <div>
+                                <label for="editStatus" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Booking Status
+                                    </span>
+                                </label>
+                                <select wire:model="editStatus" id="editStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                                    <option value="pending">🟡 Pending</option>
+                                    <option value="confirmed">✅ Confirmed</option>
+                                    <option value="cancelled">❌ Cancelled</option>
+                                    <option value="payment_expired">⏰ Payment Expired</option>
+                                    <option value="abandoned">🚫 Abandoned</option>
+                                    <option value="refunded">💸 Refunded</option>
+                                    <option value="partial_refund">💰 Partial Refund</option>
+                                </select>
+                                @error('editStatus') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Payment Status Field -->
+                            <div>
+                                <label for="editPayment" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                        </svg>
+                                        Payment Status
+                                    </span>
+                                </label>
+                                @if($selectedBooking && ($selectedBooking->status === 'refunded' || $selectedBooking->status === 'partial_refund'))
+                                    <div class="w-full px-4 py-3 border border-red-300 rounded-lg bg-red-50">
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="text-red-800 font-medium">
+                                                @if($selectedBooking->status === 'partial_refund')
+                                                    💰 Partial Refund
+                                                @else
+                                                    💸 Refunded
+                                                @endif
+                                            </span>
+                                        </div>
+                                        @if($selectedBooking->stripe_payment_intent_id)
+                                            <div class="text-sm text-red-600 mt-1 font-mono">
+                                                Payment Intent: {{ $selectedBooking->stripe_payment_intent_id }}
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <select wire:model="editPayment" id="editPayment" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                                        <option value="0">🔴 Unpaid</option>
+                                        <option value="1">🟢 Paid</option>
+                                    </select>
+                                @endif
+                                @error('editPayment') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+
+                        <!-- Notes Field (Full Width) -->
+                        <div class="mt-6">
+                            <label for="editNotes" class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    Internal Notes
+                                </span>
+                            </label>
+                            <textarea wire:model="editNotes" id="editNotes" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm resize-none" placeholder="Add any internal notes about this booking... (visible only to admin)"></textarea>
+                            @error('editNotes') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button wire:click="closeEditModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</button>
-                    <button wire:click="saveBooking" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save Changes</button>
+                <!-- Modal Footer -->
+                <div class="bg-gray-50 px-6 py-4 border-t flex justify-end space-x-3">
+                    <button wire:click="closeEditModal" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200 font-medium">
+                        Cancel
+                    </button>
+                    <button wire:click="saveBooking" class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
+                        💾 Save Changes
+                    </button>
                 </div>
             </div>
         </div>
