@@ -31,7 +31,7 @@ class Otp extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(\App\Models\User::class);
     }
 
     /**
@@ -72,7 +72,7 @@ class Otp extends Model
     /**
      * Create a new OTP for a user
      */
-    public static function createForUser(User $user, ?string $ipAddress = null, ?string $userAgent = null): self
+    public static function createForUser(\App\Models\User $user, ?string $ipAddress = null, ?string $userAgent = null): self
     {
         // Delete any existing unused OTPs for this user
         static::where('user_id', $user->id)
@@ -87,11 +87,4 @@ class Otp extends Model
             'user_agent' => $userAgent
         ]);
     }
-}space App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Otp extends Model
-{
-    //
 }
