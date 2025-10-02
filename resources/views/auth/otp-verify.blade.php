@@ -66,26 +66,6 @@
                 </button>
             </div>
 
-            <div class="text-center">
-                <p class="text-sm text-gray-600">
-                    Didn't receive the code?
-                </p>
-
-                @if($canResend)
-                    <form method="POST" action="{{ route('otp.resend') }}" class="inline">
-                        @csrf
-                        <button type="submit"
-                                class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
-                            Resend Code
-                        </button>
-                    </form>
-                @else
-                    <span class="text-gray-400">
-                        Please wait before requesting a new code
-                    </span>
-                @endif
-            </div>
-
             <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -108,6 +88,27 @@
                 </div>
             </div>
         </form>
+
+        <!-- Resend Code Section - Outside main form -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600">
+                Didn't receive the code?
+            </p>
+
+            @if($canResend)
+                <form method="POST" action="{{ route('otp.resend') }}" class="inline">
+                    @csrf
+                    <button type="submit"
+                            class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+                        Resend Code
+                    </button>
+                </form>
+            @else
+                <span class="text-gray-400">
+                    Please wait before requesting a new code
+                </span>
+            @endif
+        </div>
 
         <div class="text-center">
             <a href="{{ route('logout') }}"
