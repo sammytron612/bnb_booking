@@ -8,7 +8,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Booking;
 use App\Services\PaymentServices\PaymentService;

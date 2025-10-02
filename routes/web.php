@@ -42,20 +42,7 @@ Route::get('/venue/{route}', function ($route) {
     return view('venue', compact('venue', 'reviews'));
 })->name('venue.show');
 
-// Backward compatibility routes - redirect to dynamic route
-/*Route::get('/light-house', function () {
-    return redirect()->route('venue.show', ['route' => 'light-house']);
-})->name('light-house');
 
-Route::get('/saras', function () {
-    return redirect()->route('venue.show', ['route' => 'saras']);
-})->name('saras');
-*/
-// Booking routes removed - functionality handled by:
-// - Livewire BookingForm component (creation)
-// - Direct model updates via webhooks/commands (status updates)
-// - BookingApiController (calendar data)
-// Public API for calendar dates moved to api.php to avoid CSRF conflicts
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
