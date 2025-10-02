@@ -666,15 +666,25 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                @if($booking->status === 'confirmed') bg-green-100 text-green-800
+                                @php
+                                    // Determine actual refund status based on amounts
+                                    $refundAmount = (float) ($booking->refund_amount ?? 0);
+                                    $totalPrice = (float) $booking->total_price;
+                                    $hasRefund = $refundAmount > 0;
+                                    $isFullyRefunded = $hasRefund && ($refundAmount >= $totalPrice);
+                                    $isPartialRefund = $hasRefund && ($refundAmount < $totalPrice);
+                                @endphp
+                                @if($isFullyRefunded) bg-red-100 text-red-800
+                                @elseif($isPartialRefund) bg-orange-100 text-orange-800
+                                @elseif($booking->status === 'confirmed') bg-green-100 text-green-800
                                 @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
                                 @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
                                 @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
                                 @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
-                                @elseif($booking->status === 'refunded') bg-red-100 text-red-800
-                                @elseif($booking->status === 'partial_refund') bg-orange-100 text-orange-800
                                 @else bg-gray-100 text-gray-800 @endif">
-                                @if($booking->status === 'partial_refund')
+                                @if($isFullyRefunded)
+                                    Fully Refunded
+                                @elseif($isPartialRefund)
                                     Partial Refund
                                 @else
                                     {{ ucfirst($booking->status) }}
