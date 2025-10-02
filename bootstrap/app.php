@@ -24,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Create alias for easier reference
         $middleware->alias([
             'csp' => \App\Http\Middleware\ContentSecurityPolicy::class,
+            'otp.verification' => \App\Http\Middleware\OtpVerification::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OtpController;
 
 use App\Models\Venue;
 
@@ -46,7 +47,12 @@ Route::get('/venue/{route}', function ($route) {
     return view('venue', compact('venue', 'reviews'));
 })->name('venue.show');
 
-
+// OTP verification routes - must be authenticated but not require OTP verification
+Route::middleware(['auth'])->prefix('otp')->name('otp.')->group(function () {
+    Route::get('/verify', [OtpController::class, 'show'])->name('show');
+    Route::post('/verify', [OtpController::class, 'verify'])->name('verify');
+    Route::post('/resend', [OtpController::class, 'resend'])->name('resend');
+});
 
 // Payment routes - Checkout protected with signed URLs, success/cancel accessible by Stripe
 Route::get('/payment/checkout/{booking}', [PaymentController::class, 'createCheckoutSession'])
@@ -77,8 +83,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 });
 
-//admin routes
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+//admin routes with OTP verification
+Route::middleware(['auth', 'otp.verification'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
