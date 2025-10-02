@@ -1,3 +1,5 @@
 <x-layouts.app>
-    <livewire:bookings-table />
+    @section('content')
+    <livewire:admin.bookings-table />
+@endsection
 </x-layouts.app>

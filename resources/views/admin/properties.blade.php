@@ -1,3 +1,3 @@
 <x-layouts.app>
-    <livewire:admin-property-manager />
+    <livewire:admin.admin-property-manager />
 </x-layouts.app>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -303,6 +303,6 @@ class AdminPropertyManager extends Component
 
     public function render()
     {
-        return view('livewire.admin-property-manager');
+        return view('livewire.admin.admin-property-manager');
     }
 }

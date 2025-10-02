@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use App\Models\Booking;
 use Livewire\Component;
@@ -376,7 +376,7 @@ class BookingsTable extends Component
 
         $calendarData = $this->getCalendarData();
 
-        return view('livewire.bookings-table', [
+        return view('livewire.admin.bookings-table', [
             'bookings' => $paginatedBookings,
             'calendarData' => $calendarData
         ]);
