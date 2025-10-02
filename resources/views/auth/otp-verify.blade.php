@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'OTP Verification')
-
-@section('content')
+<x-layouts.app>
 <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div>
@@ -164,4 +160,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-@endsection
+</x-layouts.app>
