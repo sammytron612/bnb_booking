@@ -9,7 +9,7 @@ class IcalController extends Controller
     /**
      * Serve static iCal data for import testing
      */
-    public function getTestIcalData(Request $request)
+    public function getHotelIcalData(Request $request)
     {
         $ical = "BEGIN:VCALENDAR\r\n";
         $ical .= "VERSION:2.0\r\n";
