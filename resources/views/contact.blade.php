@@ -18,7 +18,7 @@
             <div class="order-1 lg:order-2">
                 <div class="bg-slate-50 dark:bg-gray-800 rounded-xl p-8">
                     <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6">Get in Touch</h3>
-                    
+
                     <div class="space-y-6">
                         <!-- Email -->
                         <div class="flex items-start space-x-4">
