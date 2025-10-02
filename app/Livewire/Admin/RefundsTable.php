@@ -216,8 +216,8 @@ class RefundsTable extends Component
             ->where(function ($q) {
                 // Include all paid bookings that aren't fully refunded
                 $q->where(function ($subQuery) {
-                    // Bookings with no refunds yet (confirmed, partial_refund status)
-                    $subQuery->whereIn('status', ['confirmed', 'partial_refund'])
+                    // Bookings with no refunds yet or partial refunds
+                    $subQuery->whereIn('status', ['confirmed', 'partial_refund', 'refunded'])
                              ->where(function ($amountQuery) {
                                  // Either no refund_amount, or refund_amount is less than total_price
                                  $amountQuery->whereNull('refund_amount')
