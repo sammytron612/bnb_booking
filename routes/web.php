@@ -26,6 +26,10 @@ Route::get('/terms-of-service', function () {
     return view('terms-of-service');
 })->name('terms-of-service');
 
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
+
 Route::get('/cookie-policy', function () {
     return view('cookie-policy');
 })->name('cookie-policy');
