@@ -35,6 +35,12 @@ class SitemapController extends Controller
                 'lastmod' => Carbon::now()->toISOString(),
                 'changefreq' => 'weekly',
                 'priority' => '1.0'
+            ],
+            [
+                'loc' => route('contact'),
+                'lastmod' => Carbon::now()->toISOString(),
+                'changefreq' => 'monthly',
+                'priority' => '0.8'
             ]
         ];
 
