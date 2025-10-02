@@ -214,13 +214,16 @@ class RefundsTable extends Component
         $query = Booking::where('is_paid', true)
             ->whereNotNull('stripe_payment_intent_id')
             ->where(function ($q) {
-                // Include confirmed bookings (no refunds yet)
-                $q->where('status', 'confirmed')
-                  // Include partial refunds where there's still money left to refund
-                  ->orWhere(function ($subQuery) {
-                      $subQuery->where('status', 'partial_refund')
-                               ->whereRaw('total_price - COALESCE(refund_amount, 0) > 0');
-                  });
+                // Include all paid bookings that aren't fully refunded
+                $q->where(function ($subQuery) {
+                    // Bookings with no refunds yet (confirmed, partial_refund status)
+                    $subQuery->whereIn('status', ['confirmed', 'partial_refund'])
+                             ->where(function ($amountQuery) {
+                                 // Either no refund_amount, or refund_amount is less than total_price
+                                 $amountQuery->whereNull('refund_amount')
+                                            ->orWhereRaw('COALESCE(refund_amount, 0) < total_price');
+                             });
+                });
             })
             ->with(['venue']);
 
