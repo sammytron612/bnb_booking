@@ -22,18 +22,18 @@
         }
         .header {
             text-align: center;
-            border-bottom: 3px solid #e74c3c;
+            border-bottom: 3px solid #27ae60;
             padding-bottom: 20px;
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #e74c3c;
+            color: #27ae60;
             margin: 0;
             font-size: 28px;
         }
         .refund-amount {
             background-color: #f8f9fa;
-            border: 2px solid #e74c3c;
+            border: 2px solid #27ae60;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
@@ -42,7 +42,7 @@
         .refund-amount .amount {
             font-size: 32px;
             font-weight: bold;
-            color: #e74c3c;
+            color: #27ae60;
             margin: 0;
         }
         .refund-amount .label {
@@ -138,7 +138,7 @@
 
         <p>Dear {{ $booking->name }},</p>
 
-        <p>We're writing to confirm that your refund request has been processed successfully. The refund amount will be returned to your original payment method within 5-10 business days.</p>
+        <p>We're emailing to confirm that your refund request has been processed successfully. The refund amount will be returned to your original payment method within 5-10 business days.</p>
 
         <div class="booking-details">
             <h3>Booking Details</h3>
