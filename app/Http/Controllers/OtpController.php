@@ -41,7 +41,7 @@ class OtpController extends Controller
 
         return view('auth.otp-verify', [
             'email' => $user->email,
-            'canResend' => !$recentOtp || Carbon::now()->diffInMinutes($recentOtp->created_at) >= 1
+            'canResend' => !$recentOtp || Carbon::now()->diffInSeconds($recentOtp->created_at) >= 30
         ]);
     }
 

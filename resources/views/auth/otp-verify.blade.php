@@ -105,12 +105,10 @@
                 </form>
             @else
                 <span class="text-gray-400">
-                    Please wait before requesting a new code
+                    Please wait 30 seconds before requesting a new code
                 </span>
             @endif
-        </div>
-
-        <div class="text-center">
+        </div>        <div class="text-center">
             <a href="{{ route('logout') }}"
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                class="text-sm text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out">
