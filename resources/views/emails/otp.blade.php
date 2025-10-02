@@ -64,7 +64,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">Eileen BnB</div>
+            <div class="logo">{{ config('app.name') }}</div>
             <h2>OTP Verification Code</h2>
         </div>
 
@@ -90,7 +90,7 @@
 
         <div class="footer">
             <p>This is an automated message from Eileen BnB Admin System.</p>
-            <p>© {{ date('Y') }} Eileen BnB. All rights reserved.</p>
+            <p>© {{ date('Y') }} {{ config('app.name') }}.</p>
         </div>
     </div>
 </body>
