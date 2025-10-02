@@ -64,7 +64,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">{{ config('app.name') }}</div>
+            <div class="logo">{{ config('mail.from.name') }}</div>
             <h2>OTP Verification Code</h2>
         </div>
 
@@ -89,8 +89,8 @@
         <p>If you're having trouble accessing your account, please contact our support team.</p>
 
         <div class="footer">
-            <p>This is an automated message from Eileen BnB Admin System.</p>
-            <p>© {{ date('Y') }} {{ config('app.name') }}.</p>
+            <p>This is an automated message from {{ config('mail.from.name') }} Admin System.</p>
+            <p>© {{ date('Y') }} {{ config('mail.from.name') }}. All rights reserved.</p>
         </div>
     </div>
 </body>
