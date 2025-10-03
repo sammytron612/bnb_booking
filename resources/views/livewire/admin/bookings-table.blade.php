@@ -1,15 +1,17 @@
 <div class="bg-white shadow-xl rounded-lg p-6">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
+    <div class="flex items-center justify-between mb-4">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">Booking Management</h2>
 
-    @if (session('success'))
-        <div class="mb-4 rounded border-green-200 bg-green-50 text-green-800 px-4 py-2">
-            {{ session('success') }}
-        </div>
-    @endif
+        @if (session('success'))
+            <div class="mb-4 rounded border-green-200 bg-green-50 text-green-800 px-4 py-2">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-        Back to Dashboard
-    </a>
+        <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Back to Dashboard
+        </a>
+    </div>
 
     <!-- View Toggle -->
     <div class="mb-6 border-b border-gray-200">
