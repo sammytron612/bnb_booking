@@ -11,9 +11,6 @@
         Back to Dashboard
     </a>
 
-    <!-- 14-Day Calendar Component -->
-    @livewire('admin.booking-cards')
-
     <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">
@@ -264,7 +261,9 @@
 
     <!-- Edit Booking Modal -->
     @if($showEditModal && $selectedBooking)
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-9999">
+        <div wire:key="edit-modal-{{ $selectedBooking->id }}"
+             class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-9999"
+             wire:click.self="closeEditModal">
             <div class="bg-white rounded-xl shadow-2xl p-0 max-w-4xl w-full mx-4 max-h-[95vh] overflow-hidden">
                 <!-- Modal Header -->
                 <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 border-b">
@@ -586,6 +585,40 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(document.body, {
         childList: true,
         subtree: true
+    });
+
+    // Modal cleanup to prevent Livewire component ID conflicts
+    window.addEventListener('livewire:init', () => {
+        Livewire.on('modal-closed', () => {
+            // Clean up any stale component references
+            setTimeout(() => {
+                // Force garbage collection of unused components
+                if (window.Livewire && window.Livewire.all) {
+                    const allComponents = window.Livewire.all();
+                    allComponents.forEach(component => {
+                        if (!document.body.contains(component.el)) {
+                            // Component DOM element no longer exists, clean it up
+                            component.tearDown?.();
+                        }
+                    });
+                }
+            }, 100);
+        });
+    });
+
+    // Add escape key handler for modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            // Check if edit modal is open and close it
+            const modal = document.querySelector('[wire\\:key^="edit-modal-"]');
+            if (modal) {
+                // Find the close button and click it
+                const closeButton = modal.querySelector('button[wire\\:click="closeEditModal"]');
+                if (closeButton) {
+                    closeButton.click();
+                }
+            }
+        }
     });
 });
 </script>

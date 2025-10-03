@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Log;
 
 class BookingsTable extends Component
 {
@@ -65,11 +66,26 @@ class BookingsTable extends Component
 
     public function closeEditModal()
     {
-        $this->showEditModal = false;
-        $this->selectedBooking = null;
-        $this->editStatus = '';
-        $this->editNotes = '';
-        $this->editPayment = "0";
+        try {
+            $this->showEditModal = false;
+            $this->selectedBooking = null;
+            $this->editStatus = '';
+            $this->editNotes = '';
+            $this->editPayment = "0";
+
+            // Force a component refresh to clear any stale references
+            $this->dispatch('modal-closed');
+        } catch (\Exception $e) {
+            // Log any errors but don't prevent modal closing
+            Log::warning('Error closing edit modal', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Still close the modal even if there's an error
+            $this->showEditModal = false;
+            $this->selectedBooking = null;
+        }
     }
 
     public function deleteBooking($bookingId)
