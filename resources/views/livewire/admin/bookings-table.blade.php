@@ -442,29 +442,10 @@
                                 <label for="editPayment" class="block text-sm font-semibold text-gray-700 mb-2">
                                     Payment Status
                                 </label>
-                                @if($selectedBooking && ($selectedBooking->status === 'refunded' || $selectedBooking->status === 'partial_refund'))
-                                    <div class="w-full px-4 py-3 border border-red-300 rounded-lg bg-red-50">
-                                        <div class="flex items-center">
-                                            <span class="text-red-800 font-medium">
-                                                @if($selectedBooking->status === 'partial_refund')
-                                                    Partial Refund
-                                                @else
-                                                    Refunded
-                                                @endif
-                                            </span>
-                                        </div>
-                                        @if($selectedBooking->stripe_payment_intent_id)
-                                            <div class="text-sm text-red-600 mt-1 font-mono">
-                                                Payment Intent: {{ $selectedBooking->stripe_payment_intent_id }}
-                                            </div>
-                                        @endif
-                                    </div>
-                                @else
-                                    <select wire:model="editPayment" id="editPayment" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
-                                        <option value="0">Unpaid</option>
-                                        <option value="1">Paid</option>
-                                    </select>
-                                @endif
+                                <select wire:model="editPayment" id="editPayment" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                                    <option value="0">Unpaid</option>
+                                    <option value="1">Paid</option>
+                                </select>
                                 @error('editPayment') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
                             </div>
                         </div>
