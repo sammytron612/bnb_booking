@@ -64,11 +64,11 @@ class BookingsTable extends Component
         $this->editStatus = $this->selectedBooking->status;
         $this->editNotes = $this->selectedBooking->notes ?? '';
         $this->editPayment = $this->selectedBooking->is_paid ? "1" : "0";
-        
+
         // Format dates for HTML date inputs (Y-m-d format)
         $this->editCheckIn = \Carbon\Carbon::parse($this->selectedBooking->check_in)->format('Y-m-d');
         $this->editCheckOut = \Carbon\Carbon::parse($this->selectedBooking->check_out)->format('Y-m-d');
-        
+
         $this->showEditModal = true;
     }
 
