@@ -510,15 +510,31 @@ class WebhookService
                 'reason' => $refund['reason'] ?? 'unknown'
             ]);
 
-            // Find the booking using the charge ID
-            $booking = Booking::where('stripe_charge_id', $refund['charge'])->first();
+            // We need to get the payment intent from the charge
+            // For now, let's try to find booking by charge ID in existing refund webhooks
+            // or find by payment_intent if it's provided in the refund object
+            $booking = null;
 
-            if (!$booking) {
-                Log::warning('No booking found for refund.created webhook', [
-                    'refund_id' => $refund['id'],
-                    'charge_id' => $refund['charge']
+            // First try to find by payment_intent if available in refund
+            if (isset($refund['payment_intent'])) {
+                $booking = Booking::where('stripe_payment_intent_id', $refund['payment_intent'])->first();
+                Log::info('Trying to find booking by payment_intent from refund', [
+                    'payment_intent' => $refund['payment_intent'],
+                    'found' => $booking ? 'yes' : 'no'
                 ]);
-                return ['status' => 'ignored', 'message' => 'No booking found for this charge'];
+            }
+
+            // If not found and we have charge ID, we could make a Stripe API call to get the charge
+            // but for now let's log what we have and see if payment_intent is in the refund object
+            if (!$booking) {
+                Log::warning('No booking found for refund.created webhook - debugging refund structure', [
+                    'refund_id' => $refund['id'],
+                    'charge_id' => $refund['charge'],
+                    'refund_keys' => array_keys($refund),
+                    'has_payment_intent' => isset($refund['payment_intent']),
+                    'payment_intent' => $refund['payment_intent'] ?? 'not_present'
+                ]);
+                return ['status' => 'ignored', 'message' => 'No booking found for this refund'];
             }
 
             // Check if we already have this refund recorded
