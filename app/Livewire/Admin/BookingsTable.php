@@ -125,6 +125,9 @@ class BookingsTable extends Component
         $this->editNotes = '';
         $this->editPayment = "0";
 
+        // Clear status filter to ensure updated booking is visible
+        $this->statusFilter = '';
+        
         // Force component refresh by resetting pagination and dispatching events
         $this->resetPage();
         $this->dispatch('bookingUpdated'); // Custom event for any listeners

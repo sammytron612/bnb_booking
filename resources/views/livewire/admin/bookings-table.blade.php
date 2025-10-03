@@ -78,6 +78,8 @@
             <option value="cancelled">Cancelled</option>
             <option value="payment_expired">Payment Expired</option>
             <option value="abandoned">Abandoned</option>
+            <option value="refunded">Refunded</option>
+            <option value="partial_refund">Partial Refund</option>
         </select>
     </div>
 
