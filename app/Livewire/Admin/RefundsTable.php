@@ -27,8 +27,6 @@ class RefundsTable extends Component
         'refundReason' => 'nullable|string|max:255'
     ];
 
-    protected $listeners = ['refreshComponent' => '$refresh'];
-
     public function updatedSearch()
     {
         $this->resetPage();
@@ -182,7 +180,10 @@ class RefundsTable extends Component
                 );
 
                 $this->closeRefundModal();
-                $this->dispatch('refreshComponent');
+
+                // Refresh the component to show updated data
+                $this->resetPage(); // Reset pagination to show latest data
+                $this->dispatch('$refresh'); // Force component refresh
 
             } else {
                 Log::error('Failed to initiate refund with Stripe via Livewire', [
