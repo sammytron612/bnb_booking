@@ -320,6 +320,15 @@ class WebhookService
     private function handleChargeRefunded($charge): array
     {
         try {
+            // Validate charge structure
+            if (!isset($charge['id'], $charge['payment_intent'], $charge['amount_refunded'])) {
+                Log::error('Invalid charge structure in refund webhook', [
+                    'charge_keys' => array_keys($charge),
+                    'charge_id' => $charge['id'] ?? 'missing'
+                ]);
+                return ['status' => 'error', 'message' => 'Invalid charge structure'];
+            }
+
             Log::info('Processing charge.refunded webhook', [
                 'charge_id' => $charge['id'],
                 'payment_intent_id' => $charge['payment_intent'],
@@ -348,17 +357,17 @@ class WebhookService
                 'is_full_refund' => $isFullRefund
             ]);
 
-            // Get refund details from the charge
-            $refundData = $charge['refunds']['data'][0] ?? null;
+            // Get refund details from the charge with proper null checking
+            $refunds = $charge['refunds']['data'] ?? [];
+            $refundData = isset($refunds[0]) ? $refunds[0] : null;
             $stripeRefundReason = $refundData['reason'] ?? 'requested_by_customer';
             $refundId = $refundData['id'] ?? null;
 
-            // Process each refund and capture ARN
-            $refunds = $charge['refunds']['data'];
-
-            foreach ($refunds as $refund) {
-                // Check if we already have this refund recorded
-                $existingArn = Arn::where('refund_id', $refund['id'])->first();
+            // Process each refund and capture ARN only if refunds exist
+            if (!empty($refunds)) {
+                foreach ($refunds as $refund) {
+                    // Check if we already have this refund recorded
+                    $existingArn = Arn::where('refund_id', $refund['id'])->first();
 
                 if (!$existingArn) {
                     // Extract ARN from the refund object
@@ -405,6 +414,12 @@ class WebhookService
                         'status' => $refund['status']
                     ]);
                 }
+            }
+            } else {
+                Log::warning('No refunds found in charge webhook', [
+                    'booking_id' => $booking->booking_id,
+                    'charge_id' => $charge['id'] ?? 'unknown'
+                ]);
             }
 
             // Create a meaningful reason combining stripe reason and refund type
