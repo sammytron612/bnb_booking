@@ -20,8 +20,8 @@ class BookingApiController extends ApiController
     {
         $venueId = $request->query('venue_id'); // Optional venue filter
 
-        // Get confirmed and pending bookings (exclude cancelled, payment_expired, and abandoned)
-        $bookingsQuery = Booking::whereIn('status', ['confirmed', 'pending'])
+        // Get confirmed, pending, refunded, and partially refunded bookings (exclude cancelled, payment_expired, and abandoned)
+        $bookingsQuery = Booking::whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
             ->where('check_out', '>=', Carbon::today()) // Only future/current bookings
             ->with('venue')
             ->select('check_in', 'check_out', 'venue_id');
