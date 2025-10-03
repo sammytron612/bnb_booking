@@ -18,13 +18,13 @@
         <nav class="-mb-px flex space-x-8">
             <button
                 wire:click="$set('activeView', 'table')"
-                class="@if($activeView === 'table') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                class="@if($activeView === 'table') hover:cursor-pointer border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
             >
                 Table View
             </button>
             <button
                 wire:click="$set('activeView', 'calendar')"
-                class="@if($activeView === 'calendar') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                class="@if($activeView === 'calendar') hover:cursor-pointer  border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
             >
                 Calendar View
             </button>
