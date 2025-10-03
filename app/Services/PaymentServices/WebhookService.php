@@ -59,6 +59,9 @@ class WebhookService
             case 'charge.refunded':
                 return $this->handleChargeRefunded($event['data']['object']);
 
+            case 'refund.created':
+                return $this->handleRefundCreated($event['data']['object']);
+
             default:
                 Log::info('Unhandled Stripe webhook event', ['type' => $event['type']]);
                 return ['status' => 'ignored', 'message' => 'Event type not handled'];
@@ -363,6 +366,18 @@ class WebhookService
             $stripeRefundReason = $refundData['reason'] ?? 'requested_by_customer';
             $refundId = $refundData['id'] ?? null;
 
+            // Enhanced logging to debug refunds structure
+            Log::info('Charge refunds structure debug', [
+                'booking_id' => $booking->booking_id,
+                'charge_id' => $charge['id'],
+                'has_refunds_key' => isset($charge['refunds']),
+                'has_refunds_data_key' => isset($charge['refunds']['data']),
+                'refunds_count' => count($refunds),
+                'refunds_raw' => $refunds,
+                'amount_refunded' => $charge['amount_refunded'],
+                'charge_amount' => $charge['amount']
+            ]);
+
             // Process each refund and capture ARN only if refunds exist
             if (!empty($refunds)) {
                 foreach ($refunds as $refund) {
@@ -477,6 +492,84 @@ class WebhookService
                 'error' => $e->getMessage(),
                 'payment_intent_id' => $charge['payment_intent'] ?? 'unknown',
                 'charge_id' => $charge['id'] ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return ['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()];
+        }
+    }
+
+    private function handleRefundCreated($refund): array
+    {
+        try {
+            Log::info('Processing refund.created webhook', [
+                'refund_id' => $refund['id'],
+                'charge_id' => $refund['charge'],
+                'amount' => $refund['amount'] / 100,
+                'status' => $refund['status'],
+                'reason' => $refund['reason'] ?? 'unknown'
+            ]);
+
+            // Find the booking using the charge ID
+            $booking = Booking::where('stripe_charge_id', $refund['charge'])->first();
+
+            if (!$booking) {
+                Log::warning('No booking found for refund.created webhook', [
+                    'refund_id' => $refund['id'],
+                    'charge_id' => $refund['charge']
+                ]);
+                return ['status' => 'ignored', 'message' => 'No booking found for this charge'];
+            }
+
+            // Check if we already have this refund recorded
+            $existingArn = Arn::where('refund_id', $refund['id'])->first();
+
+            if ($existingArn) {
+                Log::info('ARN already exists for refund', [
+                    'booking_id' => $booking->booking_id,
+                    'refund_id' => $refund['id'],
+                    'existing_arn' => $existingArn->arn_number
+                ]);
+                return ['status' => 'ignored', 'message' => 'ARN already recorded'];
+            }
+
+            // Extract ARN from the refund object
+            $arnNumber = $refund['acquirer_reference_number'] ?? null;
+
+            Log::info('Capturing ARN from refund.created webhook', [
+                'booking_id' => $booking->booking_id,
+                'refund_id' => $refund['id'],
+                'arn_number' => $arnNumber,
+                'refund_amount' => $refund['amount'] / 100,
+                'refund_status' => $refund['status'],
+                'refund_reason' => $refund['reason'] ?? 'unknown'
+            ]);
+
+            // Create ARN record
+            $arn = Arn::create([
+                'booking_id' => $booking->id,
+                'refund_id' => $refund['id'],
+                'arn_number' => $arnNumber,
+                'refund_amount' => $refund['amount'] / 100,
+                'currency' => $refund['currency'],
+                'status' => $refund['status'],
+                'refund_processed_at' => $refund['status'] === 'succeeded' ? now() : null,
+            ]);
+
+            Log::info('ARN record created successfully from refund.created webhook', [
+                'booking_id' => $booking->booking_id,
+                'refund_id' => $refund['id'],
+                'arn_number' => $arnNumber,
+                'arn_id' => $arn->id
+            ]);
+
+            return ['status' => 'success', 'message' => 'ARN captured from refund.created webhook'];
+
+        } catch (Exception $e) {
+            Log::error('Exception in refund.created handler', [
+                'error' => $e->getMessage(),
+                'refund_id' => $refund['id'] ?? 'unknown',
+                'charge_id' => $refund['charge'] ?? 'unknown',
                 'trace' => $e->getTraceAsString()
             ]);
 
