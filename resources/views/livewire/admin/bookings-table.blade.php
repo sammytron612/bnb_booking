@@ -52,7 +52,7 @@
     @if($activeView === 'calendar')
         <!-- Calendar View -->
         <div wire:key="calendar-view-{{ $activeView }}">
-            @livewire('admin.booking-cards', key: 'booking-cards-component')
+            @livewire('admin.booking-cards')
         </div>
     @else
         <!-- Table View -->
