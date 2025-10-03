@@ -118,11 +118,17 @@ class BookingsTable extends Component
             'is_paid' => $validated['editPayment'] === "1"
         ]);
 
+        // Close modal and reset form
         $this->showEditModal = false;
         $this->selectedBooking = null;
         $this->editStatus = '';
         $this->editNotes = '';
         $this->editPayment = "0";
+
+        // Force component refresh by resetting pagination and dispatching events
+        $this->resetPage();
+        $this->dispatch('bookingUpdated'); // Custom event for any listeners
+
         session()->flash('success', 'Booking updated successfully.');
     }
 
