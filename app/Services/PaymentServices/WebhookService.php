@@ -564,7 +564,7 @@ class WebhookService
                 'refund_status' => $refund->status,
                 'refund_reason' => $refund->reason ?? 'unknown',
                 'all_refund_keys' => array_keys($refundArray),
-                'refund_object_sample' => array_slice($refundArray, 0, 10, true), // First 10 fields for debugging
+                'complete_refund_object' => $refundArray, // Log the entire object to see all fields
                 'has_acquirer_reference_number' => isset($refund->acquirer_reference_number),
                 'acquirer_reference_number_value' => $refund->acquirer_reference_number ?? 'not_present'
             ]);
