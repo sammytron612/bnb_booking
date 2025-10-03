@@ -384,6 +384,50 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Check-in Date Field -->
+                            <div>
+                                <label for="editCheckIn" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Check-in Date
+                                    </span>
+                                </label>
+                                <input wire:model="editCheckIn" type="date" id="editCheckIn" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                                @error('editCheckIn') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Check-out Date Field -->
+                            <div>
+                                <label for="editCheckOut" class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Check-out Date
+                                    </span>
+                                </label>
+                                <input wire:model="editCheckOut" type="date" id="editCheckOut" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
+                                @error('editCheckOut') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+
+                            <!-- Nights Display -->
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                                        </svg>
+                                        Total Nights
+                                    </span>
+                                </label>
+                                <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                                    <span id="nightsDisplay" class="text-gray-900 font-bold text-lg">{{ $selectedBooking->nights ?? 0 }} nights</span>
+                                    <span class="text-gray-500 text-sm ml-2">(automatically calculated)</span>
+                                </div>
+                            </div>
+
                             <!-- Status Field -->
                             <div>
                                 <label for="editStatus" class="block text-sm font-semibold text-gray-700 mb-2">
@@ -639,6 +683,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
+    });
+
+    // Add date change handlers for nights calculation
+    function calculateNights() {
+        const checkInInput = document.getElementById('editCheckIn');
+        const checkOutInput = document.getElementById('editCheckOut');
+        const nightsDisplay = document.getElementById('nightsDisplay');
+
+        if (checkInInput && checkOutInput && nightsDisplay) {
+            const checkInDate = new Date(checkInInput.value);
+            const checkOutDate = new Date(checkOutInput.value);
+
+            if (checkInInput.value && checkOutInput.value && checkOutDate > checkInDate) {
+                const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+                const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                nightsDisplay.textContent = `${nights} night${nights !== 1 ? 's' : ''}`;
+            } else {
+                nightsDisplay.textContent = '0 nights';
+            }
+        }
+    }
+
+    // Add event listeners when modal opens
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'editCheckIn' || e.target.id === 'editCheckOut') {
+            calculateNights();
+        }
+    });
+
+    // Calculate nights when modal first opens
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(calculateNights, 100);
     });
 });
 </script>

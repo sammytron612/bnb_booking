@@ -24,6 +24,8 @@ class BookingsTable extends Component
     public $editStatus = '';
     public $editNotes = '';
     public $editPayment = "0";
+    public $editCheckIn = '';
+    public $editCheckOut = '';
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -62,6 +64,8 @@ class BookingsTable extends Component
         $this->editStatus = $this->selectedBooking->status;
         $this->editNotes = $this->selectedBooking->notes ?? '';
         $this->editPayment = $this->selectedBooking->is_paid ? "1" : "0";
+        $this->editCheckIn = $this->selectedBooking->check_in;
+        $this->editCheckOut = $this->selectedBooking->check_out;
         $this->showEditModal = true;
     }
 
@@ -73,6 +77,8 @@ class BookingsTable extends Component
             $this->editStatus = '';
             $this->editNotes = '';
             $this->editPayment = "0";
+            $this->editCheckIn = '';
+            $this->editCheckOut = '';
 
             // Force a component refresh to clear any stale references
             $this->dispatch('modal-closed');
@@ -108,14 +114,25 @@ class BookingsTable extends Component
             'editStatus' => 'required|in:pending,confirmed,cancelled,payment_expired,abandoned,refunded,partial_refund',
             'editNotes' => 'nullable|string|max:2000',
             'editPayment' => 'required|in:0,1',
+            'editCheckIn' => 'required|date',
+            'editCheckOut' => 'required|date|after:editCheckIn',
         ]);
 
         // Get fresh model from database and update it
         $booking = Booking::find($this->selectedBooking->id);
+
+        // Calculate nights based on new dates
+        $checkIn = \Carbon\Carbon::parse($validated['editCheckIn']);
+        $checkOut = \Carbon\Carbon::parse($validated['editCheckOut']);
+        $nights = $checkIn->diffInDays($checkOut);
+
         $booking->update([
             'status' => $validated['editStatus'],
             'notes' => $validated['editNotes'],
-            'is_paid' => $validated['editPayment'] === "1"
+            'is_paid' => $validated['editPayment'] === "1",
+            'check_in' => $validated['editCheckIn'],
+            'check_out' => $validated['editCheckOut'],
+            'nights' => $nights
         ]);
 
         // Close modal and reset form
@@ -124,6 +141,8 @@ class BookingsTable extends Component
         $this->editStatus = '';
         $this->editNotes = '';
         $this->editPayment = "0";
+        $this->editCheckIn = '';
+        $this->editCheckOut = '';
 
         // Clear status filter to ensure updated booking is visible
         $this->statusFilter = '';
