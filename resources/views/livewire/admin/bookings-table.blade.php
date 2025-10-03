@@ -329,11 +329,6 @@
                         <!-- Guest Information Card -->
                         <div class="bg-gray-50 rounded-lg p-5">
                             <div class="flex items-center mb-4">
-                                <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                </div>
                                 <h4 class="font-bold text-gray-900 text-lg">Guest Information</h4>
                             </div>
                             <div class="space-y-3">
@@ -355,11 +350,6 @@
                         <!-- Booking Details Card -->
                         <div class="bg-gray-50 rounded-lg p-5">
                             <div class="flex items-center mb-4">
-                                <div class="bg-green-100 p-2 rounded-lg mr-3">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                    </svg>
-                                </div>
                                 <h4 class="font-bold text-gray-900 text-lg">Booking Details</h4>
                             </div>
                             <div class="space-y-3">
@@ -397,11 +387,6 @@
                     <!-- Edit Form Section -->
                     <div class="bg-white border border-gray-200 rounded-lg p-6">
                         <div class="flex items-center mb-6">
-                            <div class="bg-orange-100 p-2 rounded-lg mr-3">
-                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                            </div>
                             <h4 class="font-bold text-gray-900 text-lg">Edit Booking Information</h4>
                         </div>
 
@@ -409,12 +394,7 @@
                             <!-- Check-in Date Field -->
                             <div>
                                 <label for="editCheckIn" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        Check-in Date
-                                    </span>
+                                    Check-in Date
                                 </label>
                                 <input wire:model="editCheckIn" type="date" id="editCheckIn" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
                                 @error('editCheckIn') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -423,12 +403,7 @@
                             <!-- Check-out Date Field -->
                             <div>
                                 <label for="editCheckOut" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                        Check-out Date
-                                    </span>
+                                    Check-out Date
                                 </label>
                                 <input wire:model="editCheckOut" type="date" id="editCheckOut" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
                                 @error('editCheckOut') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -437,12 +412,7 @@
                             <!-- Nights Display -->
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-                                        </svg>
-                                        Total Nights
-                                    </span>
+                                    Total Nights
                                 </label>
                                 <div class="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
                                     <span id="nightsDisplay" class="text-gray-900 font-bold text-lg">{{ $selectedBooking->nights ?? 0 }} nights</span>
@@ -453,12 +423,7 @@
                             <!-- Status Field -->
                             <div>
                                 <label for="editStatus" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        Booking Status
-                                    </span>
+                                    Booking Status
                                 </label>
                                 <select wire:model="editStatus" id="editStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
                                     <option value="pending">Pending</option>
@@ -475,24 +440,16 @@
                             <!-- Payment Status Field -->
                             <div>
                                 <label for="editPayment" class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="flex items-center">
-                                        <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                                        </svg>
-                                        Payment Status
-                                    </span>
+                                    Payment Status
                                 </label>
                                 @if($selectedBooking && ($selectedBooking->status === 'refunded' || $selectedBooking->status === 'partial_refund'))
                                     <div class="w-full px-4 py-3 border border-red-300 rounded-lg bg-red-50">
                                         <div class="flex items-center">
-                                            <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
                                             <span class="text-red-800 font-medium">
                                                 @if($selectedBooking->status === 'partial_refund')
-                                                    💰 Partial Refund
+                                                    Partial Refund
                                                 @else
-                                                    💸 Refunded
+                                                    Refunded
                                                 @endif
                                             </span>
                                         </div>
@@ -504,8 +461,8 @@
                                     </div>
                                 @else
                                     <select wire:model="editPayment" id="editPayment" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm">
-                                        <option value="0">🔴 Unpaid</option>
-                                        <option value="1">🟢 Paid</option>
+                                        <option value="0">Unpaid</option>
+                                        <option value="1">Paid</option>
                                     </select>
                                 @endif
                                 @error('editPayment') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -515,12 +472,7 @@
                         <!-- Notes Field (Full Width) -->
                         <div class="mt-6">
                             <label for="editNotes" class="block text-sm font-semibold text-gray-700 mb-2">
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                    Internal Notes
-                                </span>
+                                Internal Notes
                             </label>
                             <textarea wire:model="editNotes" id="editNotes" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm resize-none" placeholder="Add any internal notes about this booking... (visible only to admin)"></textarea>
                             @error('editNotes') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -534,7 +486,7 @@
                         Cancel
                     </button>
                     <button wire:click="saveBooking" class="px-6 py-2.5 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg">
-                        💾 Save Changes
+                        Save Changes
                     </button>
                 </div>
             </div>
