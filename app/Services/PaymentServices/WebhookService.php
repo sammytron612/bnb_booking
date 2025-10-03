@@ -552,13 +552,18 @@ class WebhookService
             // Extract ARN from the refund object
             $arnNumber = $refund['acquirer_reference_number'] ?? null;
 
-            Log::info('Capturing ARN from refund.created webhook', [
+            // Enhanced logging to debug ARN fields
+            Log::info('Capturing ARN from refund.created webhook - full debug', [
                 'booking_id' => $booking->booking_id,
                 'refund_id' => $refund['id'],
                 'arn_number' => $arnNumber,
                 'refund_amount' => $refund['amount'] / 100,
                 'refund_status' => $refund['status'],
-                'refund_reason' => $refund['reason'] ?? 'unknown'
+                'refund_reason' => $refund['reason'] ?? 'unknown',
+                'all_refund_keys' => array_keys($refund),
+                'refund_object_sample' => array_slice($refund, 0, 10, true), // First 10 fields for debugging
+                'has_acquirer_reference_number' => isset($refund['acquirer_reference_number']),
+                'acquirer_reference_number_value' => $refund['acquirer_reference_number'] ?? 'not_present'
             ]);
 
             // Create ARN record
