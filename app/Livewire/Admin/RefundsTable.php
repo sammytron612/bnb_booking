@@ -230,7 +230,13 @@ class RefundsTable extends Component
 
         // Apply status filter
         if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
+            if ($this->statusFilter === 'fully_refunded') {
+                // Show only bookings where refund_amount equals total_price
+                $query->where('status', 'refunded')
+                      ->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+            } else {
+                $query->where('status', $this->statusFilter);
+            }
         }
 
         $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
