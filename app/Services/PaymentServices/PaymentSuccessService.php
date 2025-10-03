@@ -161,17 +161,23 @@ class PaymentSuccessService
         try {
             DB::beginTransaction();
 
-            // Update booking with refund information
-            // Notes already contain admin's reason, refund_reason will contain webhook/stripe reason
+            // Determine the correct status based on refund amount
+            $totalPrice = $booking->total_price;
+            $isFullRefund = $refundAmount >= $totalPrice;
+            $newStatus = $isFullRefund ? 'refunded' : 'partial_refund';
+
             Log::info('Before updating booking with refund data', [
                 'booking_id' => $booking->booking_id,
                 'current_refund_amount' => $booking->refund_amount,
                 'new_refund_amount' => $refundAmount,
-                'new_reason' => $reason
+                'new_reason' => $reason,
+                'total_price' => $totalPrice,
+                'is_full_refund' => $isFullRefund,
+                'new_status' => $newStatus
             ]);
 
             $booking->update([
-                'status' => 'refunded',
+                'status' => $newStatus,
                 'refund_amount' => $refundAmount,
                 'refund_reason' => $reason,
                 'refunded_at' => now(),
