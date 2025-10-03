@@ -62,6 +62,9 @@ class WebhookService
             case 'refund.created':
                 return $this->handleRefundCreated($event['data']['object']);
 
+            case 'refund.updated':
+                return $this->handleRefundUpdated($event['data']['object']);
+
             default:
                 Log::info('Unhandled Stripe webhook event', ['type' => $event['type']]);
                 return ['status' => 'ignored', 'message' => 'Event type not handled'];
@@ -551,8 +554,23 @@ class WebhookService
                 return ['status' => 'ignored', 'message' => 'ARN already recorded'];
             }
 
-            // Extract ARN from the refund object
-            $arnNumber = $refund->acquirer_reference_number ?? null;
+            // Extract ARN from the refund object - check multiple possible locations
+            $arnNumber = null;
+
+            // Method 1: Direct field (older Stripe API versions)
+            if (isset($refund->acquirer_reference_number)) {
+                $arnNumber = $refund->acquirer_reference_number;
+            }
+
+            // Method 2: Check destination_details.card.reference (newer structure)
+            if (!$arnNumber && isset($refund->destination_details['card']['reference'])) {
+                $arnNumber = $refund->destination_details['card']['reference'];
+            }
+
+            // Method 3: Check if ARN is in metadata or other nested fields
+            if (!$arnNumber && isset($refund->destination_details['card']['acquirer_reference_number'])) {
+                $arnNumber = $refund->destination_details['card']['acquirer_reference_number'];
+            }
 
             // Enhanced logging to debug ARN fields
             $refundArray = $refund->toArray();
@@ -594,6 +612,80 @@ class WebhookService
                 'error' => $e->getMessage(),
                 'refund_id' => $refund->id ?? 'unknown',
                 'charge_id' => $refund->charge ?? 'unknown',
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return ['status' => 'error', 'message' => 'Internal error: ' . $e->getMessage()];
+        }
+    }
+
+    private function handleRefundUpdated($refund): array
+    {
+        try {
+            Log::info('Processing refund.updated webhook', [
+                'refund_id' => $refund->id,
+                'charge_id' => $refund->charge,
+                'status' => $refund->status
+            ]);
+
+            // Find existing ARN record
+            $arn = Arn::where('refund_id', $refund->id)->first();
+
+            if (!$arn) {
+                Log::info('No existing ARN record found for refund update', [
+                    'refund_id' => $refund->id
+                ]);
+                return ['status' => 'ignored', 'message' => 'No existing ARN record'];
+            }
+
+            // Extract ARN from the updated refund object
+            $arnNumber = null;
+
+            // Method 1: Direct field
+            if (isset($refund->acquirer_reference_number)) {
+                $arnNumber = $refund->acquirer_reference_number;
+            }
+
+            // Method 2: Check destination_details.card.reference
+            if (!$arnNumber && isset($refund->destination_details['card']['reference'])) {
+                $arnNumber = $refund->destination_details['card']['reference'];
+            }
+
+            // Method 3: Check other possible ARN locations
+            if (!$arnNumber && isset($refund->destination_details['card']['acquirer_reference_number'])) {
+                $arnNumber = $refund->destination_details['card']['acquirer_reference_number'];
+            }
+
+            // Update ARN if we found one
+            if ($arnNumber && $arnNumber !== $arn->arn_number) {
+                $arn->update([
+                    'arn_number' => $arnNumber,
+                    'status' => $refund->status,
+                    'refund_processed_at' => $refund->status === 'succeeded' ? now() : null,
+                ]);
+
+                Log::info('ARN updated from refund.updated webhook', [
+                    'refund_id' => $refund->id,
+                    'old_arn' => $arn->arn_number,
+                    'new_arn' => $arnNumber,
+                    'arn_id' => $arn->id
+                ]);
+
+                return ['status' => 'success', 'message' => 'ARN updated'];
+            }
+
+            Log::info('No ARN update needed', [
+                'refund_id' => $refund->id,
+                'current_arn' => $arn->arn_number,
+                'found_arn' => $arnNumber
+            ]);
+
+            return ['status' => 'ignored', 'message' => 'No ARN changes'];
+
+        } catch (Exception $e) {
+            Log::error('Exception in refund.updated handler', [
+                'error' => $e->getMessage(),
+                'refund_id' => $refund->id ?? 'unknown',
                 'trace' => $e->getTraceAsString()
             ]);
 
