@@ -55,7 +55,7 @@ class BookingValidationService
     public function getConflictingDatabaseBookings(Carbon $checkIn, Carbon $checkOut, int $venueId, ?int $excludeBookingId = null): Collection
     {
         return Booking::where('venue_id', $venueId)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
             ->when($excludeBookingId, function ($query) use ($excludeBookingId) {
                 $query->where('id', '!=', $excludeBookingId);
             })
@@ -111,7 +111,7 @@ class BookingValidationService
     {
         // Check database bookings
         $dbBooking = Booking::where('venue_id', $venueId)
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
             ->where('check_in', '<=', $date->format('Y-m-d'))
             ->where('check_out', '>', $date->format('Y-m-d'))
             ->exists();

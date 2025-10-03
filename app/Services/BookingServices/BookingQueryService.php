@@ -32,7 +32,7 @@ class BookingQueryService
     public function getDatabaseBookingsForDateRange(Carbon $startDate, Carbon $endDate, ?int $venueId = null): Collection
     {
         $query = Booking::with('venue')
-            ->whereIn('status', ['confirmed', 'pending'])
+            ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
             ->where(function ($query) use ($startDate, $endDate) {
                 $query->where(function ($q) use ($startDate, $endDate) {
                     // Booking starts within date range
