@@ -214,7 +214,14 @@ class RefundsTable extends Component
     {
         $query = Booking::where('is_paid', true)
             ->whereNotNull('stripe_payment_intent_id')
-            ->whereIn('status', ['confirmed', 'partial_refund', 'refunded'])
+            ->where(function ($q) {
+                // Include bookings with refund-related statuses OR bookings that have refunds (including cancelled ones)
+                $q->whereIn('status', ['confirmed', 'partial_refund', 'refunded'])
+                  ->orWhere(function ($subQuery) {
+                      $subQuery->where('status', 'cancelled')
+                               ->where('refund_amount', '>', 0);
+                  });
+            })
             ->with(['venue', 'arns']);
 
         // Apply search filter
@@ -232,9 +239,12 @@ class RefundsTable extends Component
         // Apply status filter
         if ($this->statusFilter) {
             if ($this->statusFilter === 'fully_refunded') {
-                // Show only bookings where refund_amount equals total_price
-                $query->where('status', 'refunded')
-                      ->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+                // Show only bookings where refund_amount equals total_price (any status)
+                $query->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+            } elseif ($this->statusFilter === 'cancelled') {
+                // Show only cancelled bookings that have refunds
+                $query->where('status', 'cancelled')
+                      ->where('refund_amount', '>', 0);
             } else {
                 $query->where('status', $this->statusFilter);
             }

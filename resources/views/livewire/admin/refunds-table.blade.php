@@ -29,6 +29,7 @@
                         <option value="confirmed">Confirmed</option>
                         <option value="partial_refund">Partial Refund</option>
                         <option value="refunded">Refunded</option>
+                        <option value="cancelled">Cancelled (with Refund)</option>
                         <option value="fully_refunded">Fully Refunded</option>
                     </select>
                 </div>
