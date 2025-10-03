@@ -3,6 +3,7 @@
 namespace App\Services\PaymentServices;
 
 use App\Models\Booking;
+use App\Models\Arn;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
@@ -351,6 +352,60 @@ class WebhookService
             $refundData = $charge['refunds']['data'][0] ?? null;
             $stripeRefundReason = $refundData['reason'] ?? 'requested_by_customer';
             $refundId = $refundData['id'] ?? null;
+
+            // Process each refund and capture ARN
+            $refunds = $charge['refunds']['data'];
+
+            foreach ($refunds as $refund) {
+                // Check if we already have this refund recorded
+                $existingArn = Arn::where('refund_id', $refund['id'])->first();
+
+                if (!$existingArn) {
+                    // Extract ARN from the refund object
+                    $arnNumber = $refund['acquirer_reference_number'] ?? null;
+
+                    Log::info('Capturing ARN from refund webhook', [
+                        'booking_id' => $booking->booking_id,
+                        'refund_id' => $refund['id'],
+                        'arn_number' => $arnNumber,
+                        'refund_amount' => $refund['amount'] / 100, // Convert cents to pounds
+                        'refund_status' => $refund['status']
+                    ]);
+
+                    // Create ARN record
+                    Arn::create([
+                        'booking_id' => $booking->id,
+                        'refund_id' => $refund['id'],
+                        'arn_number' => $arnNumber,
+                        'refund_amount' => $refund['amount'] / 100, // Convert cents to pounds
+                        'currency' => $refund['currency'],
+                        'status' => $refund['status'],
+                        'refund_processed_at' => $refund['status'] === 'succeeded' ? now() : null,
+                    ]);
+
+                    Log::info('ARN record created successfully', [
+                        'booking_id' => $booking->booking_id,
+                        'refund_id' => $refund['id'],
+                        'arn_number' => $arnNumber
+                    ]);
+                } else {
+                    // Update existing ARN record with latest info
+                    $arnNumber = $refund['acquirer_reference_number'] ?? $existingArn->arn_number;
+
+                    $existingArn->update([
+                        'arn_number' => $arnNumber,
+                        'status' => $refund['status'],
+                        'refund_processed_at' => $refund['status'] === 'succeeded' ? now() : $existingArn->refund_processed_at,
+                    ]);
+
+                    Log::info('ARN record updated', [
+                        'booking_id' => $booking->booking_id,
+                        'refund_id' => $refund['id'],
+                        'arn_number' => $arnNumber,
+                        'status' => $refund['status']
+                    ]);
+                }
+            }
 
             // Create a meaningful reason combining stripe reason and refund type
             $refundType = $isFullRefund ? 'Full refund' : 'Partial refund';

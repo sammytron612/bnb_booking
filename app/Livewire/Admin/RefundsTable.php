@@ -215,7 +215,7 @@ class RefundsTable extends Component
         $query = Booking::where('is_paid', true)
             ->whereNotNull('stripe_payment_intent_id')
             ->whereIn('status', ['confirmed', 'partial_refund', 'refunded'])
-            ->with(['venue']);
+            ->with(['venue', 'arns']);
 
         // Apply search filter
         if ($this->search) {

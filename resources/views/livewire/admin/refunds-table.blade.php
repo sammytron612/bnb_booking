@@ -99,6 +99,30 @@
                                     <div class="text-sm text-red-600 font-medium">
                                         £{{ number_format($booking->refund_amount, 2) }} refunded
                                     </div>
+
+                                    <!-- ARN Information -->
+                                    @if($booking->arns->count() > 0)
+                                        <div class="mt-2 space-y-1">
+                                            @foreach($booking->arns as $arn)
+                                                <div class="text-xs bg-blue-50 text-blue-700 p-2 rounded border">
+                                                    <div><strong>Refund:</strong> £{{ number_format($arn->refund_amount, 2) }}</div>
+                                                    @if($arn->arn_number)
+                                                        <div><strong>ARN:</strong> {{ $arn->arn_number }}</div>
+                                                    @else
+                                                        <div class="text-yellow-600"><strong>ARN:</strong> Pending...</div>
+                                                    @endif
+                                                    <div><strong>Status:</strong>
+                                                        <span class="@if($arn->status === 'succeeded') text-green-600 @elseif($arn->status === 'failed') text-red-600 @else text-yellow-600 @endif">
+                                                            {{ ucfirst($arn->status) }}
+                                                        </span>
+                                                    </div>
+                                                    @if($arn->refund_processed_at)
+                                                        <div><strong>Processed:</strong> {{ $arn->refund_processed_at->format('M j, Y g:i A') }}</div>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 @else
                                     <div class="text-sm text-green-600">
                                         Fully paid

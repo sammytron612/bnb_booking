@@ -231,4 +231,20 @@ class Booking extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    /**
+     * Get all ARN records for this booking.
+     */
+    public function arns()
+    {
+        return $this->hasMany(Arn::class);
+    }
+
+    /**
+     * Get the latest ARN for this booking.
+     */
+    public function latestArn()
+    {
+        return $this->hasOne(Arn::class)->latest();
+    }
 }
