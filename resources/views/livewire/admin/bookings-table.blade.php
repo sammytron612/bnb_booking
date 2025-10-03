@@ -11,7 +11,30 @@
         Back to Dashboard
     </a>
 
-    <!-- Search -->
+    <!-- View Toggle -->
+    <div class="mb-6 border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8">
+            <button
+                wire:click="$set('activeView', 'table')"
+                class="@if($activeView === 'table') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+            >
+                Table View
+            </button>
+            <button
+                wire:click="$set('activeView', 'calendar')"
+                class="@if($activeView === 'calendar') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+            >
+                Calendar View
+            </button>
+        </nav>
+    </div>
+
+    @if($activeView === 'calendar')
+        <!-- Calendar View -->
+        @livewire('admin.booking-cards')
+    @else
+        <!-- Table View -->
+        <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">
 
@@ -258,6 +281,7 @@
     <div class="mt-6">
         {{ $bookings->links() }}
     </div>
+    @endif
 
     <!-- Edit Booking Modal -->
     @if($showEditModal && $selectedBooking)

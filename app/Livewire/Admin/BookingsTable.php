@@ -16,6 +16,7 @@ class BookingsTable extends Component
     public $perPage = 15;
     public $search = '';
     public $statusFilter = '';
+    public $activeView = 'table'; // 'table' or 'calendar'
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
 
