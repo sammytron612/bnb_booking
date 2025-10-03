@@ -22,7 +22,7 @@
                 wire:target="activeView"
                 class="@if($activeView === 'table') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:cursor-pointer"
             >
-                <span wire:loading.remove wire:target="activeView">Table View</span>
+                <span class="text-lg" wire:loading.remove wire:target="activeView">Table View</span>
                 <span wire:loading wire:target="activeView" class="flex items-center">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -37,7 +37,7 @@
                 wire:target="activeView"
                 class="@if($activeView === 'calendar') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:cursor-pointer"
             >
-                <span wire:loading.remove wire:target="activeView">Calendar View</span>
+                <span class="text-lg" wire:loading.remove wire:target="activeView">Calendar View</span>
                 <span wire:loading wire:target="activeView" class="flex items-center">
                     <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
