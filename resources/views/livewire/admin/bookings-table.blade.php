@@ -18,24 +18,45 @@
         <nav class="-mb-px flex space-x-8">
             <button
                 wire:click="$set('activeView', 'table')"
-                class="@if($activeView === 'table') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                wire:loading.attr="disabled"
+                wire:target="activeView"
+                class="@if($activeView === 'table') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:cursor-pointer"
             >
-                Table View
+                <span wire:loading.remove wire:target="activeView">Table View</span>
+                <span wire:loading wire:target="activeView" class="flex items-center">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading...
+                </span>
             </button>
             <button
                 wire:click="$set('activeView', 'calendar')"
-                class="@if($activeView === 'calendar') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                wire:loading.attr="disabled"
+                wire:target="activeView"
+                class="@if($activeView === 'calendar') border-blue-500 text-blue-600 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 @endif whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:cursor-pointer"
             >
-                Calendar View
+                <span wire:loading.remove wire:target="activeView">Calendar View</span>
+                <span wire:loading wire:target="activeView" class="flex items-center">
+                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading...
+                </span>
             </button>
         </nav>
     </div>
 
     @if($activeView === 'calendar')
         <!-- Calendar View -->
-        @livewire('admin.booking-cards')
+        <div wire:key="calendar-view-{{ $activeView }}">
+            @livewire('admin.booking-cards', key: 'booking-cards-component')
+        </div>
     @else
         <!-- Table View -->
+        <div wire:key="table-view-{{ $activeView }}">
         <!-- Search -->
     <div class="mb-6">
         <input type="text" wire:model.live="search" placeholder="Search bookings..." class="w-full lg:w-1/3 px-4 py-2 border rounded-lg">
@@ -277,6 +298,7 @@
     <div class="mt-6">
         {{ $bookings->links() }}
     </div>
+        </div> <!-- End Table View -->
     @endif
 
     <!-- Edit Booking Modal -->
@@ -715,6 +737,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calculate nights when modal first opens
     document.addEventListener('DOMContentLoaded', function() {
         setTimeout(calculateNights, 100);
+    });
+
+    // Prevent rapid clicking on view toggle buttons
+    let viewSwitchInProgress = false;
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('button[wire\\:click*="activeView"]')) {
+            if (viewSwitchInProgress) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+            viewSwitchInProgress = true;
+            setTimeout(() => {
+                viewSwitchInProgress = false;
+            }, 1000); // 1 second cooldown
+        }
     });
 });
 </script>
