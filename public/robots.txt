@@ -3,7 +3,7 @@ Allow: /
 
 # Disallow admin areas
 Disallow: /admin/
-Disallow: /login
+Disallow: /danya
 Disallow: /register
 Disallow: /password/
 Disallow: /api/
