@@ -38,9 +38,9 @@ Route::middleware(['throttle:api-public'])->group(function () {
 
 // iCal API routes - Specialized rate limiting for external platforms
 Route::middleware(['throttle:ical'])->group(function () {
-   // Route::get('/ical/venue/{venueId}/calendars', [IcalController::class, 'getVenueCalendars'])->name('api.ical.venue.calendars');
-   // Route::get('/ical/fetch', [IcalController::class, 'fetchIcalData'])->name('api.ical.fetch');
-  //  Route::get('/ical/combined', [IcalController::class, 'getCombinedBookingData'])->name('api.ical.combined');
+    Route::get('/ical/venue/{venueId}/calendars', [IcalController::class, 'getVenueCalendars'])->name('api.ical.venue.calendars');
+    Route::get('/ical/fetch', [IcalController::class, 'fetchIcalData'])->name('api.ical.fetch');
+    Route::get('/ical/combined', [IcalController::class, 'getCombinedBookingData'])->name('api.ical.combined');
 
     // iCal export route for external calendar sync (Airbnb, Booking.com, Outlook, etc.)
     Route::match(['GET', 'OPTIONS'], '/ical/export/{venue_id}', [IcalController::class, 'exportVenueCalendar'])
