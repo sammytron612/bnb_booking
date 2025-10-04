@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Venue;
+use App\Models\Booking;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class IcalController extends Controller
 {
@@ -130,5 +134,69 @@ class IcalController extends Controller
             ->header('Content-Disposition', 'attachment; filename="booking-com-test-calendar.ics"')
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Cache-Control', 'public, max-age=3600');
+    }
+
+    /**
+     * Export venue calendar for external platform sync (Airbnb, Hotels.com, etc.)
+     * Shows real database bookings from today onwards
+     */
+    public function exportVenueCalendar(Request $request, $venue_id)
+    {
+        // Validate venue exists
+        $venue = Venue::find($venue_id);
+        if (!$venue) {
+            return response('Venue not found', 404);
+        }
+
+        // Get confirmed, pending, and partially refunded bookings from today onwards
+        $bookings = Booking::where('venue_id', $venue_id)
+            ->whereIn('status', ['confirmed', 'pending', 'partial_refund'])
+            ->where('check_out', '>=', Carbon::today())
+            ->orderBy('check_in')
+            ->get();
+
+        // Build iCal content
+        $ical = "BEGIN:VCALENDAR\r\n";
+        $ical .= "VERSION:2.0\r\n";
+        $ical .= "PRODID:-//Eileen BnB//Venue Calendar Export//EN\r\n";
+        $ical .= "CALSCALE:GREGORIAN\r\n";
+        $ical .= "METHOD:PUBLISH\r\n";
+        $ical .= "X-WR-CALNAME:" . $venue->name . " - Blocked Dates\r\n";
+        $ical .= "X-WR-CALDESC:Blocked dates for venue: " . $venue->name . "\r\n";
+        $ical .= "X-WR-TIMEZONE:Europe/London\r\n";
+
+        // Add each booking as a VEVENT
+        foreach ($bookings as $booking) {
+            $checkIn = Carbon::parse($booking->check_in);
+            $checkOut = Carbon::parse($booking->check_out);
+            $createdAt = Carbon::parse($booking->created_at);
+
+            $ical .= "BEGIN:VEVENT\r\n";
+            $ical .= "UID:booking-" . $booking->id . "@eileenbnb.com\r\n";
+            $ical .= "DTSTART;VALUE=DATE:" . $checkIn->format('Ymd') . "\r\n";
+            $ical .= "DTEND;VALUE=DATE:" . $checkOut->format('Ymd') . "\r\n";
+            $ical .= "DTSTAMP:" . $createdAt->utc()->format('Ymd\THis\Z') . "\r\n";
+            $ical .= "CREATED:" . $createdAt->utc()->format('Ymd\THis\Z') . "\r\n";
+            $ical .= "LAST-MODIFIED:" . Carbon::parse($booking->updated_at)->utc()->format('Ymd\THis\Z') . "\r\n";
+            $ical .= "SUMMARY:BLOCKED - " . $venue->name . "\r\n";
+            $ical .= "DESCRIPTION:Booking ID: " . $booking->id . " (Status: " . ucfirst($booking->status) . ")\r\n";
+            $ical .= "STATUS:" . strtoupper($booking->status === 'confirmed' ? 'confirmed' : 'tentative') . "\r\n";
+            $ical .= "TRANSP:OPAQUE\r\n"; // Shows as busy/blocked
+            $ical .= "CATEGORIES:BOOKING\r\n";
+            $ical .= "END:VEVENT\r\n";
+        }
+
+        $ical .= "END:VCALENDAR\r\n";
+
+        // Generate filename with venue name and current date
+        $filename = 'venue-' . $venue_id . '-' . Str::slug($venue->name) . '-calendar.ics';
+
+        return response($ical)
+            ->header('Content-Type', 'text/calendar; charset=utf-8')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type')
+            ->header('Cache-Control', 'public, max-age=1800'); // 30 minutes cache
     }
 }

@@ -39,9 +39,9 @@ Route::middleware(['throttle:api-public'])->group(function () {
 
 // iCal API routes - Specialized rate limiting for external platforms
 Route::middleware(['throttle:ical'])->group(function () {
-    Route::get('/ical/venue/{venueId}/calendars', [IcalController::class, 'getVenueCalendars'])->name('api.ical.venue.calendars');
-    Route::get('/ical/fetch', [IcalController::class, 'fetchIcalData'])->name('api.ical.fetch');
-    Route::get('/ical/combined', [IcalController::class, 'getCombinedBookingData'])->name('api.ical.combined');
+    //Route::get('/ical/venue/{venueId}/calendars', [IcalController::class, 'getVenueCalendars'])->name('api.ical.venue.calendars');
+    //Route::get('/ical/fetch', [IcalController::class, 'fetchIcalData'])->name('api.ical.fetch');
+    //Route::get('/ical/combined', [IcalController::class, 'getCombinedBookingData'])->name('api.ical.combined');
 
     // iCal export route for external calendar sync (Airbnb, Booking.com, Outlook, etc.)
     Route::match(['GET', 'OPTIONS'], '/ical/export/{venue_id}', [IcalController::class, 'exportVenueCalendar'])
@@ -49,6 +49,7 @@ Route::middleware(['throttle:ical'])->group(function () {
         ->where('venue_id', '[0-9]+');
 
     // Test iCal data for import testing
+    Route::get('/hotel-test-calendar.ics', [IcalController::class, 'getHotelIcalData'])->name('api.ical.hotel.test');
     Route::get('/airbnb-test-calendar.ics', [IcalController::class, 'getAirbnbTestIcalData'])->name('api.ical.airbnb.test');
     Route::get('/booking-com-test-calendar.ics', [IcalController::class, 'getBookingComTestIcalData'])->name('api.ical.booking-com.test');
 });
