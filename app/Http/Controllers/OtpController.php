@@ -150,12 +150,24 @@ class OtpController extends Controller
             'used' => false,
         ]);
 
-        // Send email
+        // Send email with better error handling
         try {
+            \Log::info('Attempting to send OTP email to: ' . $user->email);
             Mail::to($user->email)->send(new OtpMail($otpCode, $user->name));
+            \Log::info('OTP email sent successfully to: ' . $user->email);
         } catch (\Exception $e) {
-            \Log::error('Failed to send OTP email: ' . $e->getMessage());
-            // Could show error to user, but for security, we'll just log it
+            \Log::error('Failed to send OTP email to ' . $user->email . ': ' . $e->getMessage());
+            \Log::error('Mail error details: ', [
+                'exception' => get_class($e),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // For development/debugging, you can uncomment this to see the error
+            if (config('app.debug')) {
+                throw $e;
+            }
         }
     }
 }
