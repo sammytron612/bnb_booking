@@ -180,18 +180,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const countdownContainer = document.getElementById('countdown-container');
         const resendForm = document.getElementById('resend-form');
         const countdownText = document.getElementById('countdown-text');
-        
+
         if (!countdownElement) return;
 
         let timeLeft = 30;
-        
+
         const timer = setInterval(function() {
             timeLeft--;
             countdownElement.textContent = timeLeft;
-            
+
             if (timeLeft <= 0) {
                 clearInterval(timer);
-                
+
                 // Hide countdown text and show resend button
                 countdownText.classList.add('hidden');
                 resendForm.classList.remove('hidden');
