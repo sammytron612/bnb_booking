@@ -102,7 +102,6 @@ new #[Layout('components.layouts.auth.custom')] class extends Component {
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-                    <p class="text-gray-600">Sign in to your property management dashboard</p>
                 </div>
 
                 <!-- Session Status -->
