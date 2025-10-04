@@ -84,7 +84,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //admin routes with OTP verification
-Route::middleware(['auth', 'otp.verification'])->prefix('danya')->name('admin.')->group(function () {
+Route::middleware(['auth', 'otp.verification'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
