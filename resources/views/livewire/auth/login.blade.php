@@ -89,39 +89,10 @@ new #[Layout('components.layouts.auth.custom')] class extends Component {
                     </svg>
                 </div>
                 <h1 class="text-4xl font-bold text-white mb-4">{{config('app.name')}}</h1>
-                <p class="text-blue-100 text-lg leading-relaxed">
-                    Premium coastal accommodation management system.
-                    Access your property dashboard to manage bookings, reviews, and guest communications.
-                </p>
+
             </div>
 
-            <!-- Feature highlights -->
-            <div class="space-y-4 text-left">
-                <div class="flex items-center text-blue-100">
-                    <svg class="w-5 h-5 mr-3 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Real-time booking management
-                </div>
-                <div class="flex items-center text-blue-100">
-                    <svg class="w-5 h-5 mr-3 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Guest review system
-                </div>
-                <div class="flex items-center text-blue-100">
-                    <svg class="w-5 h-5 mr-3 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Analytics dashboard
-                </div>
-                <div class="flex items-center text-blue-100">
-                    <svg class="w-5 h-5 mr-3 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Automated notifications
-                </div>
-            </div>
+
         </div>
     </div>
 
