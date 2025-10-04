@@ -6,7 +6,6 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Venue;
 use App\Models\PropertyImage;
-use App\Models\Amenity;
 use Illuminate\Support\Facades\Storage;
 
 class AdminPropertyManager extends Component
@@ -36,22 +35,14 @@ class AdminPropertyManager extends Component
     public $editingImageId = null;
     public $editingImageTitle = '';
 
-    // Amenities management
-    public $venueAmenities = [];
-    public $newAmenityTitle = '';
-    public $newAmenitySvg = '';
-    public $editingAmenityId = null;
-    public $editingAmenityTitle = '';
-    public $editingAmenitySvg = '';
-
     public function mount()
     {
-        $this->venues = Venue::with(['propertyImages', 'amenities'])->get();
+        $this->venues = Venue::with('propertyImages')->get();
     }
 
     public function selectVenue($venueId)
     {
-        $this->selectedVenue = Venue::with(['propertyImages', 'amenities'])->find($venueId);
+        $this->selectedVenue = Venue::with('propertyImages')->find($venueId);
 
         if ($this->selectedVenue) {
             $this->venueName = $this->selectedVenue->venue_name;
@@ -66,7 +57,9 @@ class AdminPropertyManager extends Component
             $this->venueInstructions = $this->selectedVenue->instructions;
             $this->venueBookingEnabled = $this->selectedVenue->booking_enabled;
             $this->existingImages = $this->selectedVenue->propertyImages;
-            $this->venueAmenities = $this->selectedVenue->amenities;
+
+            // Dispatch event to notify AmenityManager component
+            $this->dispatch('venueSelected', venueId: $venueId);
         }
     }
 
@@ -224,80 +217,12 @@ class AdminPropertyManager extends Component
         $this->editingImageTitle = '';
     }
 
-    // Amenities Management Methods
-    public function addAmenity()
-    {
-        $this->validate([
-            'newAmenityTitle' => 'required|string|max:255',
-            'newAmenitySvg' => 'nullable|string',
-        ]);
-
-        if ($this->selectedVenue) {
-            Amenity::create([
-                'venue_id' => $this->selectedVenue->id,
-                'title' => $this->newAmenityTitle,
-                'svg' => $this->newAmenitySvg,
-            ]);
-
-            $this->newAmenityTitle = '';
-            $this->newAmenitySvg = '';
-            $this->refreshVenueData();
-            session()->flash('message', 'Amenity added successfully!');
-        }
-    }
-
-    public function startEditingAmenity($amenityId, $title, $svg)
-    {
-        $this->editingAmenityId = $amenityId;
-        $this->editingAmenityTitle = $title;
-        $this->editingAmenitySvg = $svg;
-    }
-
-    public function updateAmenity()
-    {
-        $this->validate([
-            'editingAmenityTitle' => 'required|string|max:255',
-            'editingAmenitySvg' => 'nullable|string',
-        ]);
-
-        if ($this->editingAmenityId) {
-            Amenity::where('id', $this->editingAmenityId)->update([
-                'title' => $this->editingAmenityTitle,
-                'svg' => $this->editingAmenitySvg,
-            ]);
-
-            $this->editingAmenityId = null;
-            $this->editingAmenityTitle = '';
-            $this->editingAmenitySvg = '';
-            $this->refreshVenueData();
-            session()->flash('message', 'Amenity updated successfully!');
-        }
-    }
-
-    public function cancelEditingAmenity()
-    {
-        $this->editingAmenityId = null;
-        $this->editingAmenityTitle = '';
-        $this->editingAmenitySvg = '';
-    }
-
-    public function deleteAmenity($amenityId)
-    {
-        $amenity = Amenity::find($amenityId);
-        if ($amenity) {
-            $amenity->delete();
-            $this->refreshVenueData();
-            session()->flash('message', 'Amenity deleted successfully!');
-        }
-    }
-
     private function refreshVenueData()
     {
         if ($this->selectedVenue) {
-            $this->selectedVenue = Venue::with(['propertyImages', 'amenities'])->find($this->selectedVenue->id);
+            $this->selectedVenue = Venue::with('propertyImages')->find($this->selectedVenue->id);
             $this->existingImages = $this->selectedVenue->propertyImages;
-            $this->venueAmenities = $this->selectedVenue->amenities;
-            $this->venues = Venue::with(['propertyImages', 'amenities'])->get();
+            $this->venues = Venue::with('propertyImages')->get();
         }
     }
 
