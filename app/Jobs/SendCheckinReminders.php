@@ -35,7 +35,7 @@ class SendCheckinReminders implements ShouldQueue
             ->where('check_in', '>=', now()->format('Y-m-d'))             // Today
             ->where('check_in', '<=', now()->addDays(3)->format('Y-m-d')) // 3 days ahead
             ->whereNull('check_in_reminder')
-            ->where('status', 'confirmed')                                // Only confirmed bookings
+            ->whereIn('status', ['confirmed', 'partial_refund'])          // Include partially refunded bookings
             ->where('is_paid', true)                                      // Only paid bookings
             ->get();
 
@@ -52,6 +52,7 @@ class SendCheckinReminders implements ShouldQueue
                 Log::info("Check-in email sent successfully", [
                     'email' => $booking->email,
                     'booking_id' => $booking->id,
+                    'status' => $booking->status,
                     'venue' => $booking->venue ? $booking->venue->venue_name : 'Unknown Venue'
                 ]);
 
@@ -60,6 +61,7 @@ class SendCheckinReminders implements ShouldQueue
                 Log::error("Failed to send check-in email", [
                     'email' => $booking->email,
                     'booking_id' => $booking->id,
+                    'status' => $booking->status,
                     'error' => $e->getMessage()
                 ]);
 

@@ -14,7 +14,6 @@ require __DIR__.'/auth.php';
 
 Route::get('/', function () {
     $venues = Venue::with('propertyImages','amenities')->get();
-    \Log::info('Homepage loaded with ' . $venues->count() . ' venues');
     return view('home', compact('venues'));
 })->name('home');
 

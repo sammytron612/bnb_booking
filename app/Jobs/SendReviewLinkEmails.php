@@ -34,7 +34,7 @@ class SendReviewLinkEmails implements ShouldQueue
         $bookings = Booking::with('venue')
             ->where('check_out', '>=', now()->subDays(30)) // Don't send to very old bookings
             ->where('check_out', '<=', now()->subDay())     // Must be at least 1 day after checkout
-            ->where('status', 'confirmed')                  // Only confirmed bookings
+            ->whereIn('status', ['confirmed', 'partial_refund'])          // Include partially refunded bookings
             ->where('is_paid', true)                        // Only paid bookings
             ->whereDoesntHave('reviews')
             ->whereNull('review_link')
@@ -69,6 +69,7 @@ class SendReviewLinkEmails implements ShouldQueue
                 Log::info("Review link email sent successfully", [
                     'email' => $booking->email,
                     'booking_id' => $booking->id,
+                    'status' => $booking->status,
                     'venue' => $booking->venue ? $booking->venue->venue_name : 'Unknown Venue'
                 ]);
 
@@ -77,6 +78,7 @@ class SendReviewLinkEmails implements ShouldQueue
                 Log::error("Failed to send review link email", [
                     'email' => $booking->email,
                     'booking_id' => $booking->id,
+                    'status' => $booking->status,
                     'error' => $e->getMessage()
                 ]);
 

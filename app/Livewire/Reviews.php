@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Review;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class Reviews extends Component
