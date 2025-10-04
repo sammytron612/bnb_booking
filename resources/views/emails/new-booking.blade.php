@@ -39,7 +39,7 @@
 
 
 
-            <a href="{{ url('/admin') }}" class="button">View Admin Dashboard</a>
+            <a href="{{ url('/danya') }}" class="button">View Admin Dashboard</a>
         </div>
 
         <div class="footer">

@@ -83,8 +83,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 });
 
-//admin routes with OTP verification
-Route::middleware(['auth', 'otp.verification'])->prefix('admin')->name('admin.')->group(function () {
+//admin routes with OTP verification - accessed via /danya
+Route::middleware(['auth', 'otp.verification'])->prefix('danya')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');
@@ -96,6 +96,11 @@ Route::middleware(['auth', 'otp.verification'])->prefix('admin')->name('admin.')
     Route::get('/test', [App\Http\Controllers\ReviewLink::class, 'create'])->name('test.review.link');
     Route::get('/test-jobs', [App\Http\Controllers\ReviewLink::class, 'testJobs'])->name('test.jobs');
 });
+
+// Security: Block /admin access completely
+Route::get('/admin/{any?}', function () {
+    abort(404);
+})->where('any', '.*')->name('admin.blocked');
 
 // Security: Block common scanning attempts
 Route::get('/flux/{any?}', function () {
