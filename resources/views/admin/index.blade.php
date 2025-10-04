@@ -40,14 +40,15 @@
                             </svg>
                         </div>
                         <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                            {{ \App\Models\Venue::count() }}
+                            {{ \App\Models\Venue::where('booking_enabled', true)->count() }}/{{ \App\Models\Venue::count() }}
                         </span>
                     </div>
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                         Properties
                     </h3>
                     <p class="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                        Manage venues and property images
+                        {{ \App\Models\Venue::where('booking_enabled', true)->count() }} enabled,
+                        {{ \App\Models\Venue::where('booking_enabled', false)->count() }} disabled
                     </p>
                     <a href="{{ route('admin.properties') }}" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium text-sm">
                         Manage Properties
