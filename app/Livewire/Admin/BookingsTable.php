@@ -177,7 +177,8 @@ class BookingsTable extends Component
                       ->orWhereHas('venue', function($query) {
                           $query->where('venue_name', 'like', '%' . $this->search . '%');
                       })
-                      ->orWhere('booking_id', 'like', '%' . $this->search . '%');
+                      ->orWhere('booking_id', 'like', '%' . $this->search . '%')
+                      ->orWhereRaw("CONCAT('BNB-', COALESCE(booking_id, id)) LIKE ?", ['%' . $this->search . '%']);
                 });
             })
             ->when($this->statusFilter, function ($query) {
