@@ -95,19 +95,30 @@
                 Didn't receive the code?
             </p>
 
-            @if($canResend)
-                <form method="POST" action="{{ route('otp.resend') }}" class="inline">
-                    @csrf
-                    <button type="submit"
-                            class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
-                        Resend Code
-                    </button>
-                </form>
-            @else
-                <span class="text-gray-400">
-                    Please wait 30 seconds before requesting a new code
-                </span>
-            @endif
+            <div id="resend-section">
+                @if($canResend)
+                    <form method="POST" action="{{ route('otp.resend') }}" class="inline" id="resend-form">
+                        @csrf
+                        <button type="submit" id="resend-btn"
+                                class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+                            Resend Code
+                        </button>
+                    </form>
+                @else
+                    <div id="countdown-container">
+                        <span class="text-gray-400" id="countdown-text">
+                            Please wait <span id="countdown">30</span> seconds before requesting a new code
+                        </span>
+                        <form method="POST" action="{{ route('otp.resend') }}" class="inline hidden" id="resend-form">
+                            @csrf
+                            <button type="submit" id="resend-btn"
+                                    class="font-medium text-blue-600 hover:text-blue-500 transition duration-150 ease-in-out">
+                                Resend Code
+                            </button>
+                        </form>
+                    </div>
+                @endif
+            </div>
         </div>        <div class="text-center">
             <a href="{{ route('logout') }}"
                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
@@ -127,6 +138,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-focus the input
     otpInput.focus();
+
+    // Initialize countdown timer if resend is not available
+    @if(!$canResend)
+        initializeCountdown();
+    @endif
 
     // Format input as user types
     otpInput.addEventListener('input', function(e) {
@@ -157,6 +173,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500);
         }
     });
+
+    // Countdown timer function
+    function initializeCountdown() {
+        const countdownElement = document.getElementById('countdown');
+        const countdownContainer = document.getElementById('countdown-container');
+        const resendForm = document.getElementById('resend-form');
+        const countdownText = document.getElementById('countdown-text');
+        
+        if (!countdownElement) return;
+
+        let timeLeft = 30;
+        
+        const timer = setInterval(function() {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                
+                // Hide countdown text and show resend button
+                countdownText.classList.add('hidden');
+                resendForm.classList.remove('hidden');
+            }
+        }, 1000);
+    }
+
+    // Handle resend form submission
+    const resendForm = document.getElementById('resend-form');
+    if (resendForm) {
+        resendForm.addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('resend-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    }
 });
 </script>
 </x-layouts.app>
