@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'stripe/webhook',
         ]);
 
+        // Configure authentication redirect to login page
+        $middleware->redirectGuestsTo('/danya');
+
         // Apply CSP and security headers to all web requests
         $middleware->web(append: [
             \App\Http\Middleware\ContentSecurityPolicy::class,

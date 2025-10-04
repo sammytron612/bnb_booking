@@ -4,6 +4,7 @@ Allow: /
 # Disallow admin areas
 Disallow: /admin/
 Disallow: /danya
+Disallow: /danya-admin
 Disallow: /register
 Disallow: /password/
 Disallow: /api/

@@ -83,8 +83,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
 });
 
-//admin routes with OTP verification - accessed via /danya
-Route::middleware(['auth', 'otp.verification'])->prefix('danya')->name('admin.')->group(function () {
+//admin routes with OTP verification - accessed via /danya-admin
+Route::middleware(['auth', 'otp.verification'])->prefix('danya-admin')->name('admin.')->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('index');
     Route::get('/bookings', [AdminController::class, 'bookings'])->name('bookings');
     Route::get('/reviews', [AdminController::class, 'reviews'])->name('reviews');

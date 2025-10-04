@@ -24,7 +24,7 @@ class OtpController extends Controller
 
         // Check if user already has OTP verified in session
         if (session('otp_verified')) {
-            return redirect()->intended('/danya');
+            return redirect()->intended('/danya-admin');
         }
 
         // Generate and send OTP if not already sent recently
@@ -99,7 +99,7 @@ class OtpController extends Controller
         // Clear rate limiting on successful verification
         RateLimiter::clear($key);
 
-        return redirect()->intended('/danya')->with('success', 'OTP verified successfully!');
+        return redirect()->intended('/danya-admin')->with('success', 'OTP verified successfully!');
     }
 
     /**
