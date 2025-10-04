@@ -43,6 +43,16 @@
                         @error('newAmenitySvg') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                     </div>
                 </div>
+                <div class="mt-4">
+                    <label class="flex items-center">
+                        <input
+                            type="checkbox"
+                            wire:model="newAmenityActive"
+                            class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        >
+                        <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Active (visible to guests)</span>
+                    </label>
+                </div>
                 <button
                     wire:click="addAmenity"
                     class="mt-3 bg-green-600 hover:cursor-pointer hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
@@ -86,6 +96,16 @@
                                             @error('editingAmenitySvg') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                                         </div>
                                     </div>
+                                    <div>
+                                        <label class="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                wire:model="editingAmenityActive"
+                                                class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                            >
+                                            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Active (visible to guests)</span>
+                                        </label>
+                                    </div>
                                     <div class="flex space-x-2">
                                         <button
                                             wire:click="updateAmenity"
@@ -115,9 +135,14 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <p class="font-medium text-gray-900 dark:text-white">
-                                                {{ $amenity->title }}
-                                            </p>
+                                            <div class="flex items-center">
+                                                <p class="font-medium text-gray-900 dark:text-white">
+                                                    {{ $amenity->title }}
+                                                </p>
+                                                <span class="ml-2 px-2 py-1 text-xs font-semibold rounded-full {{ $amenity->active ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100' }}">
+                                                    {{ $amenity->active ? 'Active' : 'Inactive' }}
+                                                </span>
+                                            </div>
                                             @if($amenity->svg)
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">
                                                     Has custom icon
@@ -127,7 +152,7 @@
                                     </div>
                                     <div class="flex space-x-2">
                                         <button
-                                            wire:click="startEditingAmenity({{ $amenity->id }}, {{ json_encode($amenity->title) }}, {{ json_encode($amenity->svg) }})"
+                                            wire:click="startEditingAmenity({{ $amenity->id }}, {{ json_encode($amenity->title) }}, {{ json_encode($amenity->svg) }}, {{ json_encode($amenity->active) }})"
                                             class="hover:cursor-pointer text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm"
                                         >
                                             Edit

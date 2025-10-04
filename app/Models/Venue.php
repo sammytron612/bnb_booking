@@ -63,6 +63,14 @@ class Venue extends Model
     }
 
     /**
+     * Get only the active amenities for the venue (for frontend display).
+     */
+    public function activeAmenities()
+    {
+        return $this->hasMany(Amenity::class)->where('active', true);
+    }
+
+    /**
      * Get the bookings for the venue.
      */
     public function bookings()

@@ -11,7 +11,12 @@ class Amenity extends Model
     protected $fillable = [
         'venue_id',
         'title',
-        'svg'
+        'svg',
+        'active'
+    ];
+
+    protected $casts = [
+        'active' => 'boolean'
     ];
 
     /**

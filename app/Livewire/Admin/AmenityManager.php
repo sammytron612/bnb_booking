@@ -16,9 +16,11 @@ class AmenityManager extends Component
     public $venueAmenities = [];
     public $newAmenityTitle = '';
     public $newAmenitySvg = '';
+    public $newAmenityActive = true;
     public $editingAmenityId = null;
     public $editingAmenityTitle = '';
     public $editingAmenitySvg = '';
+    public $editingAmenityActive = true;
 
     protected $listeners = ['venueSelected' => 'handleVenueSelection'];
 
@@ -59,10 +61,12 @@ class AmenityManager extends Component
                 'venue_id' => $this->venueId,
                 'title' => $this->newAmenityTitle,
                 'svg' => $this->newAmenitySvg,
+                'active' => $this->newAmenityActive,
             ]);
 
             $this->newAmenityTitle = '';
             $this->newAmenitySvg = '';
+            $this->newAmenityActive = true;
             $this->loadVenueAmenities();
 
             // Dispatch event to notify parent component
@@ -71,11 +75,12 @@ class AmenityManager extends Component
         }
     }
 
-    public function startEditingAmenity($amenityId, $title, $svg)
+    public function startEditingAmenity($amenityId, $title, $svg, $active = true)
     {
         $this->editingAmenityId = $amenityId;
         $this->editingAmenityTitle = $title;
         $this->editingAmenitySvg = $svg;
+        $this->editingAmenityActive = $active;
     }
 
     public function updateAmenity()
@@ -89,11 +94,13 @@ class AmenityManager extends Component
             Amenity::where('id', $this->editingAmenityId)->update([
                 'title' => $this->editingAmenityTitle,
                 'svg' => $this->editingAmenitySvg,
+                'active' => $this->editingAmenityActive,
             ]);
 
             $this->editingAmenityId = null;
             $this->editingAmenityTitle = '';
             $this->editingAmenitySvg = '';
+            $this->editingAmenityActive = true;
             $this->loadVenueAmenities();
 
             // Dispatch event to notify parent component
@@ -126,9 +133,11 @@ class AmenityManager extends Component
     {
         $this->newAmenityTitle = '';
         $this->newAmenitySvg = '';
+        $this->newAmenityActive = true;
         $this->editingAmenityId = null;
         $this->editingAmenityTitle = '';
         $this->editingAmenitySvg = '';
+        $this->editingAmenityActive = true;
     }
 
     public function render()
