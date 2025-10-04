@@ -23,7 +23,7 @@ class Amenities extends Component
         $this->venueId = $venueId;
         $this->theme_color = $themeColor ?? 'blue';
         if ($venueId) {
-            $this->amenities = Amenity::where('venue_id', $venueId)->get();
+            $this->amenities = Amenity::where('venue_id', $venueId)->where('active', true)->get();
             $this->displayAmenities = $this->amenities->take(6);
             $this->hasMore = $this->amenities->count() > 6;
         } else {

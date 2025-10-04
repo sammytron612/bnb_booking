@@ -145,8 +145,8 @@
         ];
 
         // Add amenities to schema
-        if ($seoVenue->amenities) {
-            foreach ($seoVenue->amenities as $amenity) {
+        if ($seoVenue->activeAmenities) {
+            foreach ($seoVenue->activeAmenities as $amenity) {
                 $venueSchema['amenityFeature'][] = [
                     '@type' => 'LocationFeatureSpecification',
                     'name' => $amenity->title

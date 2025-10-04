@@ -20,7 +20,7 @@
 
         <!-- Features -->
         <div class="grid grid-cols-2 gap-3 mb-6">
-            @foreach($venue->amenities->take(4) as $amenity)
+            @foreach($venue->activeAmenities->take(4) as $amenity)
                 <div class="flex items-center p-3 rounded-lg">
                     <div class="w-6 h-6 mr-3 text-gray-900 flex items-center justify-center flex-shrink-0">
                         {!! $amenity->svg !!}
