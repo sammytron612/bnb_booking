@@ -48,9 +48,8 @@ Route::middleware(['throttle:ical'])->group(function () {
         ->where('venue_id', '[0-9]+');
 
     // Test iCal data for import testing
-   // Route::get('/hotel-test-calendar.ics', [IcalController::class, 'getHotelIcalData'])->name('api.ical.hotel.test');
-   // Route::get('/airbnb-test-calendar.ics', [IcalController::class, 'getAirbnbTestIcalData'])->name('api.ical.airbnb.test');
-   // Route::get('/booking-com-test-calendar.ics', [IcalController::class, 'getBookingComTestIcalData'])->name('api.ical.booking-com.test');
+    Route::get('/hotel-test-calendar.ics', [IcalController::class, 'getHotelIcalData'])->name('api.ical.hotel.test');
+    Route::get('/airbnb-test-calendar.ics', [IcalController::class, 'getAirbnbTestIcalData'])->name('api.ical.airbnb.test');
 });
 
 // Public booking data API - Strict rate limiting (high-value data, prevent abuse)
