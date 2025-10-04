@@ -39,6 +39,11 @@
                 <flux:navbar.item href="{{ route('contact') }}" :current="request()->routeIs('contact')" class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
                     Contact
                 </flux:navbar.item>
+                @auth
+                <flux:navbar.item :href="route('admin.index')" :current="request()->routeIs('admin.index')" class="text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-400 font-medium px-4 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all duration-200">
+                    Admin
+                </flux:navbar.item>
+                @endauth
             </flux:navbar>
 
             <flux:spacer />
@@ -83,6 +88,11 @@
                         <flux:navlist.item href="{{ route('contact') }}" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
                             Contact
                         </flux:navlist.item>
+                        @auth
+                        <flux:navlist.item :href="route('admin.index')" :current="request()->routeIs('admin.index')" class="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium py-3 px-4 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200">
+                            Admin
+                        </flux:navlist.item>
+                        @endauth
                     </flux:navlist.group>
                 </flux:navlist>
             </div>
