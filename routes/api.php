@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\IcalController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Api\BookingApiController;
 
 /*
@@ -29,7 +30,7 @@ Route::middleware(['throttle:api-public'])->group(function () {
 
     // Dynamic robots.txt (no sessions, no cookies)
     Route::get('/robots.txt', function () {
-        $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /danya/\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/api/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
+        $content = "User-agent: *\nAllow: /\n\n# Disallow admin areas\nDisallow: /admin/\nDisallow: /login\nDisallow: /register\nDisallow: /password/\nDisallow: /api/\n\n# Allow important pages\nAllow: /venue/\nAllow: /storage/\n\n# Sitemap location\nSitemap: " . config('app.url') . "/api/sitemap.xml\n\n# Crawl-delay to be respectful\nCrawl-delay: 1";
 
         return response($content)
             ->header('Content-Type', 'text/plain');
@@ -48,8 +49,8 @@ Route::middleware(['throttle:ical'])->group(function () {
         ->where('venue_id', '[0-9]+');
 
     // Test iCal data for import testing
-    Route::get('/hotel-test-calendar.ics', [IcalController::class, 'getHotelIcalData'])->name('api.ical.hotel.test');
     Route::get('/airbnb-test-calendar.ics', [IcalController::class, 'getAirbnbTestIcalData'])->name('api.ical.airbnb.test');
+    Route::get('/booking-com-test-calendar.ics', [IcalController::class, 'getBookingComTestIcalData'])->name('api.ical.booking-com.test');
 });
 
 // Public booking data API - Strict rate limiting (high-value data, prevent abuse)
