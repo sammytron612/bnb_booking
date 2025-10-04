@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\IcalController;
-use App\Http\Controllers\BookingController;
+
 use App\Http\Controllers\Api\BookingApiController;
 
 /*
