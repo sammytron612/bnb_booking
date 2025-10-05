@@ -221,7 +221,7 @@ class RefundsTable extends Component
             // DEFAULT: Show only bookings that can still be refunded
             $query->where('is_paid', true)
                   ->where(function ($q) {
-                      $q->whereIn('status', ['confirmed', 'partial_refund'])
+                      $q->where('status', 'confirmed') // Now includes partial refunds (they stay confirmed)
                         ->orWhere(function ($subQuery) {
                             // Include cancelled bookings that still have refundable amount
                             $subQuery->where('status', 'cancelled')
@@ -230,14 +230,16 @@ class RefundsTable extends Component
                         });
                   });
         } elseif ($this->statusFilter === 'fully_refunded') {
-            // Show all fully refunded bookings (regardless of is_paid status)
-            $query->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+            // Show all fully refunded bookings (status = 'refunded')
+            $query->where('status', 'refunded')
+                  ->whereRaw('COALESCE(refund_amount, 0) >= total_price');
         } elseif ($this->statusFilter === 'all_refunds') {
             // Show all bookings that have received any refund
             $query->where('refund_amount', '>', 0);
         } elseif ($this->statusFilter === 'partial_refunds') {
-            // Show only partial refunds (still have refundable amount)
-            $query->where('is_paid', true)
+            // Show only partial refunds (confirmed status with refund_amount)
+            $query->where('status', 'confirmed')
+                  ->where('is_paid', true)
                   ->where('refund_amount', '>', 0)
                   ->whereRaw('refund_amount < total_price');
         } else {

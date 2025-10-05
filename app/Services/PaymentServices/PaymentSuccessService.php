@@ -164,7 +164,7 @@ class PaymentSuccessService
             // Determine the correct status based on refund amount
             $totalPrice = $booking->total_price;
             $isFullRefund = $refundAmount >= $totalPrice;
-            $newStatus = $isFullRefund ? 'refunded' : 'partial_refund';
+            $newStatus = $isFullRefund ? 'refunded' : 'confirmed'; // Keep partial refunds as confirmed
 
             Log::info('Before updating booking with refund data', [
                 'booking_id' => $booking->booking_id,
