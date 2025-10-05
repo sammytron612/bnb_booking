@@ -28,7 +28,7 @@ class PaymentSuccessService
                 'stripe_payment_intent_id' => $paymentIntentId,
                 'pay_method' => $paymentMethod,
                 'payment_completed_at' => now(),
-                'stripe_amount' => $booking->total_price * 100, // Convert to cents
+                'stripe_amount' => (int)($booking->total_price * 100), // Store in pence
                 'stripe_currency' => 'gbp',
             ]);
 

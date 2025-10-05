@@ -30,6 +30,7 @@ class CleanupAbandonedBookings extends Command
         $hoursOld = (int) $this->option('hours');
 
         $cutoffTime = Carbon::now()->subHours($hoursOld);
+
         $gracePeriodCutoff = Carbon::now()->subHours($hoursOld + 24); // Extra 24h for payment_expired
 
         $this->info("Looking for abandoned bookings...");
@@ -37,18 +38,24 @@ class CleanupAbandonedBookings extends Command
         $this->info("- Payment_expired bookings older than " . ($hoursOld + 24) . " hours (grace period after email)");
 
         // Find bookings that should be cleaned up
-        // This catches both webhook failures (pending) and normal expiry (payment_expired)
+        // This catches webhook failures (pending), normal expiry (payment_expired), and payment failures (payment_failed)
         $abandonedBookings = Booking::where('is_paid', false)
             ->where(function ($query) use ($cutoffTime, $gracePeriodCutoff) {
-                // Webhook failures: pending bookings older than specified hours
-                $query->where('status', 'pending')
+                $query->where(function ($q) use ($cutoffTime) {
+                    // Webhook failures: pending bookings older than specified hours
+                    $q->where('status', 'pending')
                       ->where('created_at', '<', $cutoffTime);
-            })
-            ->orWhere(function ($query) use ($gracePeriodCutoff) {
-                // Normal flow: payment_expired bookings get 24h grace period after email sent
-                $query->where('status', 'payment_expired')
-                      ->where('is_paid', false)
+                })
+                ->orWhere(function ($q) use ($gracePeriodCutoff) {
+                    // Normal flow: payment_expired bookings get 24h grace period after email sent
+                    $q->where('status', 'payment_expired')
                       ->where('updated_at', '<', $gracePeriodCutoff);
+                })
+                ->orWhere(function ($q) use ($gracePeriodCutoff) {
+                    // Payment failures: payment_failed bookings get 24h grace period to retry
+                    $q->where('status', 'payment_failed')
+                      ->where('updated_at', '<', $gracePeriodCutoff);
+                });
             })
             ->get();
 

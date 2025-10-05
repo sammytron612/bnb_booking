@@ -154,8 +154,8 @@ class PaymentController extends Controller
                 'amount' => $booking->total_price
             ]);
 
-            // Set Stripe amount using total_price converted to cents, then back to decimal
-            $booking->setStripeAmountFromCents((int)($booking->total_price * 100));
+            // Set Stripe amount in pence (integer format for exact amounts)
+            $booking->stripe_amount = (int)($booking->total_price * 100); // Store in pence
             $booking->stripe_session_id = $session->id;
             $booking->stripe_currency = 'gbp';
 

@@ -66,7 +66,7 @@ class Booking extends Model
         'check_in' => 'date',
         'check_out' => 'date',
         'total_price' => 'decimal:2',
-        'stripe_amount' => 'decimal:2',
+        'stripe_amount' => 'integer', // Changed from decimal:2 to integer (stores pence)
         'refund_amount' => 'decimal:2',
         'payment_completed_at' => 'datetime',
         'refunded_at' => 'datetime',
@@ -153,14 +153,6 @@ class Booking extends Model
     public function getStripeAmountInCents(): int
     {
         return (int) ($this->total_price * 100);
-    }
-
-    /**
-     * Set Stripe amount from cents
-     */
-    public function setStripeAmountFromCents(int $amountInCents): void
-    {
-        $this->setAttribute('stripe_amount', $amountInCents / 100);
     }
 
     /**
