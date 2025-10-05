@@ -232,6 +232,9 @@ class WebhookService
                     $booking->update([
                         'status' => 'payment_failed',
                         'stripe_payment_intent_id' => $paymentIntent['id'],
+                        'pay_method' => 'stripe_checkout',
+                        'stripe_amount' => (int) ($paymentIntent['amount'] ?? $booking->total_price * 100),
+                        'stripe_currency' => 'gbp',
                         'stripe_decline_code' => $declineCode,
                         'payment_failure_reason' => $errorMessage,
                         'payment_failed_at' => now(),
@@ -245,6 +248,8 @@ class WebhookService
                         'previous_status' => $booking->getOriginal('status'),
                         'new_status' => 'payment_failed',
                         'stripe_payment_intent_id' => $paymentIntent['id'],
+                        'pay_method' => 'stripe_checkout',
+                        'stripe_amount' => (int) ($paymentIntent['amount'] ?? $booking->total_price * 100),
                         'decline_code' => $declineCode,
                         'reason' => 'Customer can retry within same session - no premature email needed'
                     ]);
