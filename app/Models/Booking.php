@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Carbon\Carbon;
 
 class Booking extends Model
@@ -54,9 +55,6 @@ class Booking extends Model
         'refund_amount',
         'refund_reason',
         'refunded_at',
-        'stripe_decline_code',
-        'payment_failure_reason',
-        'payment_failed_at',
     ];
 
     /**
@@ -71,7 +69,6 @@ class Booking extends Model
         'stripe_amount' => 'decimal:2',
         'refund_amount' => 'decimal:2',
         'payment_completed_at' => 'datetime',
-        'payment_failed_at' => 'datetime',
         'refunded_at' => 'datetime',
         'stripe_metadata' => 'array',
         'review_link' => 'date',
@@ -234,6 +231,22 @@ class Booking extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get all payment failures for this booking.
+     */
+    public function paymentFailures(): HasMany
+    {
+        return $this->hasMany(PaymentFailure::class);
+    }
+
+    /**
+     * Get the latest payment failure for this booking.
+     */
+    public function latestPaymentFailure(): HasOne
+    {
+        return $this->hasOne(PaymentFailure::class)->latest();
     }
 
     /**

@@ -228,16 +228,23 @@ class WebhookService
             if ($bookingId) {
                 $booking = Booking::where('booking_id', $bookingId)->first();
                 if ($booking && !$booking->is_paid) {
-                    // Update booking with payment failure details
+                    // Create payment failure record
+                    \App\Models\PaymentFailure::create([
+                        'booking_id' => $booking->id,
+                        'stripe_payment_intent_id' => $paymentIntent['id'],
+                        'stripe_session_id' => $booking->stripe_session_id,
+                        'decline_code' => $declineCode,
+                        'failure_reason' => $errorMessage,
+                        'attempted_amount' => $paymentIntent['amount'] ?? $booking->total_price * 100,
+                        'currency' => $paymentIntent['currency'] ?? 'gbp',
+                        'payment_method' => 'stripe_checkout',
+                        'stripe_error_data' => $lastPaymentError,
+                        'failed_at' => now(),
+                    ]);
+
+                    // Simply update booking status - no payment failure data
                     $booking->update([
                         'status' => 'payment_failed',
-                        'stripe_payment_intent_id' => $paymentIntent['id'],
-                        'pay_method' => 'stripe_checkout',
-                        'stripe_amount' => (int) ($paymentIntent['amount'] ?? $booking->total_price * 100),
-                        'stripe_currency' => 'gbp',
-                        'stripe_decline_code' => $declineCode,
-                        'payment_failure_reason' => $errorMessage,
-                        'payment_failed_at' => now(),
                     ]);
 
                     // Note: No email sent here - customer can retry within same Stripe session
@@ -248,8 +255,6 @@ class WebhookService
                         'previous_status' => $booking->getOriginal('status'),
                         'new_status' => 'payment_failed',
                         'stripe_payment_intent_id' => $paymentIntent['id'],
-                        'pay_method' => 'stripe_checkout',
-                        'stripe_amount' => (int) ($paymentIntent['amount'] ?? $booking->total_price * 100),
                         'decline_code' => $declineCode,
                         'reason' => 'Customer can retry within same session - no premature email needed'
                     ]);
