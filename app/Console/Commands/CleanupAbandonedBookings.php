@@ -14,7 +14,7 @@ class CleanupAbandonedBookings extends Command
      */
     protected $signature = 'bookings:cleanup-abandoned
                             {--dry-run : Show what would be cleaned up without actually doing it}
-                            {--hours=24 : Hours after creation to consider booking abandoned}';
+                            {--hours=12 : Hours after creation to consider booking abandoned}';
 
     /**
      * The console command description.
