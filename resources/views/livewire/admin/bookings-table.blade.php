@@ -259,6 +259,13 @@
                                 <div class="text-xs text-gray-500">
                                     (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
                                 </div>
+                                <div class="text-xs font-medium mt-1">
+                                    @if($booking->refund_amount >= $booking->total_price)
+                                        <span class="text-red-600">Full Refund</span>
+                                    @else
+                                        <span class="text-orange-600">Partial Refund</span>
+                                    @endif
+                                </div>
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
