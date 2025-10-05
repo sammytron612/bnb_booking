@@ -311,53 +311,27 @@ class WebhookService
 
             if ($bookingId) {
                 $booking = Booking::where('booking_id', $bookingId)->first();
-                if ($booking && !$booking->is_paid && $booking->status !== 'payment_expired') {
-                    // Update booking status to indicate payment session expired
+                if ($booking && !$booking->is_paid && $booking->status !== 'abandoned') {
+                    // Update booking status directly to abandoned (no emails, no grace period)
                     $booking->update([
-                        'status' => 'payment_expired',
+                        'status' => 'abandoned',
                         'notes' => ($booking->notes ? $booking->notes . "\n" : '') .
-                                  'Payment session expired at ' . now()->format('Y-m-d H:i:s')
+                                  'Payment session expired at ' . now()->format('Y-m-d H:i:s') . ' - automatically marked as abandoned'
                     ]);
 
-                    // Send resume payment email to customer
-                    try {
-                        Mail::to($booking->email)->send(new \App\Mail\PaymentExpired($booking));
-
-                        // Update notes to record that payment recovery email was sent
-                        $booking->update([
-                            'notes' => $booking->notes . '. Payment recovery email sent at ' . now()->format('Y-m-d H:i:s')
-                        ]);
-
-                        Log::info('Payment expired email sent', [
-                            'booking_id' => $booking->getBookingReference(),
-                            'booking_display_id' => $booking->getDisplayBookingId(),
-                            'email' => $booking->email
-                        ]);
-                    } catch (Exception $e) {
-                        // Update notes to record that email sending failed
-                        $booking->update([
-                            'notes' => $booking->notes . '. Payment recovery email FAILED at ' . now()->format('Y-m-d H:i:s') . ' - ' . $e->getMessage()
-                        ]);
-
-                        Log::error('Failed to send payment expired email', [
-                            'booking_id' => $booking->getBookingReference(),
-                            'email' => $booking->email,
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-
-                    Log::info('Booking status updated to payment_expired', [
+                    Log::info('Booking marked as abandoned due to session expiry', [
                         'booking_id' => $booking->getBookingReference(),
                         'booking_display_id' => $booking->getDisplayBookingId(),
-                        'previous_status' => $booking->getOriginal('status')
+                        'previous_status' => $booking->getOriginal('status'),
+                        'session_id' => $session['id']
                     ]);
-                } else if ($booking && $booking->status === 'payment_expired') {
-                    Log::info('Payment expired webhook received for already processed booking - skipping duplicate processing', [
+                } else if ($booking && $booking->status === 'abandoned') {
+                    Log::info('Session expired webhook received for already abandoned booking - skipping duplicate processing', [
                         'booking_id' => $booking->getBookingReference(),
                         'booking_display_id' => $booking->getDisplayBookingId(),
                         'current_status' => $booking->status,
                         'session_id' => $session['id'],
-                        'reason' => 'Duplicate webhook or retry - email already sent'
+                        'reason' => 'Duplicate webhook or retry - already abandoned'
                     ]);
                 }
             }
