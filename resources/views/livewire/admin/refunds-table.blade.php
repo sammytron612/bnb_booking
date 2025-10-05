@@ -25,11 +25,12 @@
                     <select wire:model.live="statusFilter"
                             id="statusFilter"
                             class="w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500">
-                        <option value="">All Statuses</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="partial_refund">Partial Refund</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="refundable">Refundable Bookings (Default)</option>
                         <option value="fully_refunded">Fully Refunded</option>
+                        <option value="partial_refunds">Partial Refunds Only</option>
+                        <option value="all_refunds">All Refunds</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
             </div>
