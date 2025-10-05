@@ -54,6 +54,9 @@ class Booking extends Model
         'refund_amount',
         'refund_reason',
         'refunded_at',
+        'stripe_decline_code',
+        'payment_failure_reason',
+        'payment_failed_at',
     ];
 
     /**
@@ -68,6 +71,7 @@ class Booking extends Model
         'stripe_amount' => 'decimal:2',
         'refund_amount' => 'decimal:2',
         'payment_completed_at' => 'datetime',
+        'payment_failed_at' => 'datetime',
         'refunded_at' => 'datetime',
         'stripe_metadata' => 'array',
         'review_link' => 'date',

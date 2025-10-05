@@ -53,6 +53,9 @@ class WebhookService
             case 'payment_intent.payment_failed':
                 return $this->handlePaymentIntentFailed($event['data']['object']);
 
+            case 'charge.failed':
+                return $this->handleChargeFailed($event['data']['object']);
+
             case 'charge.dispute.created':
                 return $this->handleChargeDisputeCreated($event['data']['object']);
 
@@ -213,29 +216,125 @@ class WebhookService
     {
         try {
             $bookingId = $paymentIntent['metadata']['booking_id'] ?? null;
+            $lastPaymentError = $paymentIntent['last_payment_error'] ?? null;
+            $declineCode = $lastPaymentError['decline_code'] ?? null;
+            $errorMessage = $lastPaymentError['message'] ?? 'Payment failed';
 
             Log::warning('Payment intent failed', [
                 'payment_intent_id' => $paymentIntent['id'],
                 'booking_id' => $bookingId,
-                'last_payment_error' => $paymentIntent['last_payment_error'] ?? null
+                'decline_code' => $declineCode,
+                'error_message' => $errorMessage,
+                'last_payment_error' => $lastPaymentError
             ]);
 
             if ($bookingId) {
                 $booking = Booking::where('booking_id', $bookingId)->first();
                 if ($booking && !$booking->is_paid) {
-                    // Optionally update booking status or send notification
-                    Log::info('Payment failed for booking', [
+                    // Update booking with payment failure details
+                    $booking->update([
+                        'status' => 'payment_failed',
+                        'stripe_decline_code' => $declineCode,
+                        'payment_failure_reason' => $errorMessage,
+                        'payment_failed_at' => now(),
+                    ]);
+
+                    // Send payment failure notification email
+                    try {
+                        Mail::to($booking->email)->send(new \App\Mail\PaymentFailed($booking));
+                        Log::info('Payment failure email sent', [
+                            'booking_id' => $booking->booking_id,
+                            'email' => $booking->email
+                        ]);
+                    } catch (Exception $mailException) {
+                        Log::error('Failed to send payment failure email', [
+                            'booking_id' => $booking->booking_id,
+                            'email' => $booking->email,
+                            'error' => $mailException->getMessage()
+                        ]);
+                    }
+
+                    Log::info('Payment failed for booking - status updated', [
                         'booking_id' => $booking->booking_id,
-                        'current_status' => $booking->status
+                        'previous_status' => $booking->getOriginal('status'),
+                        'new_status' => 'payment_failed',
+                        'decline_code' => $declineCode
                     ]);
                 }
             }
 
-            return ['status' => 'logged', 'message' => 'Payment failure logged'];
+            return ['status' => 'processed', 'message' => 'Payment failure processed and booking updated'];
         } catch (Exception $e) {
             Log::error('Exception in payment intent failed handler', [
                 'error' => $e->getMessage(),
                 'payment_intent_id' => $paymentIntent['id'] ?? 'unknown'
+            ]);
+            return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    private function handleChargeFailed($charge): array
+    {
+        try {
+            $paymentIntentId = $charge['payment_intent'] ?? null;
+            $failureCode = $charge['failure_code'] ?? null;
+            $failureMessage = $charge['failure_message'] ?? 'Charge failed';
+            $outcomeReason = $charge['outcome']['reason'] ?? null;
+
+            Log::warning('Charge failed', [
+                'charge_id' => $charge['id'],
+                'payment_intent_id' => $paymentIntentId,
+                'failure_code' => $failureCode,
+                'failure_message' => $failureMessage,
+                'outcome_reason' => $outcomeReason
+            ]);
+
+            // If we have a payment intent, try to find the booking
+            if ($paymentIntentId) {
+                $booking = Booking::where('stripe_payment_intent_id', $paymentIntentId)->first();
+
+                if ($booking && !$booking->is_paid) {
+                    // Update booking with charge failure details
+                    $booking->update([
+                        'status' => 'payment_failed',
+                        'stripe_decline_code' => $failureCode,
+                        'payment_failure_reason' => $failureMessage,
+                        'payment_failed_at' => now(),
+                    ]);
+
+                    // Send payment failure notification email (if not already sent)
+                    if (!$booking->payment_failed_at || $booking->payment_failed_at->diffInMinutes(now()) < 5) {
+                        try {
+                            Mail::to($booking->email)->send(new \App\Mail\PaymentFailed($booking));
+                            Log::info('Charge failure email sent', [
+                                'booking_id' => $booking->booking_id,
+                                'email' => $booking->email,
+                                'charge_id' => $charge['id']
+                            ]);
+                        } catch (Exception $mailException) {
+                            Log::error('Failed to send charge failure email', [
+                                'booking_id' => $booking->booking_id,
+                                'email' => $booking->email,
+                                'charge_id' => $charge['id'],
+                                'error' => $mailException->getMessage()
+                            ]);
+                        }
+                    }
+
+                    Log::info('Charge failed for booking - status updated', [
+                        'booking_id' => $booking->booking_id,
+                        'charge_id' => $charge['id'],
+                        'failure_code' => $failureCode,
+                        'new_status' => 'payment_failed'
+                    ]);
+                }
+            }
+
+            return ['status' => 'processed', 'message' => 'Charge failure processed'];
+        } catch (Exception $e) {
+            Log::error('Exception in charge failed handler', [
+                'error' => $e->getMessage(),
+                'charge_id' => $charge['id'] ?? 'unknown'
             ]);
             return ['status' => 'error', 'message' => 'Internal error'];
         }
