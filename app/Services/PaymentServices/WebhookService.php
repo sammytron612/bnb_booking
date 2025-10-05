@@ -323,12 +323,22 @@ class WebhookService
                     try {
                         Mail::to($booking->email)->send(new \App\Mail\PaymentExpired($booking));
 
+                        // Update notes to record that payment recovery email was sent
+                        $booking->update([
+                            'notes' => $booking->notes . '. Payment recovery email sent at ' . now()->format('Y-m-d H:i:s')
+                        ]);
+
                         Log::info('Payment expired email sent', [
                             'booking_id' => $booking->getBookingReference(),
                             'booking_display_id' => $booking->getDisplayBookingId(),
                             'email' => $booking->email
                         ]);
                     } catch (Exception $e) {
+                        // Update notes to record that email sending failed
+                        $booking->update([
+                            'notes' => $booking->notes . '. Payment recovery email FAILED at ' . now()->format('Y-m-d H:i:s') . ' - ' . $e->getMessage()
+                        ]);
+
                         Log::error('Failed to send payment expired email', [
                             'booking_id' => $booking->getBookingReference(),
                             'email' => $booking->email,
