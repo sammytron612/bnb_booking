@@ -57,19 +57,31 @@
         .retry-button {
             display: inline-block;
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
-            text-decoration: none;
-            padding: 12px 30px;
-            border-radius: 6px;
-            font-weight: 600;
+            color: white !important;
+            text-decoration: none !important;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
             text-align: center;
-            margin: 20px 0;
-            transition: transform 0.2s;
+            margin: 30px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            border: none;
         }
         .retry-button:hover {
-            transform: translateY(-1px);
-            text-decoration: none;
-            color: white;
+            transform: translateY(-2px);
+            text-decoration: none !important;
+            color: white !important;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .retry-section {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            border: 2px dashed #28a745;
         }
         .error-info {
             background: #fff3cd;
@@ -147,10 +159,13 @@
                 </div>
             </div>
 
-            <div style="text-align: center;">
+            <div class="retry-section">
+                <h3 style="color: #28a745; margin-top: 0;">🚀 Ready to Complete Your Booking?</h3>
+                <p style="margin-bottom: 20px; color: #666;">Click the button below to retry your payment with a different card or method:</p>
                 <a href="{{ $retryUrl }}" class="retry-button">
                     💳 Retry Payment Now
                 </a>
+                <p style="font-size: 12px; color: #999; margin-top: 15px;">This secure link expires in 48 hours</p>
             </div>
 
             <h4>🔧 What you can do:</h4>
@@ -165,7 +180,7 @@
             <div class="contact-info">
                 <h4 style="margin-top: 0;">💬 Need Help?</h4>
                 <p style="margin-bottom: 0;">If you continue to experience issues, please don't hesitate to contact us. We're here to help ensure your booking goes smoothly.</p>
-                <p style="margin: 10px 0 0 0;"><strong>Email:</strong> {{ config('contact.email', 'info@example.com') }}</p>
+                <p style="margin: 10px 0 0 0;"><strong>Email:</strong> {{ env('OWNER_EMAIL_NO', 'info@example.com') }}</p>
             </div>
 
             <p><strong>Important:</strong> This booking will be automatically cancelled if payment is not completed within 24 hours. Please retry your payment as soon as possible to secure your reservation.</p>

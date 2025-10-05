@@ -236,26 +236,15 @@ class WebhookService
                         'payment_failed_at' => now(),
                     ]);
 
-                    // Send payment failure notification email
-                    try {
-                        Mail::to($booking->email)->send(new \App\Mail\PaymentFailed($booking));
-                        Log::info('Payment failure email sent', [
-                            'booking_id' => $booking->booking_id,
-                            'email' => $booking->email
-                        ]);
-                    } catch (Exception $mailException) {
-                        Log::error('Failed to send payment failure email', [
-                            'booking_id' => $booking->booking_id,
-                            'email' => $booking->email,
-                            'error' => $mailException->getMessage()
-                        ]);
-                    }
+                    // Note: No email sent here - customer can retry within same Stripe session
+                    // Email notifications handled by checkout.session.expired for final failures
 
-                    Log::info('Payment failed for booking - status updated', [
+                    Log::info('Payment failed for booking - status updated (no email sent)', [
                         'booking_id' => $booking->booking_id,
                         'previous_status' => $booking->getOriginal('status'),
                         'new_status' => 'payment_failed',
-                        'decline_code' => $declineCode
+                        'decline_code' => $declineCode,
+                        'reason' => 'Customer can retry within same session - no premature email needed'
                     ]);
                 }
             }
