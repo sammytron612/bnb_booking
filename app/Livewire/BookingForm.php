@@ -28,7 +28,7 @@ class BookingForm extends Component
     protected $rules = [
         'guestName' => 'required|string|min:2',
         'guestEmail' => 'required|email',
-        'guestPhone' => 'required|string|min:10',
+        'guestPhone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)]+$/',
         'checkIn' => 'required|date|after_or_equal:today',
         'checkOut' => 'required|date|after:checkIn',
     ];
@@ -38,6 +38,9 @@ class BookingForm extends Component
         'guestEmail.required' => 'Please enter your email address.',
         'guestEmail.email' => 'Please enter a valid email address.',
         'guestPhone.required' => 'Please enter your phone number.',
+        'guestPhone.min' => 'Phone number must be at least 10 digits.',
+        'guestPhone.max' => 'Phone number cannot exceed 20 characters.',
+        'guestPhone.regex' => 'Please enter a valid phone number (numbers, spaces, dashes, and parentheses only).',
         'checkIn.required' => 'Please select a check-in date.',
         'checkOut.required' => 'Please select a check-out date.',
         'checkOut.after' => 'Check-out date must be after check-in date.',
