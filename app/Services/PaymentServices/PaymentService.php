@@ -41,6 +41,7 @@ class PaymentService
                 'mode' => 'payment',
                 'client_reference_id' => $booking->getBookingReference(),
                 'customer_email' => $booking->email,
+                'expires_at' => time() + (config('services.stripe.session_expires_minutes', 1440) * 60), // Default 24 hours, configurable
                 'success_url' => route('payment.success', ['booking' => $booking->id]) . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => route('payment.cancel', ['booking' => $booking->id]),
                 'metadata' => [

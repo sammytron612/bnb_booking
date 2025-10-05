@@ -39,6 +39,7 @@ return [
         'publishable_key' => env('STRIPE_PUBLISHABLE_KEY'),
         'secret_key' => env('STRIPE_SECRET_KEY'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        'session_expires_minutes' => env('STRIPE_SESSION_EXPIRES_MINUTES', 1440), // Default 24 hours
     ],
 
     'google' => [
