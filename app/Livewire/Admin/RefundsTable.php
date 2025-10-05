@@ -16,7 +16,7 @@ class RefundsTable extends Component
     use WithPagination;
 
     public $search = '';
-    public $statusFilter = '';
+    public $statusFilter = 'refundable'; // Default to show only refundable bookings
     public $showRefundModal = false;
     public $selectedBooking;
     public $refundAmount;
@@ -212,17 +212,43 @@ class RefundsTable extends Component
 
     public function render()
     {
-        $query = Booking::where('is_paid', true)
-            ->whereNotNull('stripe_payment_intent_id')
-            ->where(function ($q) {
-                // Include bookings with refund-related statuses OR bookings that have refunds (including cancelled ones)
-                $q->whereIn('status', ['confirmed', 'partial_refund', 'refunded'])
-                  ->orWhere(function ($subQuery) {
-                      $subQuery->where('status', 'cancelled')
-                               ->where('refund_amount', '>', 0);
-                  });
-            })
+        // Base query for all bookings that have been paid at some point
+        $query = Booking::whereNotNull('stripe_payment_intent_id')
             ->with(['venue', 'arns']);
+
+        // Apply status filter with smart defaults
+        if ($this->statusFilter === 'refundable' || $this->statusFilter === '') {
+            // DEFAULT: Show only bookings that can still be refunded
+            $query->where('is_paid', true)
+                  ->where(function ($q) {
+                      $q->whereIn('status', ['confirmed', 'partial_refund'])
+                        ->orWhere(function ($subQuery) {
+                            // Include cancelled bookings that still have refundable amount
+                            $subQuery->where('status', 'cancelled')
+                                     ->where('is_paid', true)
+                                     ->whereRaw('COALESCE(refund_amount, 0) < total_price');
+                        });
+                  });
+        } elseif ($this->statusFilter === 'fully_refunded') {
+            // Show all fully refunded bookings (regardless of is_paid status)
+            $query->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+        } elseif ($this->statusFilter === 'all_refunds') {
+            // Show all bookings that have received any refund
+            $query->where('refund_amount', '>', 0);
+        } elseif ($this->statusFilter === 'partial_refunds') {
+            // Show only partial refunds (still have refundable amount)
+            $query->where('is_paid', true)
+                  ->where('refund_amount', '>', 0)
+                  ->whereRaw('refund_amount < total_price');
+        } else {
+            // Specific status filter
+            $query->where('status', $this->statusFilter)
+                  ->where(function ($q) {
+                      // For specific statuses, show either paid or refunded bookings
+                      $q->where('is_paid', true)
+                        ->orWhere('refund_amount', '>', 0);
+                  });
+        }
 
         // Apply search filter
         if ($this->search) {
@@ -234,20 +260,6 @@ class RefundsTable extends Component
                       $venueQuery->where('name', 'like', '%' . $this->search . '%');
                   });
             });
-        }
-
-        // Apply status filter
-        if ($this->statusFilter) {
-            if ($this->statusFilter === 'fully_refunded') {
-                // Show only bookings where refund_amount equals total_price (any status)
-                $query->whereRaw('COALESCE(refund_amount, 0) >= total_price');
-            } elseif ($this->statusFilter === 'cancelled') {
-                // Show only cancelled bookings that have refunds
-                $query->where('status', 'cancelled')
-                      ->where('refund_amount', '>', 0);
-            } else {
-                $query->where('status', $this->statusFilter);
-            }
         }
 
         $bookings = $query->orderBy('created_at', 'desc')->paginate(10);
