@@ -30,7 +30,7 @@ class BookingForm extends Component
         'guestEmail' => 'required|email',
         'guestPhone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)]+$/',
         'checkIn' => 'required|date|after_or_equal:today',
-        'checkOut' => 'required|date|after:checkIn',
+        'checkOut' => 'required|date|after:checkIn|after_or_equal:checkIn,+2 days',
     ];
 
     protected $messages = [
@@ -44,6 +44,7 @@ class BookingForm extends Component
         'checkIn.required' => 'Please select a check-in date.',
         'checkOut.required' => 'Please select a check-out date.',
         'checkOut.after' => 'Check-out date must be after check-in date.',
+        'checkOut.after_or_equal' => 'Minimum stay is 2 nights. Please select a check-out date at least 2 days after check-in.',
     ];
 
     // Listen for events from JavaScript
