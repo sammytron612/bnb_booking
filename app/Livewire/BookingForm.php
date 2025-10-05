@@ -8,6 +8,7 @@ use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 use App\Services\BookingServices\BookingValidationService;
+use Illuminate\Validation\ValidationException;
 
 class BookingForm extends Component
 {
@@ -115,8 +116,12 @@ class BookingForm extends Component
 
         try {
             $this->validate();
+        } catch (ValidationException $e) {
+            // Let validation exceptions bubble up to show specific field errors
+            \Log::info('Validation failed with specific errors', ['errors' => $e->validator->errors()->toArray()]);
+            throw $e;
         } catch (\Exception $e) {
-            \Log::error('Validation failed: ' . $e->getMessage());
+            \Log::error('Unexpected validation error: ' . $e->getMessage());
             session()->flash('booking_error', 'Please check your booking details and try again.');
             return;
         }
