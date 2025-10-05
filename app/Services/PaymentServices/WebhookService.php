@@ -311,7 +311,7 @@ class WebhookService
 
             if ($bookingId) {
                 $booking = Booking::where('booking_id', $bookingId)->first();
-                if ($booking && !$booking->is_paid) {
+                if ($booking && !$booking->is_paid && $booking->status !== 'payment_expired') {
                     // Update booking status to indicate payment session expired
                     $booking->update([
                         'status' => 'payment_expired',
@@ -339,7 +339,15 @@ class WebhookService
                     Log::info('Booking status updated to payment_expired', [
                         'booking_id' => $booking->getBookingReference(),
                         'booking_display_id' => $booking->getDisplayBookingId(),
-                        'previous_status' => 'pending'
+                        'previous_status' => $booking->getOriginal('status')
+                    ]);
+                } else if ($booking && $booking->status === 'payment_expired') {
+                    Log::info('Payment expired webhook received for already processed booking - skipping duplicate processing', [
+                        'booking_id' => $booking->getBookingReference(),
+                        'booking_display_id' => $booking->getDisplayBookingId(),
+                        'current_status' => $booking->status,
+                        'session_id' => $session['id'],
+                        'reason' => 'Duplicate webhook or retry - email already sent'
                     ]);
                 }
             }
