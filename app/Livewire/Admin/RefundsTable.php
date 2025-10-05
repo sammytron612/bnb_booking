@@ -230,9 +230,9 @@ class RefundsTable extends Component
                         });
                   });
         } elseif ($this->statusFilter === 'fully_refunded') {
-            // Show all fully refunded bookings (status = 'refunded')
-            $query->where('status', 'refunded')
-                  ->whereRaw('COALESCE(refund_amount, 0) >= total_price');
+            // Show all fully refunded bookings (regardless of status)
+            $query->whereRaw('COALESCE(refund_amount, 0) >= total_price')
+                  ->where('refund_amount', '>', 0); // Ensure there was actually a refund
         } elseif ($this->statusFilter === 'all_refunds') {
             // Show all bookings that have received any refund
             $query->where('refund_amount', '>', 0);
