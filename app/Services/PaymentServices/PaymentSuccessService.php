@@ -25,10 +25,10 @@ class PaymentSuccessService
             $booking->update([
                 'is_paid' => true,
                 'status' => 'confirmed',
-                'payment_intent_id' => $paymentIntentId,
+                'stripe_payment_intent_id' => $paymentIntentId,
                 'pay_method' => $paymentMethod,
-                'paid_at' => now(),
-                'stripe_amount' => $booking->getStripeAmountInCents(),
+                'payment_completed_at' => now(),
+                'stripe_amount' => $booking->total_price * 100, // Convert to cents
                 'stripe_currency' => 'gbp',
             ]);
 
