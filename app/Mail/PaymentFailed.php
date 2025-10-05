@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\URL;
 use App\Models\Booking;
 
 class PaymentFailed extends Mailable
@@ -43,7 +44,11 @@ class PaymentFailed extends Mailable
             view: 'emails.payment-failed',
             with: [
                 'booking' => $this->booking,
-                'retryUrl' => route('booking.retry-payment', $this->booking->booking_id),
+                'retryUrl' => URL::temporarySignedRoute(
+                    'payment.resume',
+                    now()->addHours(48),
+                    ['booking' => $this->booking->id]
+                ),
             ]
         );
     }
