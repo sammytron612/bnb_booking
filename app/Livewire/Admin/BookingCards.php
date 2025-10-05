@@ -51,7 +51,7 @@ class BookingCards extends Component
                 $query->where('check_in', '<=', $date->format('Y-m-d'))
                       ->where('check_out', '>', $date->format('Y-m-d'));
             })
-            ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
+            ->whereIn('status', ['confirmed', 'pending', 'payment_failed', 'refunded', 'partial_refund'])
             ->when($this->selectedVenueId, function ($query) {
                 $query->where('venue_id', $this->selectedVenueId);
             })
@@ -80,7 +80,7 @@ class BookingCards extends Component
             // Get check-ins for this specific date (database with venue filtering)
             $checkInsDb = Booking::with('venue')
                 ->whereDate('check_in', $date->format('Y-m-d'))
-                ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
+                ->whereIn('status', ['confirmed', 'pending', 'payment_failed', 'refunded', 'partial_refund'])
                 ->when($this->selectedVenueId, function ($query) {
                     $query->where('venue_id', $this->selectedVenueId);
                 })
@@ -107,7 +107,7 @@ class BookingCards extends Component
             // Get check-outs for this specific date (database with venue filtering)
             $checkOutsDb = Booking::with('venue')
                 ->whereDate('check_out', $date->format('Y-m-d'))
-                ->whereIn('status', ['confirmed', 'pending', 'refunded', 'partial_refund'])
+                ->whereIn('status', ['confirmed', 'pending', 'payment_failed', 'refunded', 'partial_refund'])
                 ->when($this->selectedVenueId, function ($query) {
                     $query->where('venue_id', $this->selectedVenueId);
                 })
