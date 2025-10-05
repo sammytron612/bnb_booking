@@ -182,7 +182,21 @@ class BookingsTable extends Component
                 });
             })
             ->when($this->statusFilter, function ($query) {
-                $query->where('status', $this->statusFilter);
+                if ($this->statusFilter === 'partial_refund') {
+                    // Show confirmed bookings with partial refunds
+                    $query->where('status', 'confirmed')
+                          ->where('refund_amount', '>', 0)
+                          ->whereRaw('refund_amount < total_price');
+                } elseif ($this->statusFilter === 'refunded') {
+                    // Show fully refunded bookings (either status = 'refunded' OR refund_amount >= total_price)
+                    $query->where(function($q) {
+                        $q->where('status', 'refunded')
+                          ->orWhereRaw('refund_amount >= total_price');
+                    });
+                } else {
+                    // Standard status filter
+                    $query->where('status', $this->statusFilter);
+                }
             })
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->perPage);
