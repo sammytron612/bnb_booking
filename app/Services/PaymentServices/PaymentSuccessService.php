@@ -169,11 +169,13 @@ class PaymentSuccessService
             Log::info('Before updating booking with refund data', [
                 'booking_id' => $booking->booking_id,
                 'current_refund_amount' => $booking->refund_amount,
+                'current_is_paid' => $booking->is_paid,
                 'new_refund_amount' => $refundAmount,
                 'new_reason' => $reason,
                 'total_price' => $totalPrice,
                 'is_full_refund' => $isFullRefund,
-                'new_status' => $newStatus
+                'new_status' => $newStatus,
+                'new_is_paid' => !$isFullRefund
             ]);
 
             $booking->update([
@@ -181,6 +183,7 @@ class PaymentSuccessService
                 'refund_amount' => $refundAmount,
                 'refund_reason' => $reason,
                 'refunded_at' => now(),
+                'is_paid' => !$isFullRefund, // Set to false for full refunds, true for partial refunds
                 'notes' => $booking->notes ? $booking->notes . "\n" . "Refunded: £{$refundAmount} - {$reason}" : "Refunded: £{$refundAmount} - {$reason}"
             ]);
 
@@ -191,6 +194,7 @@ class PaymentSuccessService
                 'booking_id' => $booking->booking_id,
                 'updated_refund_amount' => $booking->refund_amount,
                 'updated_status' => $booking->status,
+                'updated_is_paid' => $booking->is_paid,
                 'updated_reason' => $booking->refund_reason
             ]);
 
