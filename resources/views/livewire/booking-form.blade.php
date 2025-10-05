@@ -54,6 +54,9 @@
                     <h5 class="font-semibold text-green-800 dark:text-green-200 mb-3">Guest Details</h5>
 
                 <form wire:submit="submitBooking" class="space-y-3">
+                    <!-- Honeypot field to catch bots -->
+                    <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+
                     <div>
                         <label for="guestName" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                             Full Name *
