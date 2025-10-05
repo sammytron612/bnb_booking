@@ -242,9 +242,10 @@ class WebhookService
                         'failed_at' => now(),
                     ]);
 
-                    // Simply update booking status - no payment failure data
+                    // Update booking status and store payment intent ID
                     $booking->update([
                         'status' => 'payment_failed',
+                        'stripe_payment_intent_id' => $paymentIntent['id'],
                     ]);
 
                     // Note: No email sent here - customer can retry within same Stripe session
