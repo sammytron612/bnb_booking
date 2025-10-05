@@ -231,6 +231,7 @@ class WebhookService
                     // Update booking with payment failure details
                     $booking->update([
                         'status' => 'payment_failed',
+                        'stripe_payment_intent_id' => $paymentIntent['id'],
                         'stripe_decline_code' => $declineCode,
                         'payment_failure_reason' => $errorMessage,
                         'payment_failed_at' => now(),
@@ -243,6 +244,7 @@ class WebhookService
                         'booking_id' => $booking->booking_id,
                         'previous_status' => $booking->getOriginal('status'),
                         'new_status' => 'payment_failed',
+                        'stripe_payment_intent_id' => $paymentIntent['id'],
                         'decline_code' => $declineCode,
                         'reason' => 'Customer can retry within same session - no premature email needed'
                     ]);
