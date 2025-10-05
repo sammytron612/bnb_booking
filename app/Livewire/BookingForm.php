@@ -9,55 +9,57 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 use App\Services\BookingServices\BookingValidationService;
 use Illuminate\Validation\ValidationException;
-use Livewire\Attributes\Validate;
 
 class BookingForm extends Component
 {
     // Public properties for form data
     public $venueId;
     public $venue;
-
-    #[Validate('required|date|after_or_equal:today|before:+2 years', message: [
-        'required' => 'Please select a check-in date.',
-        'after_or_equal' => 'Check-in date cannot be in the past.',
-        'before' => 'Check-in date cannot be more than 2 years in advance.',
-    ])]
     public $checkIn = null;
-
-    #[Validate('required|date|after:checkIn|after_or_equal:checkIn,+2 days|before:+2 years', message: [
-        'required' => 'Please select a check-out date.',
-        'after' => 'Check-out date must be after check-in date.',
-        'after_or_equal' => 'Minimum stay is 2 nights. Please select a check-out date at least 2 days after check-in.',
-        'before' => 'Check-out date cannot be more than 2 years in advance.',
-    ])]
     public $checkOut = null;
-
-    #[Validate('required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\'\.]++$/', message: [
-        'required' => 'Please enter your full name.',
-        'min' => 'Name must be at least 2 characters.',
-        'max' => 'Name cannot exceed 100 characters.',
-        'regex' => 'Name can only contain letters, spaces, hyphens, apostrophes, and periods.',
-    ])]
     public $guestName = '';
-
-    #[Validate('required|email|max:255', message: [
-        'required' => 'Please enter your email address.',
-        'email' => 'Please enter a valid email address.',
-        'max' => 'Email address is too long.',
-    ])]
     public $guestEmail = '';
-
-    #[Validate('required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)]+$/', message: [
-        'required' => 'Please enter your phone number.',
-        'min' => 'Phone number must be at least 10 digits.',
-        'max' => 'Phone number cannot exceed 20 characters.',
-        'regex' => 'Please enter a valid phone number (numbers, spaces, dashes, and parentheses only).',
-    ])]
     public $guestPhone = '';
-
     public $nights = 0;
     public $totalPrice = 0;
     public $pricePerNight;
+
+    // Validation rules
+    protected $rules = [
+        'guestName' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\'\.]++$/',
+        'guestEmail' => 'required|email|max:255',
+        'guestPhone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)]+$/',
+        'checkIn' => 'required|date|after_or_equal:today|before:+2 years',
+        'checkOut' => 'required|date|after:checkIn|after_or_equal:checkIn,+2 days|before:+2 years',
+    ];
+
+    protected $messages = [
+        // Name validation messages
+        'guestName.required' => 'Please enter your full name.',
+        'guestName.min' => 'Name must be at least 2 characters.',
+        'guestName.max' => 'Name cannot exceed 100 characters.',
+        'guestName.regex' => 'Name can only contain letters, spaces, hyphens, apostrophes, and periods.',
+
+        // Email validation messages
+        'guestEmail.required' => 'Please enter your email address.',
+        'guestEmail.email' => 'Please enter a valid email address.',
+        'guestEmail.max' => 'Email address is too long.',
+
+        // Phone validation messages
+        'guestPhone.required' => 'Please enter your phone number.',
+        'guestPhone.min' => 'Phone number must be at least 10 digits.',
+        'guestPhone.max' => 'Phone number cannot exceed 20 characters.',
+        'guestPhone.regex' => 'Please enter a valid phone number (numbers, spaces, dashes, and parentheses only).',
+
+        // Date validation messages
+        'checkIn.required' => 'Please select a check-in date.',
+        'checkIn.after_or_equal' => 'Check-in date cannot be in the past.',
+        'checkIn.before' => 'Check-in date cannot be more than 2 years in advance.',
+        'checkOut.required' => 'Please select a check-out date.',
+        'checkOut.after' => 'Check-out date must be after check-in date.',
+        'checkOut.after_or_equal' => 'Minimum stay is 2 nights. Please select a check-out date at least 2 days after check-in.',
+        'checkOut.before' => 'Check-out date cannot be more than 2 years in advance.',
+    ];
 
     // Listen for events from JavaScript
     protected $listeners = [
