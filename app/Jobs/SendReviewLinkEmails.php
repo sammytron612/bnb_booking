@@ -34,7 +34,7 @@ class SendReviewLinkEmails implements ShouldQueue
         $bookings = Booking::with('venue')
             ->where('check_out', '>=', now()->subDays(30)) // Don't send to very old bookings
             ->where('check_out', '<=', now()->subDay())     // Must be at least 1 day after checkout
-            ->whereIn('status', ['confirmed', 'partial_refund'])          // Include partially refunded bookings
+            ->whereIn('status', ['confirmed'])          // Include partially refunded bookings
             ->where('is_paid', true)                        // Only paid bookings
             ->whereDoesntHave('reviews')
             ->whereNull('review_link')

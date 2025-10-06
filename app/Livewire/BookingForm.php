@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Booking;
 use App\Models\Venue;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 use App\Services\BookingServices\BookingValidationService;
 use Illuminate\Validation\ValidationException;
@@ -26,11 +27,11 @@ class BookingForm extends Component
 
     // Validation rules
     protected $rules = [
-        'guestName' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\'\.]++$/',
-        'guestEmail' => 'required|email|max:255',
-        'guestPhone' => 'required|string|min:10|max:20|regex:/^[\+]?[0-9\s\-\(\)]+$/',
-        'checkIn' => 'required|date|after_or_equal:today|before:+2 years',
-        'checkOut' => 'required|date|after:checkIn|after_or_equal:checkIn,+2 days|before:+2 years',
+    'guestName' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\'\.]+$/',
+    'guestEmail' => 'required|email|max:255',
+    'guestPhone' => 'required|string|min:8|max:20|regex:/^[\+]?[0-9\s\-\(\)\.]+$/',
+    'checkIn' => 'required|date|after_or_equal:today|before:+2 years',
+    'checkOut' => 'required|date|after:checkIn|after_or_equal:checkIn,+2 days|before:+2 years',
     ];
 
     protected $messages = [
@@ -47,7 +48,7 @@ class BookingForm extends Component
 
         // Phone validation messages
         'guestPhone.required' => 'Please enter your phone number.',
-        'guestPhone.min' => 'Phone number must be at least 10 digits.',
+        'guestPhone.min' => 'Phone number must be at least 8 digits.',
         'guestPhone.max' => 'Phone number cannot exceed 20 characters.',
         'guestPhone.regex' => 'Please enter a valid phone number (numbers, spaces, dashes, and parentheses only).',
 
