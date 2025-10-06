@@ -141,31 +141,6 @@
         <p>We're emailing to confirm that your refund request has been processed successfully. The refund amount will be returned to your original payment method within 5-10 business days.</p>
 
         <div class="booking-details">
-            <h3>Booking Details</h3>
-            <div class="detail-row">
-                <span class="detail-label">Booking ID:</span>
-                <span class="detail-value">{{ $booking->getDisplayBookingId() }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Property:</span>
-                <span class="detail-value">{{ $booking->venue->venue_name ?? 'N/A' }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Guest Name:</span>
-                <span class="detail-value">{{ $booking->name }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Email:</span>
-                <span class="detail-value">{{ $booking->email }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Check-in Date:</span>
-                <span class="detail-value">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label">Check-out Date:</span>
-                <span class="detail-value">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</span>
-            </div>
             <div class="detail-row">
                 <span class="detail-label">Original Amount:</span>
                 <span class="detail-value">£{{ number_format((float)$booking->total_price, 2) }}</span>
