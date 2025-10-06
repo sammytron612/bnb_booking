@@ -117,37 +117,7 @@ class BookingForm extends Component
         $this->resetValidation();
     }
 
-    // Updated methods for Livewire v3 real-time validation
-    public function updatedCheckIn()
-    {
-        $this->validateOnly('checkIn');
-        if ($this->checkIn && $this->checkOut) {
-            $this->calculateBooking();
-        }
-    }
-
-    public function updatedCheckOut()
-    {
-        $this->validateOnly('checkOut');
-        if ($this->checkIn && $this->checkOut) {
-            $this->calculateBooking();
-        }
-    }
-
-    public function updatedGuestName()
-    {
-        $this->validateOnly('guestName');
-    }
-
-    public function updatedGuestEmail()
-    {
-        $this->validateOnly('guestEmail');
-    }
-
-    public function updatedGuestPhone()
-    {
-        $this->validateOnly('guestPhone');
-    }    // Add sanitization method
+    // Add sanitization method
     private function sanitizeInputs()
     {
         $this->guestName = trim($this->guestName);

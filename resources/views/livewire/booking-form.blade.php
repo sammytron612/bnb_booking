@@ -64,7 +64,7 @@
                         <input
                             type="text"
                             id="guestName"
-                            wire:model.live="guestName"
+                            wire:model="guestName"
                             class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('guestName') border-red-500 @enderror"
                             placeholder="Enter your full name"
                         >
@@ -80,7 +80,7 @@
                         <input
                             type="email"
                             id="guestEmail"
-                            wire:model.live="guestEmail"
+                            wire:model="guestEmail"
                             class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('guestEmail') border-red-500 @enderror"
                             placeholder="Enter your email address"
                         >
@@ -96,7 +96,7 @@
                         <input
                             type="tel"
                             id="guestPhone"
-                            wire:model.live="guestPhone"
+                            wire:model="guestPhone"
                             class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white @error('guestPhone') border-red-500 @enderror"
                             placeholder="Enter your phone number"
                         >
