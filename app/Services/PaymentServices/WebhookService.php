@@ -525,16 +525,15 @@ class WebhookService
                         'payment_intent' => $charge->payment_intent,
                         'charge_id' => $chargeId,
                         'charge_amount' => $chargeAmount
-                    ]);                    // Debug: Show what bookings actually exist
+                    ]);
+
+                    // Debug: Show what bookings actually exist
                     $allBookings = Booking::whereNotNull('stripe_payment_intent_id')->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id']);
                     Log::error('All bookings with payment intents in database', [
                         'total_count' => $allBookings->count(),
                         'bookings' => $allBookings->toArray()
                     ]);
 
-                    // STOP HERE - payment intent lookup should ALWAYS work
-                    // If it doesn't, there's a fundamental issue with how payment intents are stored
-                    Log::error('REFUSING to use fallback - payment intent lookup MUST work!');
                     return null;
                 }
             } else {
