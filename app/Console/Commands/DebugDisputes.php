@@ -16,12 +16,12 @@ class DebugDisputes extends Command
         $this->info('🔍 Dispute System Debug');
         $this->newLine();
 
-        // Show recent bookings
-        $recentBookings = Booking::where('created_at', '>=', now()->subHours(2))
-            ->orderBy('created_at', 'desc')
-            ->get(['id', 'booking_id', 'name', 'email', 'stripe_payment_intent_id', 'total_price', 'is_paid', 'created_at']);
+        // Show recent bookings (by payment processing time)
+        $recentBookings = Booking::where('updated_at', '>=', now()->subHours(2)) // Use updated_at for payment processing
+            ->orderBy('updated_at', 'desc')
+            ->get(['id', 'booking_id', 'name', 'email', 'stripe_payment_intent_id', 'total_price', 'is_paid', 'created_at', 'updated_at']);
 
-        $this->info('📋 Recent Bookings (last 2 hours):');
+        $this->info('📋 Recent Bookings (last 2 hours by payment time):');
         if ($recentBookings->count() > 0) {
             $bookingData = $recentBookings->map(function ($booking) {
                 return [
@@ -33,11 +33,12 @@ class DebugDisputes extends Command
                     'Amount' => '£' . $booking->total_price,
                     'Paid' => $booking->is_paid ? 'Yes' : 'No',
                     'Created' => $booking->created_at->format('H:i:s'),
+                    'Payment Time' => $booking->updated_at->format('H:i:s'),
                 ];
             })->toArray();
 
             $this->table(
-                ['DB ID', 'Booking ID', 'Guest', 'Email', 'Payment Intent', 'Amount', 'Paid', 'Created'],
+                ['DB ID', 'Booking ID', 'Guest', 'Email', 'Payment Intent', 'Amount', 'Paid', 'Created', 'Payment Time'],
                 $bookingData
             );
         } else {

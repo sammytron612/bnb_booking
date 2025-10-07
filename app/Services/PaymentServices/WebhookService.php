@@ -455,136 +455,68 @@ class WebhookService
                 ]);
 
                 // Debug: Check what bookings exist with payment intents
-                $allRecentBookings = Booking::where('created_at', '>=', now()->subHours(1))
+                $allRecentBookings = Booking::where('updated_at', '>=', now()->subHours(1)) // Use updated_at for recent payments
                     ->whereNotNull('stripe_payment_intent_id')
-                    ->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id', 'total_price', 'created_at']);
+                    ->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id', 'total_price', 'created_at', 'updated_at']);
 
-                Log::info('Recent bookings with payment intents', [
+                Log::info('Recent bookings with payment intents (by payment time)', [
                     'charge_payment_intent' => $charge->payment_intent,
-                    'recent_bookings' => $allRecentBookings->toArray()
+                    'recent_bookings' => $allRecentBookings->map(function($booking) {
+                        return [
+                            'id' => $booking->id,
+                            'booking_id' => $booking->booking_id,
+                            'name' => $booking->name,
+                            'payment_intent' => $booking->stripe_payment_intent_id,
+                            'total_price' => $booking->total_price,
+                            'created_at' => $booking->created_at,
+                            'updated_at' => $booking->updated_at, // This shows payment processing time
+                        ];
+                    })->toArray()
                 ]);
 
                 $booking = Booking::where('stripe_payment_intent_id', $charge->payment_intent)->first();
                 if ($booking) {
-                    Log::info('Found booking via payment intent', [
+                    Log::info('Found booking via payment intent - SUCCESS!', [
+                        'booking_db_id' => $booking->id,
                         'booking_id' => $booking->booking_id,
-                        'payment_intent' => $charge->payment_intent
+                        'guest_name' => $booking->name,
+                        'payment_intent' => $charge->payment_intent,
+                        'charge_id' => $chargeId
                     ]);
                     return $booking;
                 } else {
-                    Log::warning('No booking found for payment intent', [
+                    Log::error('CRITICAL: No booking found for payment intent - this should not happen!', [
                         'payment_intent' => $charge->payment_intent,
                         'charge_id' => $chargeId,
                         'searched_payment_intent' => $charge->payment_intent
                     ]);
 
-                    // Try to find booking by amount and recent time (more specific fallback)
-                    $bookingAmount = $charge->amount / 100; // Convert pence to pounds
-                    Log::info('Trying amount-based lookup as fallback', [
-                        'charge_amount_pounds' => $bookingAmount,
-                        'charge_amount_pence' => $charge->amount
+                    // Debug: Show what bookings actually exist
+                    $allBookings = Booking::whereNotNull('stripe_payment_intent_id')->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id']);
+                    Log::error('All bookings with payment intents in database', [
+                        'total_count' => $allBookings->count(),
+                        'bookings' => $allBookings->toArray()
                     ]);
 
-                    $recentBooking = Booking::where('total_price', $bookingAmount)
-                        ->where('is_paid', true)
-                        ->where('created_at', '>=', now()->subMinutes(5)) // Very recent - within 5 minutes
-                        ->orderBy('created_at', 'desc')
-                        ->first();
-
-                    if ($recentBooking) {
-                        Log::info('Found booking by amount and timing (precise)', [
-                            'booking_id' => $recentBooking->booking_id,
-                            'booking_db_id' => $recentBooking->id,
-                            'guest_name' => $recentBooking->name,
-                            'amount' => $bookingAmount,
-                            'charge_id' => $chargeId,
-                            'created_at' => $recentBooking->created_at
-                        ]);
-                        return $recentBooking;
-                    }
+                    // STOP HERE - payment intent lookup should ALWAYS work
+                    // If it doesn't, there's a fundamental issue with how payment intents are stored
+                    Log::error('REFUSING to use fallback - payment intent lookup MUST work!');
+                    return null;
                 }
-            }
-
-            // Method 2: Skip direct charge ID check since column doesn't exist
-            // TODO: Add stripe_charge_id column to bookings table if needed
-
-            // Method 3: Skip ARN lookup since booking table doesn't have stripe_charge_id column
-            // TODO: Add proper charge ID storage if needed for ARN linking
-
-            // Method 4: Find recent booking by charge amount and timing (more precise fallback)
-            try {
-                $chargeAmount = $charge->amount / 100; // Convert pence to pounds
-                $recentBooking = Booking::where('is_paid', true)
-                    ->where('total_price', $chargeAmount)
-                    ->where('created_at', '>=', now()->subMinutes(30)) // Within last 30 minutes
-                    ->whereNotNull('stripe_payment_intent_id')
-                    ->orderBy('created_at', 'desc')
-                    ->first();
-
-                if ($recentBooking) {
-                    Log::info('Using precise fallback: booking found by amount and timing', [
-                        'charge_id' => $chargeId,
-                        'fallback_booking_id' => $recentBooking->booking_id,
-                        'amount' => $chargeAmount,
-                        'reason' => 'Found by matching amount and recent timing'
-                    ]);
-                    return $recentBooking;
-                }
-            } catch (Exception $fallbackException) {
-                Log::error('Error in precise fallback lookup', [
-                    'error' => $fallbackException->getMessage()
-                ]);
-            }
-
-            // Method 5: Last resort - any recent booking (least preferred)
-            $recentBooking = Booking::where('is_paid', true)
-                ->where('created_at', '>=', now()->subHours(1)) // Only very recent bookings
-                ->whereNotNull('stripe_payment_intent_id')
-                ->orderBy('created_at', 'desc')
-                ->first();
-
-            if ($recentBooking) {
-                Log::warning('Using last resort fallback: most recent paid booking for dispute', [
+            } else {
+                Log::error('No payment intent found in charge - this should not happen!', [
                     'charge_id' => $chargeId,
-                    'fallback_booking_id' => $recentBooking->booking_id,
-                    'reason' => 'Could not link charge to specific booking - using most recent'
+                    'charge_object' => $charge->toArray()
                 ]);
-                return $recentBooking;
+                return null;
             }
 
-            Log::warning('No booking found for charge ID after all methods', [
-                'charge_id' => $chargeId
-            ]);
-
-            return null;
         } catch (Exception $e) {
             Log::error('Error finding booking by charge ID', [
                 'charge_id' => $chargeId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-
-            // Emergency fallback: try to find any recent paid booking
-            try {
-                $fallbackBooking = Booking::where('is_paid', true)
-                    ->where('created_at', '>=', now()->subHours(1))
-                    ->latest()
-                    ->first();
-
-                if ($fallbackBooking) {
-                    Log::warning('Using emergency fallback booking for dispute', [
-                        'charge_id' => $chargeId,
-                        'fallback_booking_id' => $fallbackBooking->booking_id,
-                        'reason' => 'API error, using most recent booking'
-                    ]);
-                    return $fallbackBooking;
-                }
-            } catch (Exception $fallbackException) {
-                Log::error('Even fallback booking lookup failed', [
-                    'error' => $fallbackException->getMessage()
-                ]);
-            }
-
             return null;
         }
     }    private function handleCheckoutSessionExpired($session): array
