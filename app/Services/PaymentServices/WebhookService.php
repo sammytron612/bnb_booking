@@ -454,6 +454,16 @@ class WebhookService
                     'payment_intent' => $charge->payment_intent
                 ]);
 
+                // Debug: Check what bookings exist with payment intents
+                $allRecentBookings = Booking::where('created_at', '>=', now()->subHours(1))
+                    ->whereNotNull('stripe_payment_intent_id')
+                    ->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id', 'total_price', 'created_at']);
+                
+                Log::info('Recent bookings with payment intents', [
+                    'charge_payment_intent' => $charge->payment_intent,
+                    'recent_bookings' => $allRecentBookings->toArray()
+                ]);
+
                 $booking = Booking::where('stripe_payment_intent_id', $charge->payment_intent)->first();
                 if ($booking) {
                     Log::info('Found booking via payment intent', [
@@ -464,22 +474,31 @@ class WebhookService
                 } else {
                     Log::warning('No booking found for payment intent', [
                         'payment_intent' => $charge->payment_intent,
-                        'charge_id' => $chargeId
+                        'charge_id' => $chargeId,
+                        'searched_payment_intent' => $charge->payment_intent
                     ]);
 
                     // Try to find booking by amount and recent time (more specific fallback)
                     $bookingAmount = $charge->amount / 100; // Convert pence to pounds
+                    Log::info('Trying amount-based lookup as fallback', [
+                        'charge_amount_pounds' => $bookingAmount,
+                        'charge_amount_pence' => $charge->amount
+                    ]);
+                    
                     $recentBooking = Booking::where('total_price', $bookingAmount)
                         ->where('is_paid', true)
-                        ->where('created_at', '>=', now()->subMinutes(10)) // Within last 10 minutes
+                        ->where('created_at', '>=', now()->subMinutes(5)) // Very recent - within 5 minutes
                         ->orderBy('created_at', 'desc')
                         ->first();
 
                     if ($recentBooking) {
-                        Log::info('Found booking by amount and timing', [
+                        Log::info('Found booking by amount and timing (precise)', [
                             'booking_id' => $recentBooking->booking_id,
+                            'booking_db_id' => $recentBooking->id,
+                            'guest_name' => $recentBooking->name,
                             'amount' => $bookingAmount,
-                            'charge_id' => $chargeId
+                            'charge_id' => $chargeId,
+                            'created_at' => $recentBooking->created_at
                         ]);
                         return $recentBooking;
                     }
