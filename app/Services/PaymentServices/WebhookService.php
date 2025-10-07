@@ -458,7 +458,7 @@ class WebhookService
                 $allRecentBookings = Booking::where('created_at', '>=', now()->subHours(1))
                     ->whereNotNull('stripe_payment_intent_id')
                     ->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id', 'total_price', 'created_at']);
-                
+
                 Log::info('Recent bookings with payment intents', [
                     'charge_payment_intent' => $charge->payment_intent,
                     'recent_bookings' => $allRecentBookings->toArray()
@@ -484,7 +484,7 @@ class WebhookService
                         'charge_amount_pounds' => $bookingAmount,
                         'charge_amount_pence' => $charge->amount
                     ]);
-                    
+
                     $recentBooking = Booking::where('total_price', $bookingAmount)
                         ->where('is_paid', true)
                         ->where('created_at', '>=', now()->subMinutes(5)) // Very recent - within 5 minutes
