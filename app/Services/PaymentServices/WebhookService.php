@@ -520,12 +520,12 @@ class WebhookService
                             $query->where('is_paid', true)
                                   ->orWhere('status', 'pending'); // Include bookings still processing
                         })
-                        ->where('updated_at', '>=', now()->subSeconds(30)) // Very precise window
+                        ->where('updated_at', '>=', now()->subSeconds(60)) // Extended to 60 seconds
                         ->get();
 
                     Log::info('DEBUG: Fallback query results', [
                         'charge_amount' => $chargeAmount,
-                        'time_cutoff' => now()->subSeconds(30),
+                        'time_cutoff' => now()->subSeconds(60),
                         'matching_count' => $matchingBookings->count(),
                         'matching_bookings' => $matchingBookings->map(function($booking) {
                             return [
