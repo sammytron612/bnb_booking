@@ -47,7 +47,7 @@ class DisputeCardGuide extends Command
 
         $this->newLine();
         $this->warn('⚠️  The dispute may take a few minutes to appear in Stripe and trigger the webhook.');
-        
+
         $this->newLine();
         $this->info('💡 Alternative: Use stripe CLI to trigger events instantly:');
         $this->info('   stripe trigger charge.dispute.created');

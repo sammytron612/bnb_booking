@@ -19,7 +19,7 @@ class CheckWebhookHealth extends Command
         $webhookSecret = config('services.stripe.webhook_secret');
         $stripeKey = config('services.stripe.secret_key');
         $baseUrl = config('app.url');
-        
+
         $this->info('📋 Configuration Check:');
         $this->table(
             ['Setting', 'Status', 'Value'],
@@ -31,15 +31,15 @@ class CheckWebhookHealth extends Command
         );
 
         $this->newLine();
-        
+
         // Check webhook endpoint accessibility
         $webhookUrl = rtrim($baseUrl, '/') . '/webhooks/stripe';
         $this->info("🌐 Testing webhook endpoint: {$webhookUrl}");
-        
+
         try {
             // Make a GET request to the webhook endpoint (should return 405 Method Not Allowed)
             $response = Http::timeout(10)->get($webhookUrl);
-            
+
             if ($response->status() === 405) {
                 $this->info('✅ Webhook endpoint is accessible (405 Method Not Allowed is expected for GET)');
             } elseif ($response->status() === 200) {

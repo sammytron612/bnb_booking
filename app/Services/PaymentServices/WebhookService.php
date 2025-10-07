@@ -445,15 +445,15 @@ class WebhookService
         try {
             // Method 1: Use Stripe API to get payment intent from charge
             Log::info('Attempting to find booking by charge ID', ['charge_id' => $chargeId]);
-            
+
             $charge = \Stripe\Charge::retrieve($chargeId);
-            
+
             if ($charge->payment_intent) {
                 Log::info('Found payment intent from charge', [
                     'charge_id' => $chargeId,
                     'payment_intent' => $charge->payment_intent
                 ]);
-                
+
                 $booking = Booking::where('stripe_payment_intent_id', $charge->payment_intent)->first();
                 if ($booking) {
                     Log::info('Found booking via payment intent', [
@@ -507,7 +507,7 @@ class WebhookService
             Log::warning('No booking found for charge ID after all methods', [
                 'charge_id' => $chargeId
             ]);
-            
+
             return null;
         } catch (Exception $e) {
             Log::error('Error finding booking by charge ID', [
@@ -515,14 +515,14 @@ class WebhookService
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Emergency fallback: try to find any recent paid booking
             try {
                 $fallbackBooking = Booking::where('is_paid', true)
                     ->where('created_at', '>=', now()->subHours(1))
                     ->latest()
                     ->first();
-                    
+
                 if ($fallbackBooking) {
                     Log::warning('Using emergency fallback booking for dispute', [
                         'charge_id' => $chargeId,
@@ -536,7 +536,7 @@ class WebhookService
                     'error' => $fallbackException->getMessage()
                 ]);
             }
-            
+
             return null;
         }
     }    private function handleCheckoutSessionExpired($session): array
