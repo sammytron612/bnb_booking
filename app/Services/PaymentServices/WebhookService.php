@@ -494,9 +494,12 @@ class WebhookService
                     $chargeAmount = $charge->amount / 100; // Convert pence to pounds
 
                     // Safety check: Only use fallback if there's exactly ONE booking with this amount in recent time
-                    // Use very short time window (30 seconds) for precise matching
+                    // Look for bookings that are either paid OR still processing payment
                     $matchingBookings = Booking::where('total_price', $chargeAmount)
-                        ->where('is_paid', true)
+                        ->where(function($query) {
+                            $query->where('is_paid', true)
+                                  ->orWhere('status', 'pending'); // Include bookings still processing
+                        })
                         ->where('updated_at', '>=', now()->subSeconds(30)) // Very precise window
                         ->get();
 
