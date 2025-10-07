@@ -30,7 +30,7 @@ class DisputeNotification extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.dispute-notification',
+            view: 'emails.dispute-notification',
             with: [
                 'dispute' => $this->dispute,
                 'booking' => $this->dispute->booking,

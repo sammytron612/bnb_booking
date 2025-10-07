@@ -1,62 +1,86 @@
-# Payment Dispute Alert 🚨
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Payment Dispute Alert</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #dc3545 0%, #bd2130 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: white; padding: 30px; border: 1px solid #ddd; }
+        .dispute-details { background: #fff3cd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107; }
+        .booking-details { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .urgent { background: #f8d7da; border-left: 4px solid #dc3545; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; border-radius: 0 0 10px 10px; }
+        .button { background: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 0; }
+        .tips { background: #d1ecf1; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        .code { background: #f8f9fa; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Payment Dispute Alert</h1>
+            <p>A payment dispute has been filed against one of your bookings</p>
+        </div>
 
-**A payment dispute has been filed against one of your bookings.**
+        <div class="content">
+            <div class="dispute-details @if($dispute->is_urgent) urgent @endif">
+                <h3>⚖️ Dispute Details</h3>
+                <p><strong>Amount:</strong> {{ $dispute->amount_in_pounds }}</p>
+                <p><strong>Status:</strong> {{ $dispute->friendly_status }}</p>
+                <p><strong>Reason:</strong> {{ $dispute->friendly_reason }}</p>
+                <p><strong>Stripe Dispute ID:</strong> <span class="code">{{ $dispute->stripe_dispute_id }}</span></p>
 
----
+                @if($dispute->evidence_due_by)
+                <p><strong>⏰ Evidence Due:</strong> {{ $dispute->evidence_due_by->format('l, F j, Y \a\t H:i') }}</p>
+                <p><strong>Days Remaining:</strong> {{ $dispute->days_until_due }} days</p>
 
-## Dispute Details
+                @if($dispute->is_urgent)
+                <p style="color: #dc3545; font-weight: bold;">🚨 URGENT: Evidence due in {{ $dispute->days_until_due }} days or less!</p>
+                @endif
+                @else
+                <p><strong>⏰ Evidence Due:</strong> Not specified</p>
+                @endif
+            </div>
 
-**Amount:** {{ $dispute->amount_in_pounds }}
-**Status:** {{ $dispute->friendly_status }}
-**Reason:** {{ $dispute->friendly_reason }}
-**Stripe Dispute ID:** `{{ $dispute->stripe_dispute_id }}`
+            <div class="booking-details">
+                <h3>📋 Booking Information</h3>
+                <p><strong>Guest:</strong> {{ $guest }}</p>
+                <p><strong>Booking ID:</strong> {{ $booking->booking_id ?? $booking->id }}</p>
+                <p><strong>Check-in:</strong> {{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('l, F j, Y') : 'Not set' }}</p>
+                <p><strong>Check-out:</strong> {{ $booking->check_out ? \Carbon\Carbon::parse($booking->check_out)->format('l, F j, Y') : 'Not set' }}</p>
+                <p><strong>Total Amount:</strong> £{{ number_format(($booking->total_price ?? 0), 2) }}</p>
+            </div>
 
-@if($dispute->evidence_due_by)
-**⏰ Evidence Due:** {{ $dispute->evidence_due_by->format('d/m/Y H:i') }}
-**Days Remaining:** {{ $dispute->days_until_due }} days
-@if($dispute->is_urgent)
+            <h3>📝 Next Steps</h3>
+            <ol>
+                <li><strong>Review the dispute details</strong> in your Stripe dashboard</li>
+                <li><strong>Gather evidence</strong> (booking confirmation, communication, photos, etc.)</li>
+                <li><strong>Respond promptly</strong> if evidence is required</li>
+                <li><strong>Contact guest</strong> if appropriate to resolve directly</li>
+            </ol>
 
-**🚨 URGENT: Evidence due in {{ $dispute->days_until_due }} days or less!**
-@endif
-@else
-**⏰ Evidence Due:** Not specified
-@endif
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ $stripeDisputeUrl }}" class="button">View in Stripe Dashboard</a>
+            </div>
 
----
+            <div class="tips">
+                <h4>💡 Tips for Dispute Response:</h4>
+                <ul>
+                    <li><strong>Booking confirmation</strong> emails and receipts</li>
+                    <li><strong>Communication history</strong> with the guest</li>
+                    <li><strong>Property photos</strong> and descriptions</li>
+                    <li><strong>Proof of service delivery</strong> (check-in confirmations, etc.)</li>
+                    <li><strong>Cancellation policy</strong> evidence if applicable</li>
+                </ul>
+            </div>
+        </div>
 
-## Booking Information
-
-**Guest:** {{ $guest }}
-**Booking ID:** {{ $booking->booking_id ?? $booking->id }}
-**Check-in:** {{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') : 'Not set' }}
-**Check-out:** {{ $booking->check_out ? \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') : 'Not set' }}
-**Total Amount:** £{{ number_format(($booking->total_price ?? 0), 2) }}
-
----
-
-## Next Steps
-
-1. **Review the dispute details** in your Stripe dashboard
-2. **Gather evidence** (booking confirmation, communication, photos, etc.)
-3. **Respond promptly** if evidence is required
-4. **Contact guest** if appropriate to resolve directly
-
-<x-mail::button :url="$stripeDisputeUrl" color="primary">
-View in Stripe Dashboard
-</x-mail::button>
-
----
-
-### Tips for Dispute Response:
-
-- **Booking confirmation** emails and receipts
-- **Communication history** with the guest
-- **Property photos** and descriptions
-- **Proof of service delivery** (check-in confirmations, etc.)
-- **Cancellation policy** evidence if applicable
-
----
-
-*This dispute was automatically detected and logged in your system. Please respond promptly to protect your revenue.*
-
-**{{ config('app.name') }}**
+        <div class="footer">
+            <p><em>This dispute was automatically detected and logged in your system. Please respond promptly to protect your revenue.</em></p>
+            <p><strong>{{ config('app.name') }}</strong></p>
+        </div>
+    </div>
+</body>
+</html>
