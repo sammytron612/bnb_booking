@@ -25,8 +25,8 @@ class IcalController extends Controller
         // Add a couple of test events
         $ical .= "BEGIN:VEVENT\r\n";
         $ical .= "UID:test-booking-1@eileenbnb.com\r\n";
-        $ical .= "DTSTART;VALUE=DATE:20250928\r\n";
-        $ical .= "DTEND;VALUE=DATE:20251002\r\n";
+        $ical .= "DTSTART;VALUE=DATE:20251010\r\n";
+        $ical .= "DTEND;VALUE=DATE:20251015\r\n";
         $ical .= "DTSTAMP:20250927T120000Z\r\n";
         $ical .= "SUMMARY:BOOKED: Test Venue\r\n";
         $ical .= "DESCRIPTION:Test booking for import\r\n";
