@@ -485,10 +485,46 @@ class WebhookService
                     ]);
                     return $booking;
                 } else {
-                    Log::error('CRITICAL: No booking found for payment intent - this should not happen!', [
+                    Log::warning('Payment intent not found - trying fallback by amount and timing', [
+                        'payment_intent' => $charge->payment_intent,
+                        'charge_id' => $chargeId
+                    ]);
+
+                    // Simple fallback: Find recent paid booking with matching amount
+                    $chargeAmount = $charge->amount / 100; // Convert pence to pounds
+
+                    // Safety check: Only use fallback if there's exactly ONE booking with this amount in recent time
+                    $matchingBookings = Booking::where('total_price', $chargeAmount)
+                        ->where('is_paid', true)
+                        ->where('updated_at', '>=', now()->subMinutes(5))
+                        ->get();
+
+                    if ($matchingBookings->count() === 1) {
+                        $recentBooking = $matchingBookings->first();
+                        Log::info('Found SINGLE booking via fallback (amount + timing) - safe to use', [
+                            'booking_db_id' => $recentBooking->id,
+                            'booking_id' => $recentBooking->booking_id,
+                            'guest_name' => $recentBooking->name,
+                            'amount' => $chargeAmount,
+                            'charge_id' => $chargeId,
+                            'matching_count' => 1
+                        ]);
+                        return $recentBooking;
+                    } else if ($matchingBookings->count() > 1) {
+                        Log::error('Multiple bookings found with same amount - cannot safely determine correct booking', [
+                            'payment_intent' => $charge->payment_intent,
+                            'charge_id' => $chargeId,
+                            'charge_amount' => $chargeAmount,
+                            'matching_count' => $matchingBookings->count(),
+                            'booking_ids' => $matchingBookings->pluck('booking_id')->toArray()
+                        ]);
+                        return null; // Safety: Don't guess when multiple matches
+                    }
+
+                    Log::error('CRITICAL: No booking found for payment intent or by fallback', [
                         'payment_intent' => $charge->payment_intent,
                         'charge_id' => $chargeId,
-                        'searched_payment_intent' => $charge->payment_intent
+                        'charge_amount' => $chargeAmount
                     ]);                    // Debug: Show what bookings actually exist
                     $allBookings = Booking::whereNotNull('stripe_payment_intent_id')->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id']);
                     Log::error('All bookings with payment intents in database', [
