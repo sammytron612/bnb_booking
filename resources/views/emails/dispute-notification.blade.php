@@ -20,32 +20,32 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚨 Payment Dispute Alert</h1>
+            <h1>Payment Dispute Alert</h1>
             <p>A payment dispute has been filed against one of your bookings</p>
         </div>
 
         <div class="content">
             <div class="dispute-details @if($dispute->is_urgent) urgent @endif">
-                <h3>⚖️ Dispute Details</h3>
+                <h3>Dispute Details</h3>
                 <p><strong>Amount:</strong> {{ $dispute->amount_in_pounds }}</p>
                 <p><strong>Status:</strong> {{ $dispute->friendly_status }}</p>
                 <p><strong>Reason:</strong> {{ $dispute->friendly_reason }}</p>
                 <p><strong>Stripe Dispute ID:</strong> <span class="code">{{ $dispute->stripe_dispute_id }}</span></p>
 
                 @if($dispute->evidence_due_by)
-                <p><strong>⏰ Evidence Due:</strong> {{ $dispute->evidence_due_by->format('l, F j, Y \a\t H:i') }}</p>
+                <p><strong>Evidence Due:</strong> {{ $dispute->evidence_due_by->format('l, F j, Y \a\t H:i') }}</p>
                 <p><strong>Days Remaining:</strong> {{ $dispute->days_until_due }} days</p>
 
                 @if($dispute->is_urgent)
-                <p style="color: #dc3545; font-weight: bold;">🚨 URGENT: Evidence due in {{ $dispute->days_until_due }} days or less!</p>
+                <p style="color: #dc3545; font-weight: bold;"> URGENT: Evidence due in {{ $dispute->days_until_due }} days or less!</p>
                 @endif
                 @else
-                <p><strong>⏰ Evidence Due:</strong> Not specified</p>
+                <p><strong>Evidence Due:</strong> Not specified</p>
                 @endif
             </div>
 
             <div class="booking-details">
-                <h3>📋 Booking Information</h3>
+                <h3>Booking Information</h3>
                 <p><strong>Guest:</strong> {{ $guest }}</p>
                 <p><strong>Booking ID:</strong> {{ $booking->booking_id ?? $booking->id }}</p>
                 <p><strong>Check-in:</strong> {{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('l, F j, Y') : 'Not set' }}</p>

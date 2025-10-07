@@ -97,6 +97,7 @@
             <option value="confirmed">Confirmed</option>
             <option value="pending">Pending</option>
             <option value="cancelled">Cancelled</option>
+            <option value="payment_failed">Payment Failed</option>
             <option value="payment_expired">Payment Expired</option>
             <option value="abandoned">Abandoned</option>
             <option value="refunded">Refunded</option>
@@ -436,6 +437,7 @@
                                     <option value="pending">Pending</option>
                                     <option value="confirmed">Confirmed</option>
                                     <option value="cancelled">Cancelled</option>
+                                    <option value="payment_failed">Payment Failed</option>
                                     <option value="payment_expired">Payment Expired</option>
                                     <option value="abandoned">Abandoned</option>
                                     <option value="refunded">Refunded</option>
