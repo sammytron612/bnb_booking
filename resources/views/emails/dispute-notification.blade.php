@@ -53,27 +53,8 @@
                 <p><strong>Total Amount:</strong> £{{ number_format(($booking->total_price ?? 0), 2) }}</p>
             </div>
 
-            <h3>📝 Next Steps</h3>
-            <ol>
-                <li><strong>Review the dispute details</strong> in your Stripe dashboard</li>
-                <li><strong>Gather evidence</strong> (booking confirmation, communication, photos, etc.)</li>
-                <li><strong>Respond promptly</strong> if evidence is required</li>
-                <li><strong>Contact guest</strong> if appropriate to resolve directly</li>
-            </ol>
-
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{{ $stripeDisputeUrl }}" class="button">View in Stripe Dashboard</a>
-            </div>
-
-            <div class="tips">
-                <h4>💡 Tips for Dispute Response:</h4>
-                <ul>
-                    <li><strong>Booking confirmation</strong> emails and receipts</li>
-                    <li><strong>Communication history</strong> with the guest</li>
-                    <li><strong>Property photos</strong> and descriptions</li>
-                    <li><strong>Proof of service delivery</strong> (check-in confirmations, etc.)</li>
-                    <li><strong>Cancellation policy</strong> evidence if applicable</li>
-                </ul>
             </div>
         </div>
 

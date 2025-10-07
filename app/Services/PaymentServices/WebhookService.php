@@ -493,6 +493,26 @@ class WebhookService
                     // Simple fallback: Find recent paid booking with matching amount
                     $chargeAmount = $charge->amount / 100; // Convert pence to pounds
 
+                    // Debug: Show ALL recent bookings regardless of status
+                    $allRecentBookings = Booking::where('updated_at', '>=', now()->subMinutes(2))
+                        ->get(['id', 'booking_id', 'name', 'total_price', 'is_paid', 'status', 'updated_at']);
+
+                    Log::info('DEBUG: All recent bookings (last 2 minutes)', [
+                        'charge_amount' => $chargeAmount,
+                        'recent_bookings' => $allRecentBookings->map(function($booking) {
+                            return [
+                                'id' => $booking->id,
+                                'booking_id' => $booking->booking_id,
+                                'name' => $booking->name,
+                                'total_price' => $booking->total_price,
+                                'is_paid' => $booking->is_paid,
+                                'status' => $booking->status,
+                                'updated_at' => $booking->updated_at,
+                                'seconds_ago' => now()->diffInSeconds($booking->updated_at)
+                            ];
+                        })->toArray()
+                    ]);
+
                     // Safety check: Only use fallback if there's exactly ONE booking with this amount in recent time
                     // Look for bookings that are either paid OR still processing payment
                     $matchingBookings = Booking::where('total_price', $chargeAmount)
