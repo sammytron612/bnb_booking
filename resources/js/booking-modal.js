@@ -202,11 +202,11 @@ function initializeBookingCalendar() {
             }
 
             if (inRange) {
-                classNames.push('bg-pink-50 text-pink-700 font-semibold');
+                classNames.push('bg-green-50 text-green-800 font-semibold');
             }
 
             if (isStart || isEnd) {
-                classNames.push('ring-2 ring-pink-500 font-bold');
+                classNames.push('ring-2 ring-green-600 font-bold');
             }
 
             btn.className = classNames.join(' ');
