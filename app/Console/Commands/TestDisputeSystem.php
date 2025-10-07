@@ -16,7 +16,7 @@ class TestDisputeSystem extends Command
     public function handle()
     {
         $bookingId = $this->argument('booking_id');
-        
+
         if ($bookingId) {
             $booking = Booking::where('booking_id', $bookingId)->first();
         } else {
@@ -37,7 +37,7 @@ class TestDisputeSystem extends Command
             'booking_id' => $booking->id,
             'stripe_dispute_id' => 'dp_test_' . uniqid(),
             'stripe_charge_id' => 'ch_test_' . uniqid(),
-            'amount' => $booking->total_price * 100, // Convert to pence
+            'amount' => (float)$booking->total_price * 100, // Convert to pence
             'currency' => 'gbp',
             'reason' => 'unrecognized',
             'status' => 'needs_response',
@@ -52,9 +52,9 @@ class TestDisputeSystem extends Command
         try {
             Mail::to(config('mail.owner_email', 'admin@example.com'))
                 ->send(new DisputeNotification($dispute));
-            
+
             $dispute->update(['admin_notified' => true]);
-            
+
             $this->info("✅ Email notification sent to: " . config('mail.owner_email'));
             $this->info("📧 Check your email for the dispute notification");
         } catch (\Exception $e) {
