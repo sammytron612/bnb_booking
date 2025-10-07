@@ -485,48 +485,11 @@ class WebhookService
                     ]);
                     return $booking;
                 } else {
-                    Log::warning('Payment intent not found in bookings yet - checking for race condition', [
-                        'payment_intent' => $charge->payment_intent,
-                        'charge_id' => $chargeId
-                    ]);
-
-                    // RACE CONDITION FIX: The payment intent might not be stored yet
-                    // Let's try to find a recent booking that matches the charge amount and is processing
-                    $chargeAmount = $charge->amount / 100; // Convert pence to pounds
-
-                    // Look for very recent bookings with matching amount that might be processing payment
-                    $processingBooking = Booking::where('total_price', $chargeAmount)
-                        ->where('status', 'pending') // Still processing
-                        ->where('updated_at', '>=', now()->subMinutes(2)) // Very recent
-                        ->whereNull('stripe_payment_intent_id') // Payment intent not stored yet
-                        ->orderBy('updated_at', 'desc')
-                        ->first();
-
-                    if ($processingBooking) {
-                        Log::info('Found booking in payment processing state - updating with payment intent', [
-                            'booking_db_id' => $processingBooking->id,
-                            'booking_id' => $processingBooking->booking_id,
-                            'guest_name' => $processingBooking->name,
-                            'payment_intent' => $charge->payment_intent,
-                            'charge_id' => $chargeId,
-                            'reason' => 'Race condition fix - payment processing'
-                        ]);
-
-                        // Update the booking with the payment intent we found from the dispute
-                        $processingBooking->update([
-                            'stripe_payment_intent_id' => $charge->payment_intent
-                        ]);
-
-                        return $processingBooking;
-                    }
-
-                    Log::error('CRITICAL: No booking found for payment intent and no processing booking found', [
+                    Log::error('CRITICAL: No booking found for payment intent - this should not happen!', [
                         'payment_intent' => $charge->payment_intent,
                         'charge_id' => $chargeId,
-                        'charge_amount' => $chargeAmount
-                    ]);
-
-                    // Debug: Show what bookings actually exist
+                        'searched_payment_intent' => $charge->payment_intent
+                    ]);                    // Debug: Show what bookings actually exist
                     $allBookings = Booking::whereNotNull('stripe_payment_intent_id')->get(['id', 'booking_id', 'name', 'stripe_payment_intent_id']);
                     Log::error('All bookings with payment intents in database', [
                         'total_count' => $allBookings->count(),
