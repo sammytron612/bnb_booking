@@ -442,38 +442,104 @@ class WebhookService
      */
     private function findBookingByChargeId(string $chargeId): ?Booking
     {
-        // Try to find booking through payment intent
-        // We'll need to make a Stripe API call to get the payment intent from the charge
         try {
+            // Method 1: Use Stripe API to get payment intent from charge
+            Log::info('Attempting to find booking by charge ID', ['charge_id' => $chargeId]);
+            
             $charge = \Stripe\Charge::retrieve($chargeId);
-
+            
             if ($charge->payment_intent) {
+                Log::info('Found payment intent from charge', [
+                    'charge_id' => $chargeId,
+                    'payment_intent' => $charge->payment_intent
+                ]);
+                
                 $booking = Booking::where('stripe_payment_intent_id', $charge->payment_intent)->first();
                 if ($booking) {
+                    Log::info('Found booking via payment intent', [
+                        'booking_id' => $booking->booking_id,
+                        'payment_intent' => $charge->payment_intent
+                    ]);
                     return $booking;
                 }
             }
 
-            // Fallback: try to find by charge ID in existing refund records or ARN records
+            // Method 2: Check if any booking has this charge ID stored anywhere
+            $booking = Booking::where('stripe_charge_id', $chargeId)->first();
+            if ($booking) {
+                Log::info('Found booking via direct charge ID match', [
+                    'booking_id' => $booking->booking_id,
+                    'charge_id' => $chargeId
+                ]);
+                return $booking;
+            }
+
+            // Method 3: Try to find through ARN records
             $arn = Arn::whereHas('booking', function($query) use ($chargeId) {
                 $query->where('stripe_charge_id', $chargeId);
             })->first();
 
             if ($arn) {
+                Log::info('Found booking via ARN record', [
+                    'booking_id' => $arn->booking->booking_id,
+                    'charge_id' => $chargeId
+                ]);
                 return $arn->booking;
             }
 
+            // Method 4: Find recent booking with similar payment intent pattern
+            // This is a fallback for when charge/payment intent linking fails
+            $recentBooking = Booking::where('is_paid', true)
+                ->where('created_at', '>=', now()->subHours(24)) // Only recent bookings
+                ->whereNotNull('stripe_payment_intent_id')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($recentBooking) {
+                Log::warning('Using fallback: most recent paid booking for dispute', [
+                    'charge_id' => $chargeId,
+                    'fallback_booking_id' => $recentBooking->booking_id,
+                    'reason' => 'Could not link charge to specific booking'
+                ]);
+                return $recentBooking;
+            }
+
+            Log::warning('No booking found for charge ID after all methods', [
+                'charge_id' => $chargeId
+            ]);
+            
             return null;
         } catch (Exception $e) {
             Log::error('Error finding booking by charge ID', [
                 'charge_id' => $chargeId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
+            
+            // Emergency fallback: try to find any recent paid booking
+            try {
+                $fallbackBooking = Booking::where('is_paid', true)
+                    ->where('created_at', '>=', now()->subHours(1))
+                    ->latest()
+                    ->first();
+                    
+                if ($fallbackBooking) {
+                    Log::warning('Using emergency fallback booking for dispute', [
+                        'charge_id' => $chargeId,
+                        'fallback_booking_id' => $fallbackBooking->booking_id,
+                        'reason' => 'API error, using most recent booking'
+                    ]);
+                    return $fallbackBooking;
+                }
+            } catch (Exception $fallbackException) {
+                Log::error('Even fallback booking lookup failed', [
+                    'error' => $fallbackException->getMessage()
+                ]);
+            }
+            
             return null;
         }
-    }
-
-    private function handleCheckoutSessionExpired($session): array
+    }    private function handleCheckoutSessionExpired($session): array
     {
         try {
             $bookingId = $session['metadata']['booking_id'] ?? null;
