@@ -467,18 +467,8 @@ class WebhookService
             // Method 2: Skip direct charge ID check since column doesn't exist
             // TODO: Add stripe_charge_id column to bookings table if needed
 
-            // Method 3: Try to find through ARN records
-            $arn = Arn::whereHas('booking', function($query) use ($chargeId) {
-                $query->where('stripe_charge_id', $chargeId);
-            })->first();
-
-            if ($arn) {
-                Log::info('Found booking via ARN record', [
-                    'booking_id' => $arn->booking->booking_id,
-                    'charge_id' => $chargeId
-                ]);
-                return $arn->booking;
-            }
+            // Method 3: Skip ARN lookup since booking table doesn't have stripe_charge_id column
+            // TODO: Add proper charge ID storage if needed for ARN linking
 
             // Method 4: Find recent booking with similar payment intent pattern
             // This is a fallback for when charge/payment intent linking fails

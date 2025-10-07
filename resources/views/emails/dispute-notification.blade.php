@@ -6,7 +6,7 @@
 
 ## Dispute Details
 
-**Amount:** £{{ $dispute->amount_in_pounds }}
+**Amount:** {{ $dispute->amount_in_pounds }}
 **Status:** {{ $dispute->friendly_status }}
 **Reason:** {{ $dispute->friendly_reason }}
 **Stripe Dispute ID:** `{{ $dispute->stripe_dispute_id }}`
@@ -20,7 +20,9 @@
 @endif
 @else
 **⏰ Evidence Due:** Not specified
-@endif---
+@endif
+
+---
 
 ## Booking Information
 
@@ -28,7 +30,9 @@
 **Booking ID:** {{ $booking->booking_id ?? $booking->id }}
 **Check-in:** {{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') : 'Not set' }}
 **Check-out:** {{ $booking->check_out ? \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') : 'Not set' }}
-**Total Amount:** £{{ number_format(($booking->total_price ?? 0), 2) }}---
+**Total Amount:** £{{ number_format(($booking->total_price ?? 0), 2) }}
+
+---
 
 ## Next Steps
 
@@ -55,4 +59,4 @@ View in Stripe Dashboard
 
 *This dispute was automatically detected and logged in your system. Please respond promptly to protect your revenue.*
 
-**Eileen's BnB Management System**
+**{{ config('app.name') }}**
