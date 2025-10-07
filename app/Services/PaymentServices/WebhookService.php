@@ -523,6 +523,24 @@ class WebhookService
                         ->where('updated_at', '>=', now()->subSeconds(30)) // Very precise window
                         ->get();
 
+                    Log::info('DEBUG: Fallback query results', [
+                        'charge_amount' => $chargeAmount,
+                        'time_cutoff' => now()->subSeconds(30),
+                        'matching_count' => $matchingBookings->count(),
+                        'matching_bookings' => $matchingBookings->map(function($booking) {
+                            return [
+                                'id' => $booking->id,
+                                'booking_id' => $booking->booking_id,
+                                'name' => $booking->name,
+                                'total_price' => $booking->total_price,
+                                'is_paid' => $booking->is_paid,
+                                'status' => $booking->status,
+                                'updated_at' => $booking->updated_at,
+                                'seconds_ago' => now()->diffInSeconds($booking->updated_at)
+                            ];
+                        })->toArray()
+                    ]);
+
                     if ($matchingBookings->count() === 1) {
                         $recentBooking = $matchingBookings->first();
                         Log::info('Found SINGLE booking via fallback (amount + timing) - safe to use', [
