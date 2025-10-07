@@ -494,9 +494,10 @@ class WebhookService
                     $chargeAmount = $charge->amount / 100; // Convert pence to pounds
 
                     // Safety check: Only use fallback if there's exactly ONE booking with this amount in recent time
+                    // Use very short time window (30 seconds) for precise matching
                     $matchingBookings = Booking::where('total_price', $chargeAmount)
                         ->where('is_paid', true)
-                        ->where('updated_at', '>=', now()->subMinutes(5))
+                        ->where('updated_at', '>=', now()->subSeconds(30)) // Very precise window
                         ->get();
 
                     if ($matchingBookings->count() === 1) {
@@ -507,7 +508,9 @@ class WebhookService
                             'guest_name' => $recentBooking->name,
                             'amount' => $chargeAmount,
                             'charge_id' => $chargeId,
-                            'matching_count' => 1
+                            'matching_count' => 1,
+                            'booking_updated_at' => $recentBooking->updated_at,
+                            'minutes_ago' => now()->diffInMinutes($recentBooking->updated_at)
                         ]);
                         return $recentBooking;
                     } else if ($matchingBookings->count() > 1) {
