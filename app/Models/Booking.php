@@ -256,4 +256,20 @@ class Booking extends Model
     {
         return $this->hasOne(Arn::class)->latest();
     }
+
+    /**
+     * Get all disputes for this booking.
+     */
+    public function disputes()
+    {
+        return $this->hasMany(BookingDispute::class);
+    }
+
+    /**
+     * Get the latest dispute for this booking.
+     */
+    public function latestDispute()
+    {
+        return $this->hasOne(BookingDispute::class)->latest();
+    }
 }

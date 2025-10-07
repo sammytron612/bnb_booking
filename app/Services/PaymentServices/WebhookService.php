@@ -4,6 +4,8 @@ namespace App\Services\PaymentServices;
 
 use App\Models\Booking;
 use App\Models\Arn;
+use App\Models\BookingDispute;
+use App\Mail\DisputeNotification;
 use Stripe\Stripe;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
@@ -55,6 +57,12 @@ class WebhookService
 
             case 'charge.dispute.created':
                 return $this->handleChargeDisputeCreated($event['data']['object']);
+
+            case 'charge.dispute.updated':
+                return $this->handleChargeDisputeUpdated($event['data']['object']);
+
+            case 'charge.dispute.closed':
+                return $this->handleChargeDisputeClosed($event['data']['object']);
 
             case 'charge.refunded':
                 return $this->handleChargeRefunded($event['data']['object']);
@@ -283,18 +291,185 @@ class WebhookService
                 'status' => $dispute['status']
             ]);
 
-            // Here you could add logic to:
-            // - Send admin notifications
-            // - Mark related bookings for review
-            // - Gather evidence automatically
+            // Find the booking associated with this charge
+            $booking = $this->findBookingByChargeId($dispute['charge']);
 
-            return ['status' => 'logged', 'message' => 'Dispute logged and admins notified'];
+            if (!$booking) {
+                Log::warning('No booking found for dispute charge', [
+                    'dispute_id' => $dispute['id'],
+                    'charge_id' => $dispute['charge']
+                ]);
+                return ['status' => 'ignored', 'message' => 'Booking not found for charge'];
+            }
+
+            // All bookings in our system are direct bookings since external bookings
+            // (like Airbnb) wouldn't use our Stripe payment system
+            // So we process all disputes for our bookings
+
+            // Check if dispute already exists
+            $existingDispute = BookingDispute::where('stripe_dispute_id', $dispute['id'])->first();
+            if ($existingDispute) {
+                Log::info('Dispute already exists', ['dispute_id' => $dispute['id']]);
+                return ['status' => 'exists', 'message' => 'Dispute already recorded'];
+            }
+
+            // Create the dispute record
+            $bookingDispute = BookingDispute::create([
+                'booking_id' => $booking->id,
+                'stripe_dispute_id' => $dispute['id'],
+                'stripe_charge_id' => $dispute['charge'],
+                'amount' => $dispute['amount'],
+                'currency' => $dispute['currency'] ?? 'gbp',
+                'reason' => $dispute['reason'],
+                'status' => $dispute['status'],
+                'evidence_details' => $dispute['evidence_details'] ?? null,
+                'evidence_due_by' => isset($dispute['evidence_due_by']) ? \Carbon\Carbon::createFromTimestamp($dispute['evidence_due_by']) : null,
+                'created_at_stripe' => \Carbon\Carbon::createFromTimestamp($dispute['created']),
+                'admin_notified' => false,
+            ]);
+
+            // Send admin notification
+            try {
+                Mail::to(config('mail.owner_email', 'admin@example.com'))
+                    ->send(new DisputeNotification($bookingDispute));
+
+                $bookingDispute->update(['admin_notified' => true]);
+
+                Log::info('Dispute notification sent successfully', [
+                    'dispute_id' => $dispute['id'],
+                    'booking_id' => $booking->booking_id
+                ]);
+            } catch (Exception $mailException) {
+                Log::error('Failed to send dispute notification', [
+                    'dispute_id' => $dispute['id'],
+                    'error' => $mailException->getMessage()
+                ]);
+            }
+
+            return ['status' => 'processed', 'message' => 'Dispute recorded and admin notified'];
         } catch (Exception $e) {
             Log::error('Exception in charge dispute created handler', [
                 'error' => $e->getMessage(),
                 'dispute_id' => $dispute['id'] ?? 'unknown'
             ]);
             return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    private function handleChargeDisputeUpdated($dispute): array
+    {
+        try {
+            Log::info('Charge dispute updated', [
+                'dispute_id' => $dispute['id'],
+                'status' => $dispute['status'],
+                'evidence_due_by' => $dispute['evidence_due_by'] ?? null
+            ]);
+
+            // Find existing dispute record
+            $bookingDispute = BookingDispute::where('stripe_dispute_id', $dispute['id'])->first();
+
+            if (!$bookingDispute) {
+                Log::warning('Dispute update received for unknown dispute', [
+                    'dispute_id' => $dispute['id']
+                ]);
+                return ['status' => 'ignored', 'message' => 'Unknown dispute'];
+            }
+
+            // Update dispute record
+            $bookingDispute->update([
+                'status' => $dispute['status'],
+                'evidence_details' => $dispute['evidence_details'] ?? $bookingDispute->evidence_details,
+                'evidence_due_by' => isset($dispute['evidence_due_by']) ? \Carbon\Carbon::createFromTimestamp($dispute['evidence_due_by']) : $bookingDispute->evidence_due_by,
+            ]);
+
+            Log::info('Dispute updated successfully', [
+                'dispute_id' => $dispute['id'],
+                'new_status' => $dispute['status']
+            ]);
+
+            return ['status' => 'updated', 'message' => 'Dispute record updated'];
+        } catch (Exception $e) {
+            Log::error('Exception in charge dispute updated handler', [
+                'error' => $e->getMessage(),
+                'dispute_id' => $dispute['id'] ?? 'unknown'
+            ]);
+            return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    private function handleChargeDisputeClosed($dispute): array
+    {
+        try {
+            Log::info('Charge dispute closed', [
+                'dispute_id' => $dispute['id'],
+                'status' => $dispute['status']
+            ]);
+
+            // Find existing dispute record
+            $bookingDispute = BookingDispute::where('stripe_dispute_id', $dispute['id'])->first();
+
+            if (!$bookingDispute) {
+                Log::warning('Dispute closed event received for unknown dispute', [
+                    'dispute_id' => $dispute['id']
+                ]);
+                return ['status' => 'ignored', 'message' => 'Unknown dispute'];
+            }
+
+            // Update dispute with final status
+            $bookingDispute->update([
+                'status' => $dispute['status'],
+                'evidence_details' => $dispute['evidence_details'] ?? $bookingDispute->evidence_details,
+            ]);
+
+            Log::info('Dispute closed and record updated', [
+                'dispute_id' => $dispute['id'],
+                'final_status' => $dispute['status'],
+                'booking_id' => $bookingDispute->booking->booking_id
+            ]);
+
+            return ['status' => 'closed', 'message' => 'Dispute closed and recorded'];
+        } catch (Exception $e) {
+            Log::error('Exception in charge dispute closed handler', [
+                'error' => $e->getMessage(),
+                'dispute_id' => $dispute['id'] ?? 'unknown'
+            ]);
+            return ['status' => 'error', 'message' => 'Internal error'];
+        }
+    }
+
+    /**
+     * Find booking by Stripe charge ID
+     */
+    private function findBookingByChargeId(string $chargeId): ?Booking
+    {
+        // Try to find booking through payment intent
+        // We'll need to make a Stripe API call to get the payment intent from the charge
+        try {
+            $charge = \Stripe\Charge::retrieve($chargeId);
+
+            if ($charge->payment_intent) {
+                $booking = Booking::where('stripe_payment_intent_id', $charge->payment_intent)->first();
+                if ($booking) {
+                    return $booking;
+                }
+            }
+
+            // Fallback: try to find by charge ID in existing refund records or ARN records
+            $arn = Arn::whereHas('booking', function($query) use ($chargeId) {
+                $query->where('stripe_charge_id', $chargeId);
+            })->first();
+
+            if ($arn) {
+                return $arn->booking;
+            }
+
+            return null;
+        } catch (Exception $e) {
+            Log::error('Error finding booking by charge ID', [
+                'charge_id' => $chargeId,
+                'error' => $e->getMessage()
+            ]);
+            return null;
         }
     }
 
