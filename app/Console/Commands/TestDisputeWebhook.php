@@ -14,7 +14,7 @@ class TestDisputeWebhook extends Command
     public function handle()
     {
         $bookingId = $this->argument('booking_id');
-        
+
         if ($bookingId) {
             $booking = Booking::where('booking_id', $bookingId)->first();
         } else {
@@ -43,10 +43,10 @@ class TestDisputeWebhook extends Command
 
         // Mock the webhook service to find this booking
         $this->info("📡 Simulating charge.dispute.created webhook...");
-        
+
         // Note: In real testing, you'd need to modify the findBookingByChargeId method
         // to handle test bookings, or use Stripe's test mode with actual test charges
-        
+
         $this->table(
             ['Webhook Property', 'Value'],
             [

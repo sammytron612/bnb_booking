@@ -59,7 +59,7 @@ class MonitorDisputes extends Command
         if ($recentDisputes->count() > 0) {
             $this->newLine();
             $this->info("📋 Recent Disputes:");
-            
+
             $disputeData = $recentDisputes->map(function ($dispute) {
                 return [
                     'ID' => substr($dispute->stripe_dispute_id, 0, 15) . '...',
@@ -83,7 +83,7 @@ class MonitorDisputes extends Command
         // System health checks
         $this->newLine();
         $this->info("🔧 System Health:");
-        
+
         $ownerEmail = config('mail.owner_email');
         $webhookSecret = config('services.stripe.webhook_secret') ? '✅ Set' : '❌ Missing';
         $stripeKey = config('services.stripe.secret_key') ? '✅ Set' : '❌ Missing';
@@ -105,7 +105,7 @@ class MonitorDisputes extends Command
 
         $this->newLine();
         $this->info("💡 Use 'php artisan dispute:monitor' anytime to check status");
-        
+
         return 0;
     }
 }
