@@ -34,7 +34,7 @@ class DisputeNotification extends Mailable
             with: [
                 'dispute' => $this->dispute,
                 'booking' => $this->dispute->booking,
-                'guest' => $this->dispute->booking->guest_name ?? 'Unknown Guest',
+                'guest' => $this->dispute->booking->name ?? 'Unknown Guest',
                 'stripeDisputeUrl' => "https://dashboard.stripe.com/payments/{$this->dispute->stripe_charge_id}"
             ]
         );

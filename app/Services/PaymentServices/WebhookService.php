@@ -461,6 +461,28 @@ class WebhookService
                         'payment_intent' => $charge->payment_intent
                     ]);
                     return $booking;
+                } else {
+                    Log::warning('No booking found for payment intent', [
+                        'payment_intent' => $charge->payment_intent,
+                        'charge_id' => $chargeId
+                    ]);
+
+                    // Try to find booking by amount and recent time (more specific fallback)
+                    $bookingAmount = $charge->amount / 100; // Convert pence to pounds
+                    $recentBooking = Booking::where('total_price', $bookingAmount)
+                        ->where('is_paid', true)
+                        ->where('created_at', '>=', now()->subMinutes(10)) // Within last 10 minutes
+                        ->orderBy('created_at', 'desc')
+                        ->first();
+
+                    if ($recentBooking) {
+                        Log::info('Found booking by amount and timing', [
+                            'booking_id' => $recentBooking->booking_id,
+                            'amount' => $bookingAmount,
+                            'charge_id' => $chargeId
+                        ]);
+                        return $recentBooking;
+                    }
                 }
             }
 
@@ -470,19 +492,43 @@ class WebhookService
             // Method 3: Skip ARN lookup since booking table doesn't have stripe_charge_id column
             // TODO: Add proper charge ID storage if needed for ARN linking
 
-            // Method 4: Find recent booking with similar payment intent pattern
-            // This is a fallback for when charge/payment intent linking fails
+            // Method 4: Find recent booking by charge amount and timing (more precise fallback)
+            try {
+                $chargeAmount = $charge->amount / 100; // Convert pence to pounds
+                $recentBooking = Booking::where('is_paid', true)
+                    ->where('total_price', $chargeAmount)
+                    ->where('created_at', '>=', now()->subMinutes(30)) // Within last 30 minutes
+                    ->whereNotNull('stripe_payment_intent_id')
+                    ->orderBy('created_at', 'desc')
+                    ->first();
+
+                if ($recentBooking) {
+                    Log::info('Using precise fallback: booking found by amount and timing', [
+                        'charge_id' => $chargeId,
+                        'fallback_booking_id' => $recentBooking->booking_id,
+                        'amount' => $chargeAmount,
+                        'reason' => 'Found by matching amount and recent timing'
+                    ]);
+                    return $recentBooking;
+                }
+            } catch (Exception $fallbackException) {
+                Log::error('Error in precise fallback lookup', [
+                    'error' => $fallbackException->getMessage()
+                ]);
+            }
+
+            // Method 5: Last resort - any recent booking (least preferred)
             $recentBooking = Booking::where('is_paid', true)
-                ->where('created_at', '>=', now()->subHours(24)) // Only recent bookings
+                ->where('created_at', '>=', now()->subHours(1)) // Only very recent bookings
                 ->whereNotNull('stripe_payment_intent_id')
                 ->orderBy('created_at', 'desc')
                 ->first();
 
             if ($recentBooking) {
-                Log::warning('Using fallback: most recent paid booking for dispute', [
+                Log::warning('Using last resort fallback: most recent paid booking for dispute', [
                     'charge_id' => $chargeId,
                     'fallback_booking_id' => $recentBooking->booking_id,
-                    'reason' => 'Could not link charge to specific booking'
+                    'reason' => 'Could not link charge to specific booking - using most recent'
                 ]);
                 return $recentBooking;
             }
