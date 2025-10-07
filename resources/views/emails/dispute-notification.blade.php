@@ -12,25 +12,23 @@
 **Stripe Dispute ID:** `{{ $dispute->stripe_dispute_id }}`
 
 @if($dispute->evidence_due_by)
-**⏰ Evidence Due:** {{ $dispute->evidence_due_by->format('d/m/Y H:i') }}
+**⏰ Evidence Due:** {{ $dispute->evidence_due_by->format('d/m/Y H:i') }}  
 **Days Remaining:** {{ $dispute->days_until_due }} days
 @if($dispute->is_urgent)
 
 **🚨 URGENT: Evidence due in {{ $dispute->days_until_due }} days or less!**
 @endif
-@endif
-
----
+@else
+**⏰ Evidence Due:** Not specified
+@endif---
 
 ## Booking Information
 
-**Guest:** {{ $guest }}
-**Booking ID:** {{ $booking->id }}
-**Check-in:** {{ $booking->checkin_date->format('d/m/Y') }}
-**Check-out:** {{ $booking->checkout_date->format('d/m/Y') }}
-**Total Amount:** £{{ number_format($booking->total_amount / 100, 2) }}
-
----
+**Guest:** {{ $guest }}  
+**Booking ID:** {{ $booking->booking_id ?? $booking->id }}  
+**Check-in:** {{ $booking->check_in ? \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') : 'Not set' }}  
+**Check-out:** {{ $booking->check_out ? \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') : 'Not set' }}  
+**Total Amount:** £{{ number_format(($booking->total_price ?? 0), 2) }}---
 
 ## Next Steps
 

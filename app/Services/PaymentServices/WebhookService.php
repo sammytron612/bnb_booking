@@ -464,15 +464,8 @@ class WebhookService
                 }
             }
 
-            // Method 2: Check if any booking has this charge ID stored anywhere
-            $booking = Booking::where('stripe_charge_id', $chargeId)->first();
-            if ($booking) {
-                Log::info('Found booking via direct charge ID match', [
-                    'booking_id' => $booking->booking_id,
-                    'charge_id' => $chargeId
-                ]);
-                return $booking;
-            }
+            // Method 2: Skip direct charge ID check since column doesn't exist
+            // TODO: Add stripe_charge_id column to bookings table if needed
 
             // Method 3: Try to find through ARN records
             $arn = Arn::whereHas('booking', function($query) use ($chargeId) {
