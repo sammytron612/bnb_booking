@@ -24,6 +24,5 @@ Artisan::command('test:reviews', function () {
 Schedule::job(new SendCheckinReminders())->dailyAt('09:00')->name('send-checkin-reminders');
 Schedule::job(new SendReviewLinkEmails())->dailyAt('09:00')->name('send-review-link-emails');
 
-// Schedule cleanup of abandoned bookings - runs every 12 hours
-<?php
+// Schedule cleanup of abandoned bookings - runs every hour, cleans bookings older than 12 hours
 Schedule::command('bookings:cleanup-abandoned --hours=12')->hourly()->name('cleanup-abandoned-bookings');
