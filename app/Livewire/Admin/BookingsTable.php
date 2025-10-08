@@ -22,6 +22,7 @@ class BookingsTable extends Component
     public $activeView = 'table'; // 'table' or 'calendar'
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
+    public $hideAbandoned = true; // Hide abandoned bookings by default
 
     // Venue filtering properties
     public $selectedVenueId = null; // null = "All Venues"
@@ -58,6 +59,12 @@ class BookingsTable extends Component
 
     public function updatedStatusFilter()
     {
+        $this->resetPage();
+    }
+
+    public function toggleAbandoned()
+    {
+        $this->hideAbandoned = !$this->hideAbandoned;
         $this->resetPage();
     }
 
@@ -205,6 +212,9 @@ class BookingsTable extends Component
         $dbBookingsQuery = Booking::with('venue')
             ->when($this->selectedVenueId, function ($query) {
                 $query->where('venue_id', $this->selectedVenueId);
+            })
+            ->when($this->hideAbandoned, function ($query) {
+                $query->where('status', '!=', 'abandoned');
             })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {

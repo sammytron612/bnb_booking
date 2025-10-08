@@ -106,6 +106,14 @@
         </select>
     </div>
 
+    <!-- Abandoned Bookings Toggle -->
+    <div class="mb-6">
+        <label class="inline-flex items-center">
+            <input type="checkbox" wire:model.live="hideAbandoned" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out">
+            <span class="ml-2 text-sm text-gray-700">Hide abandoned bookings</span>
+        </label>
+    </div>
+
     <!-- Venue Filtering Buttons -->
     <div class="mb-6 border-t border-gray-200 pt-4">
         <div class="flex flex-wrap gap-2 justify-center">
