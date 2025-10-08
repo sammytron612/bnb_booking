@@ -179,9 +179,10 @@ function initializeBookingCalendar() {
             // Allow clicking on dates that are:
             // 1. Not in the past
             // 2. Not orphaned (can accommodate minimum stay)
-            // 3. Either completely free OR allow same-day turnover
-            const canSameDayTurnover = isCheckInDay || isCheckOutDay;
-            const isClickable = !isPast && !isOrphaned && (!isFullyBooked || canSameDayTurnover);
+            // 3. Either completely free OR allow same-day turnover via check-in days only
+            // Note: Check-out days are made non-clickable to simplify UX (but keep tooltips)
+            const canSameDayTurnoverViaCheckIn = isCheckInDay; // Only check-in days allow same-day turnover
+            const isClickable = !isPast && !isOrphaned && (!isFullyBooked || canSameDayTurnoverViaCheckIn) && !isCheckOutDay;
 
             // Style based on availability, with fully booked taking precedence
             if (isOrphaned) {
@@ -190,8 +191,8 @@ function initializeBookingCalendar() {
                 // Check-in days that are also fully booked - show as available for same-day turnover
                 classNames.push('bg-orange-50 text-orange-700 border border-orange-200');
             } else if (isCheckOutDay && isFullyBooked) {
-                // Check-out days that are also fully booked - show as available for same-day turnover
-                classNames.push('bg-green-50 text-green-700 border border-green-200');
+                // Check-out days that are also fully booked - informational only, not clickable
+                classNames.push('bg-green-50 text-green-700 border border-green-200 cursor-not-allowed');
             } else if (isFullyBooked) {
                 // Fully booked dates with no same-day turnover option
                 classNames.push('line-through text-gray-400 bg-gray-100 cursor-not-allowed');
@@ -199,7 +200,8 @@ function initializeBookingCalendar() {
                 // Check-in days (not fully booked)
                 classNames.push('bg-orange-50 text-orange-700 border border-orange-200');
             } else if (isCheckOutDay) {
-                classNames.push('bg-green-50 text-green-700 border border-green-200');
+                // Check-out days - informational only, not clickable
+                classNames.push('bg-green-50 text-green-700 border border-green-200 cursor-not-allowed');
             }
 
             if (isPast) {
