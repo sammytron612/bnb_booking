@@ -101,12 +101,16 @@ class ParseIcalUrl extends Command
             $checkInDate = $event['DTSTART;VALUE=DATE'] ?? $event['DTSTART'] ?? '';
             $checkOutDate = $event['DTEND;VALUE=DATE'] ?? $event['DTEND'] ?? '';
 
+            $this->line("Event " . ($index + 1) . " - Raw Check-in: '$checkInDate', Raw Check-out: '$checkOutDate'");
+            $this->line("  Check-in length: " . strlen($checkInDate) . ", Check-out length: " . strlen($checkOutDate));
+
             $checkIn = $this->parseDate($checkInDate);
             $checkOut = $this->parseDate($checkOutDate);
             $summary = $event['SUMMARY'] ?? 'Booking';
             $uid = $event['UID'] ?? '';
 
-            $this->line("Event " . ($index + 1) . " - Check-in: '$checkInDate', Check-out: '$checkOutDate'");
+            $this->line("  Parsed Check-in: " . ($checkIn ? $checkIn->format('Y-m-d') : 'NULL') .
+                      ", Parsed Check-out: " . ($checkOut ? $checkOut->format('Y-m-d') : 'NULL'));
 
             if ($checkIn && $checkOut) {
                 $booking = [
@@ -179,24 +183,35 @@ class ParseIcalUrl extends Command
     private function parseDate($dateString)
     {
         if (empty($dateString)) {
+            $this->line("    parseDate: Empty date string");
             return null;
         }
 
+        $this->line("    parseDate: Trying to parse '$dateString' (length: " . strlen($dateString) . ")");
+
         try {
             // Handle different iCal date formats
-            if (strlen($dateString) === 8) {
-                // YYYYMMDD format
-                return Carbon::createFromFormat('Ymd', $dateString);
+            if (strlen($dateString) === 8 && ctype_digit($dateString)) {
+                // YYYYMMDD format (pure digits)
+                $this->line("    parseDate: Treating as YYYYMMDD format");
+                $parsed = Carbon::createFromFormat('Ymd', $dateString);
+                $this->line("    parseDate: Successfully parsed to " . $parsed->format('Y-m-d'));
+                return $parsed;
             } elseif (strlen($dateString) === 15 && substr($dateString, -1) === 'Z') {
                 // YYYYMMDDTHHMMSSZ format
+                $this->line("    parseDate: Treating as YYYYMMDDTHHMMSSZ format");
                 return Carbon::createFromFormat('Ymd\THis\Z', $dateString);
             } elseif (strlen($dateString) === 15) {
                 // YYYYMMDDTHHMMSS format
+                $this->line("    parseDate: Treating as YYYYMMDDTHHMMSS format");
                 return Carbon::createFromFormat('Ymd\THis', $dateString);
+            } else {
+                $this->line("    parseDate: Unrecognized format - length " . strlen($dateString) . ", is digits: " . (ctype_digit($dateString) ? 'yes' : 'no'));
             }
 
             return null;
         } catch (\Exception $e) {
+            $this->line("    parseDate: Exception - " . $e->getMessage());
             return null;
         }
     }
