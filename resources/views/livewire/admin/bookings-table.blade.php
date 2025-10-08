@@ -248,6 +248,8 @@
                                 <span class="font-mono text-sm text-gray-600">{{ $booking->getDisplayBookingId() }}</span>
                                 @if($this->isExternalBooking($booking))
                                     <span class="ml-2 px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">External</span>
+                                @else
+                                    <span class="ml-2 px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Internal</span>
                                 @endif
                             </div>
                         </td>
