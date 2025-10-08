@@ -203,6 +203,20 @@
                         </button>
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <button wire:click="sortByField('status')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
+                            <span>Status</span>
+                            @if($sortBy === 'status')
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    @if($sortDirection === 'asc')
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                    @else
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    @endif
+                                </svg>
+                            @endif
+                        </button>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         <button wire:click="sortByField('check_in')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
                             <span>Check In</span>
                             @if($sortBy === 'check_in')
@@ -258,20 +272,6 @@
                             @endif
                         </button>
                     </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        <button wire:click="sortByField('status')" class="flex items-center space-x-1 hover:bg-gray-100 hover:cursor-pointer p-2 rounded transition-colors duration-150">
-                            <span>Status</span>
-                            @if($sortBy === 'status')
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    @if($sortDirection === 'asc')
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
-                                    @else
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    @endif
-                                </svg>
-                            @endif
-                        </button>
-                    </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
             </thead>
@@ -302,29 +302,6 @@
                                 {{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            @if($this->isExternalBooking($booking))
-                                <div class="text-gray-500">External Booking</div>
-                                <div class="text-xs text-gray-400">No pricing data</div>
-                            @else
-                                <div class="text-green-600">£{{ number_format($this->getNetAmount($booking), 2) }}</div>
-                                @if($booking->refund_amount > 0)
-                                    <div class="text-xs text-gray-500">
-                                        (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
-                                    </div>
-                                    <div class="text-xs font-medium mt-1">
-                                        @if($booking->refund_amount >= $booking->total_price)
-                                            <span class="text-red-600">Full Refund</span>
-                                        @else
-                                            <span class="text-orange-600">Partial Refund</span>
-                                        @endif
-                                    </div>
-                                @endif
-                            @endif
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($this->isExternalBooking($booking))
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
@@ -348,6 +325,29 @@
                                         {{ ucfirst(str_replace('_', ' ', $booking->status)) }}
                                     @endif
                                 </span>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            @if($this->isExternalBooking($booking))
+                                <div class="text-gray-500">External Booking</div>
+                                <div class="text-xs text-gray-400">No pricing data</div>
+                            @else
+                                <div class="text-green-600">£{{ number_format($this->getNetAmount($booking), 2) }}</div>
+                                @if($booking->refund_amount > 0)
+                                    <div class="text-xs text-gray-500">
+                                        (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
+                                    </div>
+                                    <div class="text-xs font-medium mt-1">
+                                        @if($booking->refund_amount >= $booking->total_price)
+                                            <span class="text-red-600">Full Refund</span>
+                                        @else
+                                            <span class="text-orange-600">Partial Refund</span>
+                                        @endif
+                                    </div>
+                                @endif
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
