@@ -265,10 +265,13 @@ function initializeBookingCalendar() {
         console.log('Clicked date:', dateKey, {
             isOrphaned,
             isCheckInDay,
+            isCheckOutDay: checkOutDates.has(dateKey),
             fullyBookedDates: fullyBookedDates.has(dateKey),
             currentCheckIn: checkIn ? fmt(checkIn) : null,
             currentCheckOut: checkOut ? fmt(checkOut) : null,
             fullyBookedSet: Array.from(fullyBookedDates),
+            checkInSet: Array.from(checkInDates),
+            checkOutSet: Array.from(checkOutDates),
             dateKeyType: typeof dateKey
         });
 
