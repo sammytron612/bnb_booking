@@ -322,7 +322,7 @@ function initializeBookingCalendar() {
             // Check if this is a same-day turnover scenario
             const isCheckInDay = checkInDates.has(dateKey);
             const isCheckOutDay = checkOutDates.has(dateKey);
-            
+
             if (isCheckInDay && fullyBookedDates.has(dateKey)) {
                 // Same-day turnover: clicked date is checkout date (not last night staying)
                 console.log('Same-day turnover detected: setting checkout to', dateKey);
