@@ -319,8 +319,18 @@ function initializeBookingCalendar() {
             // Extend backwards - new start date
             checkIn = date;
         } else if (date >= checkOut) {
-            // Extend forwards - date becomes last night, so checkout is day after
-            checkOut = addDays(date, 1);
+            // Check if this is a same-day turnover scenario
+            const isCheckInDay = checkInDates.has(dateKey);
+            const isCheckOutDay = checkOutDates.has(dateKey);
+            
+            if (isCheckInDay && fullyBookedDates.has(dateKey)) {
+                // Same-day turnover: clicked date is checkout date (not last night staying)
+                console.log('Same-day turnover detected: setting checkout to', dateKey);
+                checkOut = date; // Checkout ON this date (same-day turnover)
+            } else {
+                // Normal extension: date becomes last night, so checkout is day after
+                checkOut = addDays(date, 1);
+            }
         } else {
             // Clicking within current range - restart from this date
             checkIn = date;
