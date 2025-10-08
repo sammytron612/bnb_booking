@@ -126,17 +126,25 @@ class ParseIcalUrl extends Command
             } else {
                 $this->warn("✗ Could not parse dates");
             }
-        }        if (empty($bookings)) {
+        }
+
+        $this->info("\n📈 Processing Summary:");
+        $this->line("• Total events found: " . count($events));
+        $this->line("• Successfully parsed bookings: " . count($bookings));
+        $this->line("• Failed to parse: " . (count($events) - count($bookings)));
+
+        if (empty($bookings)) {
             $this->warn("No valid booking dates found in the iCal data.");
             return;
         }
 
         // Sort bookings by check-in date
         usort($bookings, function($a, $b) {
-            return $a['check_in']->compare($b['check_in']);
+            return $a['check_in'] <=> $b['check_in'];
         });
 
         // Display bookings in a nice table format
+        $this->info("\n📋 All Bookings:");
         $tableData = [];
         foreach ($bookings as $index => $booking) {
             $tableData[] = [
@@ -172,7 +180,7 @@ class ParseIcalUrl extends Command
         if ($upcoming->count() > 0) {
             $this->info("\n🔮 Next 5 upcoming bookings:");
             foreach ($upcoming as $booking) {
-                $daysUntil = now()->diffInDays($booking['check_in']);
+                $daysUntil = now()->startOfDay()->diffInDays($booking['check_in']->startOfDay(), false);
                 $this->line("• {$booking['check_in']->format('d/m/Y')} - {$booking['check_out']->format('d/m/Y')} ({$booking['nights']} nights) - in {$daysUntil} days");
             }
         }

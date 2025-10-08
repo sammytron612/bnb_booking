@@ -6,6 +6,9 @@ use App\Models\Booking;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use App\Services\BookingServices\ExternalCalendarService;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 class BookingsTable extends Component
 {
@@ -161,15 +164,35 @@ class BookingsTable extends Component
 
     public function getNetAmount($booking)
     {
+        // External bookings don't have pricing data
+        if ($this->isExternalBooking($booking)) {
+            return 0;
+        }
+
         $totalPrice = (float) $booking->total_price;
         $refundAmount = (float) ($booking->refund_amount ?? 0);
         return $totalPrice - $refundAmount;
     }
 
+    public function isExternalBooking($booking)
+    {
+        return isset($booking->is_external) && $booking->is_external === true;
+    }
+
+    public function canEditBooking($booking)
+    {
+        return !$this->isExternalBooking($booking);
+    }
+
+    public function canDeleteBooking($booking)
+    {
+        return !$this->isExternalBooking($booking);
+    }
+
     public function render()
     {
-        // Get database bookings only (for the table)
-        $paginatedBookings = Booking::with('venue')
+        // Get database bookings
+        $dbBookingsQuery = Booking::with('venue')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -182,27 +205,120 @@ class BookingsTable extends Component
                 });
             })
             ->when($this->statusFilter, function ($query) {
-                if ($this->statusFilter === 'partial_refund') {
-                    // Show confirmed bookings with partial refunds
+                if ($this->statusFilter === 'external') {
+                    // When filtering for external only, exclude all database bookings
+                    $query->whereRaw('1 = 0'); // This will return no results
+                } elseif ($this->statusFilter === 'partial_refund') {
                     $query->where('status', 'confirmed')
                           ->where('refund_amount', '>', 0)
                           ->whereRaw('refund_amount < total_price');
                 } elseif ($this->statusFilter === 'refunded') {
-                    // Show fully refunded bookings (either status = 'refunded' OR refund_amount >= total_price)
                     $query->where(function($q) {
                         $q->where('status', 'refunded')
                           ->orWhereRaw('refund_amount >= total_price');
                     });
                 } else {
-                    // Standard status filter
                     $query->where('status', $this->statusFilter);
                 }
-            })
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate($this->perPage);
+            });
+
+        // Get external bookings
+        $externalBookings = $this->getExternalBookings();
+
+        // Filter external bookings by search and status if needed
+        $filteredExternalBookings = $externalBookings->when($this->search, function ($collection) {
+            return $collection->filter(function ($booking) {
+                return stripos($booking->name, $this->search) !== false ||
+                       stripos($booking->email, $this->search) !== false ||
+                       stripos($booking->booking_id, $this->search) !== false ||
+                       stripos($booking->venue->venue_name ?? '', $this->search) !== false;
+            });
+        })->when($this->statusFilter, function ($collection) {
+            if ($this->statusFilter === 'external') {
+                return $collection; // Return all external bookings when filtering for external
+            } elseif ($this->statusFilter === 'confirmed') {
+                return $collection; // External bookings are shown as confirmed
+            }
+            return collect(); // Return empty if filtering for other statuses
+        });
+
+        // Get database bookings as collection
+        $dbBookings = $dbBookingsQuery->get();
+
+        // Merge database and external bookings
+        $allBookings = $dbBookings->concat($filteredExternalBookings);
+
+        // Sort the merged collection
+        $sortedBookings = $allBookings->sortBy([
+            [$this->sortBy, $this->sortDirection === 'asc' ? 'asc' : 'desc']
+        ]);
+
+        // Manual pagination
+        $currentPage = Paginator::resolveCurrentPage();
+        $itemsForCurrentPage = $sortedBookings->forPage($currentPage, $this->perPage);
+
+        $paginatedBookings = new LengthAwarePaginator(
+            $itemsForCurrentPage->values(),
+            $sortedBookings->count(),
+            $this->perPage,
+            $currentPage,
+            [
+                'path' => request()->url(),
+                'pageName' => 'page',
+            ]
+        );
 
         return view('livewire.admin.bookings-table', [
             'bookings' => $paginatedBookings
         ]);
+    }
+
+    private function getExternalBookings()
+    {
+        $externalBookings = collect();
+
+        try {
+            $externalCalendarService = app(ExternalCalendarService::class);
+            $rawExternalBookings = $externalCalendarService->getExternalBookings();
+
+            if ($rawExternalBookings && $rawExternalBookings->count() > 0) {
+                $index = 0;
+                foreach ($rawExternalBookings as $rawBooking) {
+                    $sourceName = $rawBooking->source ?? 'External Booking';
+                    $uniqueId = 'ext-' . $rawBooking->source . '-' . $index . '-' . uniqid();
+
+                    $booking = new Booking([
+                        'venue_id' => $rawBooking->venue_id,
+                        'booking_id' => 'EXT-' . strtoupper(substr(md5($uniqueId), 0, 6)),
+                        'name' => $sourceName,
+                        'email' => 'external@booking.com',
+                        'phone' => '',
+                        'check_in' => $rawBooking->check_in,
+                        'check_out' => $rawBooking->check_out,
+                        'total_price' => 0,
+                        'status' => 'confirmed',
+                        'notes' => $rawBooking->summary ?? 'External calendar booking',
+                        'nights' => $rawBooking->check_in->diffInDays($rawBooking->check_out),
+                        'pay_method' => 'external',
+                        'is_paid' => true
+                    ]);
+
+                    // Add a flag to identify this as external
+                    $booking->is_external = true;
+
+                    // Load venue relationship if exists
+                    if ($rawBooking->venue_id) {
+                        $booking->setRelation('venue', \App\Models\Venue::find($rawBooking->venue_id));
+                    }
+
+                    $externalBookings->push($booking);
+                    $index++;
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to fetch external bookings: ' . $e->getMessage());
+        }
+
+        return $externalBookings;
     }
 }

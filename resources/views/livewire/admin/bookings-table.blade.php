@@ -102,6 +102,7 @@
             <option value="abandoned">Abandoned</option>
             <option value="refunded">Refunded</option>
             <option value="partial_refund">Partial Refund</option>
+            <option value="external">External Bookings</option>
         </select>
     </div>
 
@@ -241,56 +242,87 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
                 @forelse($bookings as $booking)
-                    <tr class="hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 {{ $this->isExternalBooking($booking) ? 'bg-blue-50' : '' }}">
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            <span class="font-mono text-sm text-gray-600">{{ $booking->getDisplayBookingId() }}</span>
+                            <div class="flex items-center">
+                                <span class="font-mono text-sm text-gray-600">{{ $booking->getDisplayBookingId() }}</span>
+                                @if($this->isExternalBooking($booking))
+                                    <span class="ml-2 px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">External</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">{{ $booking->name }}</div>
                             <div class="text-sm text-gray-500">{{ $booking->email }}</div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->venue->venue_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->venue->venue_name ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            @if($this->isExternalBooking($booking))
+                                <span class="text-gray-500">External Source</span>
+                            @else
+                                {{ \Carbon\Carbon::parse($booking->created_at)->format('d/m/Y H:i') }}
+                            @endif
+                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_in)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ \Carbon\Carbon::parse($booking->check_out)->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $booking->nights }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <div class="text-green-600">£{{ number_format($this->getNetAmount($booking), 2) }}</div>
-                            @if($booking->refund_amount > 0)
-                                <div class="text-xs text-gray-500">
-                                    (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
-                                </div>
-                                <div class="text-xs font-medium mt-1">
-                                    @if($booking->refund_amount >= $booking->total_price)
-                                        <span class="text-red-600">Full Refund</span>
-                                    @else
-                                        <span class="text-orange-600">Partial Refund</span>
-                                    @endif
-                                </div>
+                            @if($this->isExternalBooking($booking))
+                                <div class="text-gray-500">External Booking</div>
+                                <div class="text-xs text-gray-400">No pricing data</div>
+                            @else
+                                <div class="text-green-600">£{{ number_format($this->getNetAmount($booking), 2) }}</div>
+                                @if($booking->refund_amount > 0)
+                                    <div class="text-xs text-gray-500">
+                                        (£{{ number_format((float)$booking->total_price, 2) }} - £{{ number_format((float)$booking->refund_amount, 2) }})
+                                    </div>
+                                    <div class="text-xs font-medium mt-1">
+                                        @if($booking->refund_amount >= $booking->total_price)
+                                            <span class="text-red-600">Full Refund</span>
+                                        @else
+                                            <span class="text-orange-600">Partial Refund</span>
+                                        @endif
+                                    </div>
+                                @endif
                             @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                @if($booking->status === 'refunded') bg-red-100 text-red-800
-                                @elseif($booking->status === 'partial_refund') bg-orange-100 text-orange-800
-                                @elseif($booking->status === 'confirmed') bg-green-100 text-green-800
-                                @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
-                                @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
-                                @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
-                                @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
-                                @else bg-gray-100 text-gray-800 @endif">
-                                @if($booking->status === 'refunded')
-                                    Fully Refunded
-                                @elseif($booking->status === 'partial_refund')
-                                    Partial Refund
-                                @else
-                                    {{ ucfirst(str_replace('_', ' ', $booking->status)) }}
-                                @endif
-                            </span>
+                            @if($this->isExternalBooking($booking))
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    External
+                                </span>
+                            @else
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    @if($booking->status === 'refunded') bg-red-100 text-red-800
+                                    @elseif($booking->status === 'partial_refund') bg-orange-100 text-orange-800
+                                    @elseif($booking->status === 'confirmed') bg-green-100 text-green-800
+                                    @elseif($booking->status === 'pending') bg-yellow-100 text-yellow-800
+                                    @elseif($booking->status === 'cancelled') bg-red-100 text-red-800
+                                    @elseif($booking->status === 'payment_expired') bg-orange-100 text-orange-800
+                                    @elseif($booking->status === 'abandoned') bg-gray-100 text-gray-800
+                                    @else bg-gray-100 text-gray-800 @endif">
+                                    @if($booking->status === 'refunded')
+                                        Fully Refunded
+                                    @elseif($booking->status === 'partial_refund')
+                                        Partial Refund
+                                    @else
+                                        {{ ucfirst(str_replace('_', ' ', $booking->status)) }}
+                                    @endif
+                                </span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button wire:click="editBooking({{ $booking->id }})" class="text-white  bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-lg p-2 mr-3">Edit</button>
-                            <button wire:click="deleteBooking({{ $booking->id }})" class="text-white bg-red-600 hover:bg-red-700 hover:cursor-pointer rounded-lg p-2" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                            @if($this->canEditBooking($booking))
+                                <button wire:click="editBooking({{ $booking->id }})" class="text-white bg-blue-600 hover:bg-blue-700 hover:cursor-pointer rounded-lg p-2 mr-3">Edit</button>
+                            @else
+                                <button disabled class="text-gray-400 bg-gray-200 cursor-not-allowed rounded-lg p-2 mr-3" title="External bookings cannot be edited">Edit</button>
+                            @endif
+
+                            @if($this->canDeleteBooking($booking))
+                                <button wire:click="deleteBooking({{ $booking->id }})" class="text-white bg-red-600 hover:bg-red-700 hover:cursor-pointer rounded-lg p-2" onclick="return confirm('Are you sure you want to delete this booking?')">Delete</button>
+                            @else
+                                <button disabled class="text-gray-400 bg-gray-200 cursor-not-allowed rounded-lg p-2" title="External bookings cannot be deleted">Delete</button>
+                            @endif
                         </td>
                     </tr>
                 @empty
