@@ -328,12 +328,26 @@ function initializeBookingCalendar() {
                 const cursorKey = fmt(cursor);
                 const isCheckInDay = checkInDates.has(cursorKey);
                 const isCheckOutDay = checkOutDates.has(cursorKey);
-                const canSameDayTurnover = isCheckInDay || isCheckOutDay;
 
-                if (fullyBookedDates.has(cursorKey) && !canSameDayTurnover) {
-                    console.log('Backward extension blocked by fully booked night:', cursorKey);
-                    conflictFound = true;
-                    break;
+                console.log(`Checking night ${cursorKey}: fullyBooked=${fullyBookedDates.has(cursorKey)}, isCheckInDay=${isCheckInDay}, isCheckOutDay=${isCheckOutDay}`);
+
+                // Key insight: if it's a check-in day, you can CHECKOUT on that day but not STAY that night
+                // Same-day turnover means: you leave morning, they arrive afternoon
+                if (fullyBookedDates.has(cursorKey)) {
+                    if (isCheckOutDay) {
+                        // You can stay this night and they checkout next morning = OK
+                        console.log(`Night ${cursorKey} is OK: they checkout, you can stay`);
+                    } else if (isCheckInDay) {
+                        // They're checking in this day = they stay this night = conflict with you staying
+                        console.log(`Night ${cursorKey} CONFLICT: they check-in and stay this night`);
+                        conflictFound = true;
+                        break;
+                    } else {
+                        // Fully booked with no turnover opportunity
+                        console.log(`Night ${cursorKey} CONFLICT: fully booked, no turnover`);
+                        conflictFound = true;
+                        break;
+                    }
                 }
                 cursor = addDays(cursor, 1);
             }
