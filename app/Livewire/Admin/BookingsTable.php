@@ -23,6 +23,10 @@ class BookingsTable extends Component
     public $showEditModal = false;
     public ?Booking $selectedBooking = null;
 
+    // Venue filtering properties
+    public $selectedVenueId = null; // null = "All Venues"
+    public $availableVenues = [];
+
     // Form fields for editing
     public $editStatus = '';
     public $editNotes = '';
@@ -38,7 +42,13 @@ class BookingsTable extends Component
 
     public function mount()
     {
-        //
+        $this->availableVenues = \App\Models\Venue::orderBy('venue_name')->get();
+    }
+
+    public function selectVenue($venueId)
+    {
+        $this->selectedVenueId = $venueId; // null for "All Venues"
+        $this->resetPage(); // Reset pagination when changing venues
     }
 
     public function updatedSearch()
@@ -193,6 +203,9 @@ class BookingsTable extends Component
     {
         // Get database bookings
         $dbBookingsQuery = Booking::with('venue')
+            ->when($this->selectedVenueId, function ($query) {
+                $query->where('venue_id', $this->selectedVenueId);
+            })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('name', 'like', '%' . $this->search . '%')
@@ -225,8 +238,12 @@ class BookingsTable extends Component
         // Get external bookings
         $externalBookings = $this->getExternalBookings();
 
-        // Filter external bookings by search and status if needed
-        $filteredExternalBookings = $externalBookings->when($this->search, function ($collection) {
+        // Filter external bookings by search, status, and venue if needed
+        $filteredExternalBookings = $externalBookings->when($this->selectedVenueId, function ($collection) {
+            return $collection->filter(function ($booking) {
+                return $booking->venue_id == $this->selectedVenueId;
+            });
+        })->when($this->search, function ($collection) {
             return $collection->filter(function ($booking) {
                 return stripos($booking->name, $this->search) !== false ||
                        stripos($booking->email, $this->search) !== false ||
