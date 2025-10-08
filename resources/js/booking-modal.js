@@ -317,7 +317,34 @@ function initializeBookingCalendar() {
         // Extend or modify selection
         if (date < checkIn) {
             // Extend backwards - new start date
+            console.log('Extending backwards from', fmt(checkIn), 'to', dateKey);
+            const originalCheckOut = checkOut;
             checkIn = date;
+
+            // Validate that extending backwards doesn't create conflicts
+            let conflictFound = false;
+            let cursor = new Date(checkIn);
+            while (cursor < originalCheckOut) {
+                const cursorKey = fmt(cursor);
+                const isCheckInDay = checkInDates.has(cursorKey);
+                const isCheckOutDay = checkOutDates.has(cursorKey);
+                const canSameDayTurnover = isCheckInDay || isCheckOutDay;
+
+                if (fullyBookedDates.has(cursorKey) && !canSameDayTurnover) {
+                    console.log('Backward extension blocked by fully booked night:', cursorKey);
+                    conflictFound = true;
+                    break;
+                }
+                cursor = addDays(cursor, 1);
+            }
+
+            if (conflictFound) {
+                // Reset to just this single night if extension creates conflicts
+                console.log('Resetting to single night due to backward extension conflict');
+                checkIn = date;
+                checkOut = addDays(date, minNights); // Ensure minimum nights
+            }
+
         } else if (date >= checkOut) {
             // Check if this is a same-day turnover scenario
             const isCheckInDay = checkInDates.has(dateKey);
