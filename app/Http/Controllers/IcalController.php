@@ -161,8 +161,8 @@ class IcalController extends Controller
         $ical .= "PRODID:-//Eileen BnB//Venue Calendar Export//EN\r\n";
         $ical .= "CALSCALE:GREGORIAN\r\n";
         $ical .= "METHOD:PUBLISH\r\n";
-        $ical .= "X-WR-CALNAME:" . $venue->name . " - Blocked Dates\r\n";
-        $ical .= "X-WR-CALDESC:Blocked dates for venue: " . $venue->name . "\r\n";
+        $ical .= "X-WR-CALNAME:" . $venue->venue_name . " - Blocked Dates\r\n";
+        $ical .= "X-WR-CALDESC:Blocked dates for venue: " . $venue->venue_name . "\r\n";
         $ical .= "X-WR-TIMEZONE:Europe/London\r\n";
 
         // Add each booking as a VEVENT
@@ -178,7 +178,7 @@ class IcalController extends Controller
             $ical .= "DTSTAMP:" . $createdAt->utc()->format('Ymd\THis\Z') . "\r\n";
             $ical .= "CREATED:" . $createdAt->utc()->format('Ymd\THis\Z') . "\r\n";
             $ical .= "LAST-MODIFIED:" . Carbon::parse($booking->updated_at)->utc()->format('Ymd\THis\Z') . "\r\n";
-            $ical .= "SUMMARY:BLOCKED - " . $venue->name . "\r\n";
+            $ical .= "SUMMARY:BLOCKED - " . $venue->venue_name . "\r\n";
             $ical .= "DESCRIPTION:Booking ID: " . $booking->id . " (Status: " . ucfirst($booking->status) . ")\r\n";
             $ical .= "STATUS:" . strtoupper($booking->status === 'confirmed' ? 'confirmed' : 'tentative') . "\r\n";
             $ical .= "TRANSP:OPAQUE\r\n"; // Shows as busy/blocked
@@ -189,7 +189,7 @@ class IcalController extends Controller
         $ical .= "END:VCALENDAR\r\n";
 
         // Generate filename with venue name and current date
-        $filename = 'venue-' . $venue_id . '-' . Str::slug($venue->name) . '-calendar.ics';
+        $filename = 'venue-' . $venue_id . '-' . Str::slug($venue->venue_name) . '-calendar.ics';
 
         return response($ical)
             ->header('Content-Type', 'text/calendar; charset=utf-8')
