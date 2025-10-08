@@ -176,17 +176,27 @@ function initializeBookingCalendar() {
             ];
 
             // Determine if the date is clickable
-            // Fully booked dates are never clickable when selecting nights to stay
-            const isClickable = !isPast && !isOrphaned && !isFullyBooked;
+            // Allow clicking on dates that are:
+            // 1. Not in the past
+            // 2. Not orphaned (can accommodate minimum stay)
+            // 3. Either completely free OR allow same-day turnover
+            const canSameDayTurnover = isCheckInDay || isCheckOutDay;
+            const isClickable = !isPast && !isOrphaned && (!isFullyBooked || canSameDayTurnover);
 
             // Style based on availability, with fully booked taking precedence
             if (isOrphaned) {
                 classNames.push('line-through text-gray-400 bg-red-50 cursor-not-allowed border border-red-200');
+            } else if (isCheckInDay && isFullyBooked) {
+                // Check-in days that are also fully booked - show as available for same-day turnover
+                classNames.push('bg-orange-50 text-orange-700 border border-orange-200');
+            } else if (isCheckOutDay && isFullyBooked) {
+                // Check-out days that are also fully booked - show as available for same-day turnover
+                classNames.push('bg-green-50 text-green-700 border border-green-200');
             } else if (isFullyBooked) {
-                // Fully booked dates are always gray and blocked
+                // Fully booked dates with no same-day turnover option
                 classNames.push('line-through text-gray-400 bg-gray-100 cursor-not-allowed');
             } else if (isCheckInDay) {
-                // Check-in days (only if not fully booked)
+                // Check-in days (not fully booked)
                 classNames.push('bg-orange-50 text-orange-700 border border-orange-200');
             } else if (isCheckOutDay) {
                 classNames.push('bg-green-50 text-green-700 border border-green-200');
@@ -215,12 +225,14 @@ function initializeBookingCalendar() {
             // Add tooltip for special dates
             if (isOrphaned) {
                 btn.title = 'Unavailable - Cannot accommodate minimum 2-night stay';
+            } else if (isCheckInDay && isFullyBooked) {
+                btn.title = 'Check-in day - Available for checkout via same-day turnover (depart 11am, new guests arrive 3pm)';
             } else if (isCheckInDay) {
-                btn.title = 'Check-in day - Available for checkout (11am departure, 3pm arrival)';
+                btn.title = 'Check-in day - Available for booking';
             } else if (isCheckOutDay) {
                 btn.title = 'Check-out day - Available for check-in (11am departure, 3pm arrival)';
             } else if (isFullyBooked && !isCheckInDay && !isCheckOutDay) {
-                btn.title = 'Fully booked';
+                btn.title = 'Fully booked - No same-day turnover available';
             }
 
             // Add click handler based on clickability
@@ -271,12 +283,22 @@ function initializeBookingCalendar() {
         }
 
         // When selecting nights to stay:
-        // - Can't select nights that are fully booked (someone staying that night)
+        // - Can't select nights that are fully booked UNLESS it's a same-day turnover
         // - CAN select on check-out days (previous guest leaves, you can start staying)
-        // - CANNOT select on check-in days (someone else is starting to stay that night)
-        if (fullyBookedDates.has(dateKey) || isOrphaned) {
-            console.log('Blocked selection:', dateKey, 'fullyBooked:', fullyBookedDates.has(dateKey), 'isOrphaned:', isOrphaned);
+        // - CAN select nights ending on check-in days (same-day turnover - you checkout when they checkin)
+        const isCheckOutDay = checkOutDates.has(dateKey);
+        const canEndOnCheckInDay = checkInDates.has(dateKey); // Same-day turnover
+
+        // Block selection if fully booked AND not a same-day turnover opportunity
+        if (fullyBookedDates.has(dateKey) && !isCheckOutDay && !canEndOnCheckInDay) {
+            console.log('Blocked selection:', dateKey, 'fullyBooked:', fullyBookedDates.has(dateKey), 'notSameDayTurnover');
             return; // Invalid night selection
+        }
+
+        // Also block if orphaned (can't accommodate minimum stay)
+        if (isOrphaned) {
+            console.log('Blocked selection:', dateKey, 'isOrphaned:', isOrphaned);
+            return;
         }
 
         if (!checkIn) {

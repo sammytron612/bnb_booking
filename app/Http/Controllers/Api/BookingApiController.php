@@ -52,7 +52,7 @@ class BookingApiController extends ApiController
             // Add check-out date (guests leave this day at 11am)
             $checkOutDates[] = $checkOutDate->format('Y-m-d');
 
-            // Add all nights when property is occupied
+            // Add all nights when property is occupied (excluding check-out date)
             // From check-in date up to (but not including) check-out date
             // This represents the nights guests are staying
             $current = $checkInDate->copy();
@@ -80,7 +80,7 @@ class BookingApiController extends ApiController
             // Add check-out date
             $checkOutDates[] = $checkOutDate->format('Y-m-d');
 
-            // Add all nights when property is occupied
+            // Add all nights when property is occupied (excluding check-out date)
             $current = $checkInDate->copy();
             while ($current < $checkOutDate) {
                 $dateStr = $current->format('Y-m-d');
