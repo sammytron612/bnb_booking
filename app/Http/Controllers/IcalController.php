@@ -24,7 +24,7 @@ class IcalController extends Controller
 
         // Add a couple of test events
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:test-booking-1@eileenbnb.com\r\n";
+        $ical .= "UID:test-booking-1@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251010\r\n";
         $ical .= "DTEND;VALUE=DATE:20251015\r\n";
         $ical .= "DTSTAMP:20250927T120000Z\r\n";
@@ -34,7 +34,7 @@ class IcalController extends Controller
         $ical .= "END:VEVENT\r\n";
 
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:test-booking-2@eileenbnb.com\r\n";
+        $ical .= "UID:test-booking-2@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251005\r\n";
         $ical .= "DTEND;VALUE=DATE:20251007\r\n";
         $ical .= "DTSTAMP:20250927T120000Z\r\n";
@@ -66,7 +66,7 @@ class IcalController extends Controller
 
         // Add test events for Airbnb
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:airbnb-booking-1@eileenbnb.com\r\n";
+        $ical .= "UID:airbnb-booking-1@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251001\r\n";
         $ical .= "DTEND;VALUE=DATE:20251003\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
@@ -76,7 +76,7 @@ class IcalController extends Controller
         $ical .= "END:VEVENT\r\n";
 
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:airbnb-booking-2@eileenbnb.com\r\n";
+        $ical .= "UID:airbnb-booking-2@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251008\r\n";
         $ical .= "DTEND;VALUE=DATE:20251010\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
@@ -108,7 +108,7 @@ class IcalController extends Controller
 
         // Add test events for Booking.com
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:booking-com-1@eileenbnb.com\r\n";
+        $ical .= "UID:booking-com-1@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251005\r\n";
         $ical .= "DTEND;VALUE=DATE:20251007\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
@@ -118,7 +118,7 @@ class IcalController extends Controller
         $ical .= "END:VEVENT\r\n";
 
         $ical .= "BEGIN:VEVENT\r\n";
-        $ical .= "UID:booking-com-2@eileenbnb.com\r\n";
+        $ical .= "UID:booking-com-2@seaham-retreats.com\r\n";
         $ical .= "DTSTART;VALUE=DATE:20251012\r\n";
         $ical .= "DTEND;VALUE=DATE:20251015\r\n";
         $ical .= "DTSTAMP:20250930T120000Z\r\n";
@@ -158,7 +158,7 @@ class IcalController extends Controller
         // Build iCal content
         $ical = "BEGIN:VCALENDAR\r\n";
         $ical .= "VERSION:2.0\r\n";
-        $ical .= "PRODID:-//Eileen BnB//Venue Calendar Export//EN\r\n";
+        $ical .= "PRODID:-//Seaham Retreats//Venue Calendar Export//EN\r\n";
         $ical .= "CALSCALE:GREGORIAN\r\n";
         $ical .= "METHOD:PUBLISH\r\n";
         $ical .= "X-WR-CALNAME:" . $venue->venue_name . " - Blocked Dates\r\n";
@@ -172,7 +172,7 @@ class IcalController extends Controller
             $createdAt = Carbon::parse($booking->created_at);
 
             $ical .= "BEGIN:VEVENT\r\n";
-            $ical .= "UID:booking-" . $booking->id . "@eileenbnb.com\r\n";
+            $ical .= "UID:booking-" . $booking->id . "@seaham-retreats.com\r\n";
             $ical .= "DTSTART;VALUE=DATE:" . $checkIn->format('Ymd') . "\r\n";
             $ical .= "DTEND;VALUE=DATE:" . $checkOut->format('Ymd') . "\r\n";
             $ical .= "DTSTAMP:" . $createdAt->utc()->format('Ymd\THis\Z') . "\r\n";
