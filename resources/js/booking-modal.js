@@ -333,11 +333,17 @@ function initializeBookingCalendar() {
         while (cursor < checkOut) { // Check all nights we're staying
             const cursorKey = fmt(cursor);
 
-            // Block if any night is fully booked - we can't stay on nights others are staying
-            if (fullyBookedDates.has(cursorKey)) {
-                console.log('Selection blocked by fully booked night:', cursorKey);
+            // Block if any night is fully booked AND not a same-day turnover opportunity
+            const isCheckInDay = checkInDates.has(cursorKey);
+            const isCheckOutDay = checkOutDates.has(cursorKey);
+            const canSameDayTurnover = isCheckInDay || isCheckOutDay;
+
+            if (fullyBookedDates.has(cursorKey) && !canSameDayTurnover) {
+                console.log('Selection blocked by fully booked night:', cursorKey, '(no same-day turnover available)');
                 blocked = true;
                 break;
+            } else if (fullyBookedDates.has(cursorKey) && canSameDayTurnover) {
+                console.log('Allowing same-day turnover on:', cursorKey, {isCheckInDay, isCheckOutDay});
             }
             cursor = addDays(cursor, 1);
         }
@@ -359,10 +365,18 @@ function initializeBookingCalendar() {
             let minBlocked = false;
             while (minCursor < checkOut) {
                 const minKey = fmt(minCursor);
-                if (fullyBookedDates.has(minKey)) {
-                    console.log('Cannot meet minimum nights requirement due to fully booked night:', minKey);
+
+                // Check for same-day turnover opportunities
+                const isCheckInDay = checkInDates.has(minKey);
+                const isCheckOutDay = checkOutDates.has(minKey);
+                const canSameDayTurnover = isCheckInDay || isCheckOutDay;
+
+                if (fullyBookedDates.has(minKey) && !canSameDayTurnover) {
+                    console.log('Cannot meet minimum nights requirement due to fully booked night:', minKey, '(no same-day turnover available)');
                     minBlocked = true;
                     break;
+                } else if (fullyBookedDates.has(minKey) && canSameDayTurnover) {
+                    console.log('Minimum nights validation: allowing same-day turnover on:', minKey);
                 }
                 minCursor = addDays(minCursor, 1);
             }
