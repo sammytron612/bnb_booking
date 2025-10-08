@@ -421,17 +421,27 @@ function initializeBookingCalendar() {
         while (cursor < checkOut) { // Check all nights we're staying
             const cursorKey = fmt(cursor);
 
-            // Block if any night is fully booked AND not a same-day turnover opportunity
+            // Check for same-day turnover opportunities
             const isCheckInDay = checkInDates.has(cursorKey);
             const isCheckOutDay = checkOutDates.has(cursorKey);
-            const canSameDayTurnover = isCheckInDay || isCheckOutDay;
 
-            if (fullyBookedDates.has(cursorKey) && !canSameDayTurnover) {
-                console.log('Selection blocked by fully booked night:', cursorKey, '(no same-day turnover available)');
-                blocked = true;
-                break;
-            } else if (fullyBookedDates.has(cursorKey) && canSameDayTurnover) {
-                console.log('Allowing same-day turnover on:', cursorKey, {isCheckInDay, isCheckOutDay});
+            console.log(`Main validation checking night ${cursorKey}: fullyBooked=${fullyBookedDates.has(cursorKey)}, isCheckInDay=${isCheckInDay}, isCheckOutDay=${isCheckOutDay}`);
+
+            if (fullyBookedDates.has(cursorKey)) {
+                if (isCheckOutDay) {
+                    // You can stay this night and they checkout next morning = OK
+                    console.log(`Main validation: Night ${cursorKey} is OK: they checkout, you can stay`);
+                } else if (isCheckInDay) {
+                    // They're checking in this day = they stay this night = conflict with you staying
+                    console.log(`Main validation: Night ${cursorKey} CONFLICT: they check-in and stay this night`);
+                    blocked = true;
+                    break;
+                } else {
+                    // Fully booked with no turnover opportunity
+                    console.log(`Main validation: Night ${cursorKey} CONFLICT: fully booked, no turnover`);
+                    blocked = true;
+                    break;
+                }
             }
             cursor = addDays(cursor, 1);
         }
@@ -457,14 +467,24 @@ function initializeBookingCalendar() {
                 // Check for same-day turnover opportunities
                 const isCheckInDay = checkInDates.has(minKey);
                 const isCheckOutDay = checkOutDates.has(minKey);
-                const canSameDayTurnover = isCheckInDay || isCheckOutDay;
 
-                if (fullyBookedDates.has(minKey) && !canSameDayTurnover) {
-                    console.log('Cannot meet minimum nights requirement due to fully booked night:', minKey, '(no same-day turnover available)');
-                    minBlocked = true;
-                    break;
-                } else if (fullyBookedDates.has(minKey) && canSameDayTurnover) {
-                    console.log('Minimum nights validation: allowing same-day turnover on:', minKey);
+                console.log(`Min nights checking night ${minKey}: fullyBooked=${fullyBookedDates.has(minKey)}, isCheckInDay=${isCheckInDay}, isCheckOutDay=${isCheckOutDay}`);
+
+                if (fullyBookedDates.has(minKey)) {
+                    if (isCheckOutDay) {
+                        // You can stay this night and they checkout next morning = OK
+                        console.log(`Minimum nights: Night ${minKey} is OK: they checkout, you can stay`);
+                    } else if (isCheckInDay) {
+                        // They're checking in this day = they stay this night = conflict with you staying
+                        console.log(`Minimum nights: Night ${minKey} CONFLICT: they check-in and stay this night`);
+                        minBlocked = true;
+                        break;
+                    } else {
+                        // Fully booked with no turnover opportunity
+                        console.log(`Minimum nights: Night ${minKey} CONFLICT: fully booked, no turnover`);
+                        minBlocked = true;
+                        break;
+                    }
                 }
                 minCursor = addDays(minCursor, 1);
             }
