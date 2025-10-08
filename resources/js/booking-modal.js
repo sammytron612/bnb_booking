@@ -342,7 +342,44 @@ function initializeBookingCalendar() {
                 // Reset to just this single night if extension creates conflicts
                 console.log('Resetting to single night due to backward extension conflict');
                 checkIn = date;
-                checkOut = addDays(date, minNights); // Ensure minimum nights
+
+                // For minimum nights, find the earliest safe checkout date
+                let safeCheckOut = addDays(date, minNights);
+                let searchCursor = addDays(date, 1); // Start checking from the day after check-in
+
+                while (searchCursor <= safeCheckOut) {
+                    const searchKey = fmt(searchCursor);
+                    const isCheckInDay = checkInDates.has(searchKey);
+                    const isCheckOutDay = checkOutDates.has(searchKey);
+                    const canSameDayTurnover = isCheckInDay || isCheckOutDay;
+
+                    // If this night is fully booked and no same-day turnover, we can't stay past this point
+                    if (fullyBookedDates.has(searchKey) && !canSameDayTurnover) {
+                        console.log('Cannot extend to minimum nights due to conflict on:', searchKey);
+                        safeCheckOut = searchCursor; // Checkout before the conflict
+                        break;
+                    }
+
+                    // If we found a check-in day (same-day turnover), we can checkout here
+                    if (isCheckInDay && fullyBookedDates.has(searchKey)) {
+                        console.log('Found same-day turnover opportunity on:', searchKey);
+                        safeCheckOut = searchCursor; // Checkout on this day (same-day turnover)
+                        break;
+                    }
+
+                    searchCursor = addDays(searchCursor, 1);
+                }
+
+                // Check if we can meet minimum nights requirement
+                if (diffDays(date, safeCheckOut) < minNights) {
+                    console.log('Cannot meet minimum nights requirement, clearing selection');
+                    checkIn = null;
+                    checkOut = null;
+                    renderCalendar();
+                    return;
+                }
+
+                checkOut = safeCheckOut;
             }
 
         } else if (date >= checkOut) {
