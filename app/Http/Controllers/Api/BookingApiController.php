@@ -96,6 +96,11 @@ class BookingApiController extends ApiController
         $fullyBookedDates = array_unique($fullyBookedDates);
         $bookedDates = array_unique($bookedDates);
 
+        // Handle same-day turnovers: remove dates that are both check-in AND check-out from fullyBookedDates
+        $sameDayTurnovers = array_intersect($checkInDates, $checkOutDates);
+        $fullyBookedDates = array_diff($fullyBookedDates, $sameDayTurnovers);
+        $fullyBookedDates = array_values($fullyBookedDates); // Re-index array
+
         sort($checkInDates);
         sort($checkOutDates);
         sort($fullyBookedDates);
