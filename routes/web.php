@@ -30,6 +30,10 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+Route::get('/seaglass', function () {
+    return view('seaglass');
+})->name('seaglass');
+
 Route::get('/cookie-policy', function () {
     return view('cookie-policy');
 })->name('cookie-policy');
