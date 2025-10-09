@@ -31,7 +31,16 @@ Route::get('/contact', function () {
 })->name('contact');
 
 Route::get('/seaglass', function () {
-    return view('seaglass');
+    $seoData = [
+        'title' => 'Seaham Seaglass - History & Collecting Guide',
+        'description' => 'Discover the fascinating history of Seaham seaglass from Victorian glass works to world-renowned collecting destination. Learn about the Candlish Glass Works legacy and best collecting spots.',
+        'keywords' => 'Seaham seaglass, sea glass collecting, Victorian glass works, Candlish Glass Works, beach glass, County Durham, glass collecting, Seaham history, seaglass beaches',
+        'type' => 'article',
+        'image' => asset('storage/seaham_bottle_works1.jpg'),
+        'imageAlt' => 'Historic Seaham Bottle Works - Victorian glass factory that created the seaglass legacy',
+        'canonical' => route('seaglass')
+    ];
+    return view('seaglass', compact('seoData'));
 })->name('seaglass');
 
 Route::get('/cookie-policy', function () {

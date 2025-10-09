@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app :seoData="$seoData">
     <div class="container mx-auto px-4 py-8">
         <!-- Header Section -->
         <div class="text-center mb-12">
