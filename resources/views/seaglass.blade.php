@@ -16,7 +16,7 @@
                 <!-- Historical Image -->
                 <div class="mb-8 text-center">
                     <div class="relative inline-block">
-                        <img src="{{ asset('storage/seaham_bottle_works.jpg') }}"
+                        <img src="{{ asset('seaham_bottle_works.jpg') }}"
                              alt="Historic Seaham Bottle Works - Victorian glass factory that created the seaglass legacy"
                              class="rounded-xl shadow-lg max-w-full h-auto mx-auto border-4 border-white dark:border-gray-700"
                              style="max-height: 400px;">
