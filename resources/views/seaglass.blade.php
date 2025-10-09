@@ -210,19 +210,19 @@
                 </div>
 
                 <div class="text-center">
-                    <div class="w-16 h-16 bg-green-300 rounded-full mx-auto mb-3 shadow-inner"></div>
+                    <div class="w-16 h-16 bg-green-600 rounded-full mx-auto mb-3 shadow-inner"></div>
                     <h3 class="font-semibold text-slate-800 dark:text-slate-200">Green</h3>
                     <p class="text-sm text-slate-600 dark:text-slate-400">Common</p>
                 </div>
 
                 <div class="text-center">
-                    <div class="w-16 h-16 bg-blue-400 rounded-full mx-auto mb-3 shadow-inner"></div>
+                    <div class="w-16 h-16 bg-blue-600 rounded-full mx-auto mb-3 shadow-inner"></div>
                     <h3 class="font-semibold text-slate-800 dark:text-slate-200">Blue</h3>
                     <p class="text-sm text-slate-600 dark:text-slate-400">Uncommon</p>
                 </div>
 
                 <div class="text-center">
-                    <div class="w-16 h-16 bg-red-400 rounded-full mx-auto mb-3 shadow-inner"></div>
+                    <div class="w-16 h-16 bg-red-600 rounded-full mx-auto mb-3 shadow-inner"></div>
                     <h3 class="font-semibold text-slate-800 dark:text-slate-200">Red</h3>
                     <p class="text-sm text-slate-600 dark:text-slate-400">Very Rare</p>
                 </div>
