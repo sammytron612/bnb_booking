@@ -189,7 +189,7 @@ function initializeBookingCalendar() {
                 classNames.push('line-through text-gray-400 bg-red-50 cursor-not-allowed border border-red-200');
             } else if (isCheckInDay && isFullyBooked) {
                 // Check-in days that are also fully booked - non-clickable, informational only
-                classNames.push('bg-orange-50 text-orange-700 border border-orange-200 cursor-not-allowed');
+                classNames.push('line-through bg-orange-50 text-orange-700 border border-orange-200 cursor-not-allowed');
             } else if (isCheckOutDay && isFullyBooked) {
                 // Check-out days that are also fully booked - available for same-day turnover
                 classNames.push('bg-green-50 text-green-700 border border-green-200');
@@ -198,7 +198,7 @@ function initializeBookingCalendar() {
                 classNames.push('line-through text-gray-400 bg-gray-100 cursor-not-allowed');
             } else if (isCheckInDay) {
                 // Check-in days (not fully booked) - non-clickable, informational only
-                classNames.push('bg-orange-50 text-orange-700 border border-orange-200 cursor-not-allowed');
+                classNames.push('line-through bg-orange-50 text-orange-700 border border-orange-200 cursor-not-allowed');
             } else if (isCheckOutDay) {
                 // Check-out days - available for same-day turnover
                 classNames.push('bg-green-50 text-green-700 border border-green-200');
