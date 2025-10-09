@@ -61,11 +61,7 @@ Apartment booking system is a comprehensive booking system designed to manage re
 - Access the application at `http://localhost:8000`.
 - Use the admin panel to manage bookings, disputes, and customer interactions.
 
-## Testing
-Run the test suite using:
-```bash
-php artisan test
-```
+
 
 ## Contributing
 1. Fork the repository.
