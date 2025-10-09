@@ -200,7 +200,7 @@
 
         <!-- Colors and Rarity -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-12">
-            <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-8 text-center">Seaglass Colors & Rarity</h2>
+            <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-8 text-center">Seaglass Colours & Rarity</h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="text-center">
