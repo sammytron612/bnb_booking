@@ -594,41 +594,9 @@ function initializeBookingCalendar() {
         });
     }
 
-    // --- iCal parsing --- COMMENTED OUT (server-side processing)
-    // Parse a subset of iCal to get date ranges from VEVENT DTSTART/DTEND (date-only formats)
-    /*
-    function parseIcs(icsText) {
-        const lines = icsText.replace(/\r/g,'').split('\n');
-        const events = [];
-        let cur = null;
-        for (let raw of lines) {
-            const line = raw.trim();
-            if (line === 'BEGIN:VEVENT') { cur = {}; continue; }
-            if (line === 'END:VEVENT') { if (cur && cur.DTSTART && cur.DTEND) events.push(cur); cur = null; continue; }
-            if (!cur) continue;
-            if (line.startsWith('DTSTART')) { cur.DTSTART = line.split(':').pop(); }
-            if (line.startsWith('DTEND')) { cur.DTEND = line.split(':').pop(); }
-        }
-        const added = [];
-        for (const ev of events) {
-            const start = ev.DTSTART.substring(0,8); // YYYYMMDD
-            const end = ev.DTEND.substring(0,8); // exclusive
-            if (!/^\d{8}$/.test(start) || !/^\d{8}$/.test(end)) continue;
-            const s = `${start.slice(0,4)}-${start.slice(4,6)}-${start.slice(6,8)}`;
-            const e = `${end.slice(0,4)}-${end.slice(4,6)}-${end.slice(6,8)}`;
-            let d = dFrom(s);
-            const eDate = dFrom(e);
-            while (d < eDate) {
-                bookedDates.add(fmt(d));
-                added.push(fmt(d));
-                d = addDays(d,1);
-            }
-        }
-        return added.length;
-    }
-    */
 
-    // Load booked dates from Laravel database
+
+    // Load booked dates from  database
     async function loadBookedDatesFromDatabase(venueId = null) {
         try {
             const url = venueId ? `/api/booked-dates?venue_id=${venueId}` : '/api/booked-dates';
@@ -701,26 +669,7 @@ function initializeBookingCalendar() {
         }
     }
 
-    // Modified iCal loading function - COMMENTED OUT (server-side processing)
-    /*
-    async function loadIcalFromUrl(url) {
-        const status = document.getElementById('icalStatus');
-        if (status) status.textContent = 'Loading iCal from URL…';
-        try {
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('HTTP '+res.status);
-            const text = await res.text();
-            const count = parseIcs(text);
-            if (status) status.textContent = `Imported ${count} booked days from iCal.`;
-            console.log(`Loaded ${count} booked dates from iCal`);
-            return count;
-        } catch (err) {
-            console.error('iCal load error:', err);
-            if (status) status.textContent = 'Failed to load iCal calendar.';
-            return 0;
-        }
-    }
-    */
+
 
     // Load all booked dates (database + iCal)
     async function loadAllBookedDates(venueId = null) {
@@ -730,11 +679,7 @@ function initializeBookingCalendar() {
         // Load from database first
         await loadBookedDatesFromDatabase(venueId);
 
-        // iCal integration REMOVED - all processing done server-side via /api/booked-dates
-        // The server automatically combines:
-        // - Database bookings (confirmed/pending)
-        // - External iCal feeds (from 'ical' table)
-        // No client-side iCal parsing needed anymore
+
 
         // Re-render calendar with updated booked dates
         renderCalendar();
@@ -757,9 +702,7 @@ function initializeBookingCalendar() {
     // Initial render and data loading
     loadAllBookedDates(currentVenue); // Load booked dates from database
 
-    // Auto-sync iCal once on load (disabled by default, uncomment if needed)
-    // const AIRBNB_ICAL_URL = 'https://example.com/your-airbnb-calendar.ics';
-    // loadIcalFromUrl(AIRBNB_ICAL_URL);
+
 
     // Booking Modal functionality (only if elements exist)
     if (bookingModal && openBookingBtn) {
