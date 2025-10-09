@@ -43,12 +43,6 @@ class BookingValidationService
             $errors[] = 'These dates conflict with external calendar bookings.';
         }
 
-        // Check same-day turnover policy
-        $sameDayIssues = $this->checkSameDayTurnover($checkInDate, $checkOutDate, $venueId, $excludeBookingId);
-        if (!empty($sameDayIssues)) {
-            $errors = array_merge($errors, $sameDayIssues);
-        }
-
         return $errors;
     }
 
@@ -67,7 +61,7 @@ class BookingValidationService
                 })->orWhere(function ($q) use ($checkIn, $checkOut) {
                     // New booking ends during existing booking
                     $q->where('check_in', '<', $checkOut->format('Y-m-d'))
-                      ->where('check_out', '>=', $checkOut->format('Y-m-d'));
+                      ->where('check_out', '>', $checkOut->format('Y-m-d'));
                 })->orWhere(function ($q) use ($checkIn, $checkOut) {
                     // New booking completely contains existing booking
                     $q->where('check_in', '>=', $checkIn->format('Y-m-d'))
@@ -91,20 +85,6 @@ class BookingValidationService
 
             return ($checkIn->lt($extCheckOut) && $checkOut->gt($extCheckIn));
         });
-    }
-
-    public function checkSameDayTurnover(Carbon $checkIn, Carbon $checkOut, int $venueId, ?int $excludeBookingId = null): array
-    {
-        $errors = [];
-
-        // SAME-DAY TURNOVER IS ALLOWED IN HOSPITALITY INDUSTRY
-        // One guest checks out at 11 AM, next guest checks in at 3 PM
-        // This is standard practice and should not be blocked
-
-        // Only check for overlapping dates, not same-day turnover
-        // Same-day turnover is actually desired for maximum occupancy
-
-        return $errors;
     }
 
     public function isDateAvailable(Carbon $date, int $venueId): bool
