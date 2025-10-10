@@ -205,36 +205,38 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Colors and Rarity -->
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mb-12">
-            <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-8 text-center">Seaglass Colours & Rarity</h2>
+                <!-- Colors and Rarity -->
+                <div class="mt-8">
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-8">
+                        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6">Seaglass Colours & Rarity</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-gray-200 rotate-45 mx-auto mb-3 shadow-inner"></div>
-                    <h3 class="font-semibold text-slate-800 dark:text-slate-200">White/Clear</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">Very Common</p>
-                </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-gray-200 rotate-45 mx-auto mb-3 shadow-inner"></div>
+                                <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">White/Clear</h3>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">Very Common</p>
+                            </div>
 
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-green-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
-                    <h3 class="font-semibold text-slate-800 dark:text-slate-200">Green</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">Common</p>
-                </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-green-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
+                                <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Green</h3>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">Common</p>
+                            </div>
 
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-blue-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
-                    <h3 class="font-semibold text-slate-800 dark:text-slate-200">Blue</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">Uncommon</p>
-                </div>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-blue-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
+                                <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Blue</h3>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">Uncommon</p>
+                            </div>
 
-                <div class="text-center">
-                    <div class="w-12 h-12 bg-red-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
-                    <h3 class="font-semibold text-slate-800 dark:text-slate-200">Red</h3>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">Very Rare</p>
+                            <div class="text-center">
+                                <div class="w-12 h-12 bg-red-600 rotate-45 mx-auto mb-3 shadow-inner"></div>
+                                <h3 class="font-semibold text-slate-800 dark:text-slate-200 text-sm">Red</h3>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">Very Rare</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
