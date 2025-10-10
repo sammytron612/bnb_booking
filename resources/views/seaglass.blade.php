@@ -129,7 +129,7 @@
             <!-- Seaglass Information -->
             <div>
                 <div class="bg-gradient-to-br from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-xl p-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6">What is Seaglass?</h2>
+                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6 text-center">What is Seaglass?</h2>
 
                     <div class="space-y-4 text-slate-600 dark:text-slate-400">
                         <p>
@@ -164,7 +164,7 @@
             <!-- Collecting Tips -->
             <div>
                 <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6">Collecting Tips</h2>
+                    <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6 text-center">Collecting Tips</h2>
 
                     <div class="space-y-4">
                         <div class="flex items-start space-x-3">
@@ -209,7 +209,7 @@
                 <!-- Colors and Rarity -->
                 <div class="mt-8">
                     <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-8">
-                        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6">Seaglass Colours & Rarity</h2>
+                        <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6 text-center">Seaglass Colours & Rarity</h2>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div class="text-center">
