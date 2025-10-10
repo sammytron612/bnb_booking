@@ -202,16 +202,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
             <!-- Row 2, Column 1: Collecting Tips -->
             <div>
-                <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl p-8">
+                <div class="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 dark:from-green-900/20 dark:to-green-900/20 rounded-xl p-8">
                     <h2 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-6 text-center">Collecting Tips</h2>
 
                     <div class="space-y-4">
                         <div class="flex items-start space-x-3">
-                            <div class="bg-amber-100 dark:bg-amber-900 p-2 rounded-lg mt-1">
-                                <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                </svg>
-                            </div>
                             <div>
                                 <h3 class="font-semibold text-slate-800 dark:text-slate-200">Best Times</h3>
                                 <p class="text-slate-600 dark:text-slate-400">Early morning after high tide or storms when new treasures are revealed.</p>
@@ -219,12 +214,6 @@
                         </div>
 
                         <div class="flex items-start space-x-3">
-                            <div class="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg mt-1">
-                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                            </div>
                             <div>
                                 <h3 class="font-semibold text-slate-800 dark:text-slate-200">Best Locations</h3>
                                 <p class="text-slate-600 dark:text-slate-400">Seaham Hall Beach, Nose's Point, and the areas around the harbor are prime spots.</p>
@@ -232,11 +221,6 @@
                         </div>
 
                         <div class="flex items-start space-x-3">
-                            <div class="bg-green-100 dark:bg-green-900 p-2 rounded-lg mt-1">
-                                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                            </div>
                             <div>
                                 <h3 class="font-semibold text-slate-800 dark:text-slate-200">What to Look For</h3>
                                 <p class="text-slate-600 dark:text-slate-400">Smooth, frosted pieces without sharp edges. Rare colors like red, orange, and cobalt blue are special finds!</p>
@@ -248,14 +232,14 @@
 
             <!-- Row 2, Column 2: Safety Notice -->
             <div>
-                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-8">
-                    <div class="flex items-start space-x-3">
-                        <div class="bg-amber-100 dark:bg-amber-900 p-2 rounded-lg">
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-8 h-full flex items-center">
+                    <div class="flex items-start space-x-3 w-full">
+                        <div class="bg-amber-100 dark:bg-amber-900 p-2 rounded-lg flex-shrink-0">
                             <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L4.168 15.5C3.398 17.333 4.36 19 5.9 19z"></path>
                             </svg>
                         </div>
-                        <div>
+                        <div class="flex-1">
                             <h3 class="font-semibold text-amber-800 dark:text-amber-200 mb-2">Safety</h3>
                             <p class="text-amber-700 dark:text-amber-300">
                                 Always be mindful of tides and weather conditions when collecting. Check tide times before heading to the beach, wear appropriate footwear for rocky surfaces, and never turn your back on the sea. Be aware of changing weather conditions and inform someone of your plans when collecting alone.
