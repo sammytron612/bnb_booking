@@ -129,17 +129,17 @@
                 if (window.laravelCookieConsent) {
                     // User has accepted cookies - load analytics
                     console.log('Loading analytics - user has consented to cookies');
-                    
+
                     // Example: Load Google Analytics here
                     // gtag('config', 'GA_MEASUREMENT_ID');
-                    
+
                     // Example: Load Facebook Pixel here
                     // fbq('init', 'YOUR_PIXEL_ID');
-                    
+
                 } else {
                     console.log('Analytics not loaded - user has not consented to cookies');
                 }
-                
+
                 // Listen for cookie consent changes
                 document.addEventListener('cookie-consent-given', function() {
                     console.log('User just accepted cookies - can now load analytics');
