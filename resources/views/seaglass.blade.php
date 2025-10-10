@@ -63,65 +63,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Timeline Section -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-                <h3 class="text-2xl font-semibold text-slate-800 dark:text-slate-200 mb-8 text-center">Seaham Seaglass Timeline</h3>
-
-                <div class="relative">
-                    <!-- Timeline line -->
-                    <div class="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-blue-200 dark:bg-blue-700"></div>
-
-                    <div class="space-y-12">
-                        <!-- 1853 -->
-                        <div class="relative flex items-center">
-                            <div class="flex-1 pr-8 text-right">
-                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                                    <h4 class="font-semibold text-blue-900 dark:text-blue-200">1853</h4>
-                                    <p class="text-slate-600 dark:text-slate-400 text-sm">Seaham Bottle Works established by the Candlish family</p>
-                                </div>
-                            </div>
-                            <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-blue-500 rounded-full border-4 border-white dark:border-gray-800"></div>
-                            <div class="flex-1 pl-8"></div>
-                        </div>
-
-                        <!-- 1853-1921 -->
-                        <div class="relative flex items-center">
-                            <div class="flex-1 pr-8"></div>
-                            <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-white dark:border-gray-800"></div>
-                            <div class="flex-1 pl-8">
-                                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
-                                    <h4 class="font-semibold text-green-900 dark:text-green-200">1853-1921</h4>
-                                    <p class="text-slate-600 dark:text-slate-400 text-sm">68 years of glass production and waste disposal into the North Sea</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 1921 -->
-                        <div class="relative flex items-center">
-                            <div class="flex-1 pr-8 text-right">
-                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
-                                    <h4 class="font-semibold text-amber-900 dark:text-amber-200">1921</h4>
-                                    <p class="text-slate-600 dark:text-slate-400 text-sm">Factory closes, but the sea continues its work on the glass waste</p>
-                                </div>
-                            </div>
-                            <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-amber-500 rounded-full border-4 border-white dark:border-gray-800"></div>
-                            <div class="flex-1 pl-8"></div>
-                        </div>
-
-                        <!-- Present Day -->
-                        <div class="relative flex items-center">
-                            <div class="flex-1 pr-8"></div>
-                            <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-purple-500 rounded-full border-4 border-white dark:border-gray-800"></div>
-                            <div class="flex-1 pl-8">
-                                <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-                                    <h4 class="font-semibold text-purple-900 dark:text-purple-200">Present Day</h4>
-                                    <p class="text-slate-600 dark:text-slate-400 text-sm">Over 100 years later, Seaham is world-famous for its abundant, high-quality seaglass</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
         </div>
 
         <!-- 2x2 Grid Layout -->
