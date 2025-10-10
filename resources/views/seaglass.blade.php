@@ -148,6 +148,16 @@
                             Each piece tells a story of Victorian industry, maritime power, and nature's remarkable ability to transform human waste into objects of beauty. The glass fragments have been tumbling in the North Sea for over a century, creating the perfect frosted finish that makes Seaham seaglass so highly prized by collectors worldwide.
                         </p>
                     </div>
+
+                    <!-- Seaglass Collection Image -->
+                    <div class="mt-8 text-center">
+                        <img src="{{ asset('storage/seaglass2.jpg') }}"
+                             alt="Beautiful collection of Seaham seaglass pieces showing various colors and shapes"
+                             class="mx-auto rounded-lg shadow-lg border-4 border-white dark:border-gray-700 max-w-full h-auto">
+                        <div class="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                            A stunning collection of Seaham seaglass pieces showcasing the variety of colors and forms found on the beach
+                        </div>
+                    </div>
                 </div>
             </div>
 

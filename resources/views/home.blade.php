@@ -113,12 +113,12 @@
                             </h3>
                             <p class="text-gray-700 text-center md:text-left dark:text-gray-300 leading-relaxed">
                                 <img class="block mx-auto mb-4 md:float-left md:mt-1 w-64 h-64 object-cover rounded-lg shadow-md md:mr-6 md:mb-4" src="{{ url('storage/tommy222.webp') }}" alt="The knackpit in Seaham">
-                                With ongoing regeneration projects and a growing arts scene, Seaham is becoming a hub for creativity and community spirit. The town's transformation includes beautiful coastal walks, independent cafes serving locally-sourced produce, and artisan shops celebrating the area's maritime heritage. Visitors can enjoy the award-winning Blue Flag beaches, explore the newly developed town center with its mix of historic architecture and contemporary amenities, or take part in the vibrant festival calendar that brings the community together throughout the year. The famous weekly markets showcase local crafts, fresh seafood, and regional specialties, while the nearby countryside offers excellent walking and cycling routes through rolling farmland and along dramatic clifftops. Whether you're exploring its rich industrial history, hunting for rare seaglass treasures, or simply enjoying the therapeutic sound of waves against limestone cliffs, Seaham invites visitors to experience a unique blend of tradition and tranquility, making it a true gem of the North East coast.
+                                With ongoing regeneration projects and a growing arts scene, Seaham is becoming a hub for creativity and community spirit. The town's transformation includes beautiful coastal walks, independent cafes serving locally-sourced produce, and artisan shops celebrating the area's maritime heritage. Visitors can enjoy the award-winning Blue Flag beaches, explore the newly developed town center with its mix of historic architecture and contemporary amenities, or take part in the vibrant festival calendar that brings the community together throughout the year. <p>The famous weekly markets showcase local crafts, fresh seafood, and regional specialties, while the nearby countryside offers excellent walking and cycling routes through rolling farmland and along dramatic clifftops.</p> <p>Whether you're exploring its rich industrial history, hunting for rare seaglass treasures, or simply enjoying the therapeutic sound of waves against limestone cliffs, Seaham invites visitors to experience a unique blend of tradition and tranquility, making it a true gem of the North East coast.</p>
                             </p>
                         </div>
 
                         <!-- Seaham's Seaglass Section -->
-                        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-md">
+                        <!--<div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-md">
                             <h3 class="text-2xl font-bold text-teal-600 dark:text-teal-400 mb-4 flex items-center justify-center">
                                 Seaham's Famous Seaglass: Nature's Hidden Treasure
                             </h3>
@@ -129,6 +129,7 @@
                                 Beyond the blues, Seaham's beaches yield an rainbow of colors including emerald greens from beer bottles, pure whites from milk glass, and occasional reds from ship's lanterns. Each piece tells a story of Seaham's industrial heritage, polished to perfection by decades of tumbling in the North Sea. Join the daily treasure hunters at dawn for the best finds, when fresh seaglass is revealed by the receding tide.
                             </p>
                         </div>
+                        -->
 
                         <!-- Attractions Section -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-2 md:p-6 shadow-md">
