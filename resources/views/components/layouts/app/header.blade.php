@@ -120,5 +120,33 @@
 
         @fluxScripts
 
+        @include('cookie-consent::index')
+
+        <!-- Analytics Script (Only loads if cookies are accepted) -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Check if user has consented to cookies
+                if (window.laravelCookieConsent) {
+                    // User has accepted cookies - load analytics
+                    console.log('Loading analytics - user has consented to cookies');
+                    
+                    // Example: Load Google Analytics here
+                    // gtag('config', 'GA_MEASUREMENT_ID');
+                    
+                    // Example: Load Facebook Pixel here
+                    // fbq('init', 'YOUR_PIXEL_ID');
+                    
+                } else {
+                    console.log('Analytics not loaded - user has not consented to cookies');
+                }
+                
+                // Listen for cookie consent changes
+                document.addEventListener('cookie-consent-given', function() {
+                    console.log('User just accepted cookies - can now load analytics');
+                    // Load analytics here when user accepts
+                });
+            });
+        </script>
+
     </body>
 </html>
