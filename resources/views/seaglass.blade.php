@@ -246,25 +246,22 @@
                 </div>
             </div>
 
-            <!-- Row 2, Column 2: Empty for now -->
+            <!-- Row 2, Column 2: Safety Notice -->
             <div>
-                <!-- This column is now empty -->
-            </div>
-        </div>
-
-        <!-- Safety Notice -->
-        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-6">
-            <div class="flex items-start space-x-3">
-                <div class="bg-amber-100 dark:bg-amber-900 p-2 rounded-lg">
-                    <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L4.168 15.5C3.398 17.333 4.36 19 5.9 19z"></path>
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-amber-800 dark:text-amber-200 mb-2">Safety</h3>
-                    <p class="text-amber-700 dark:text-amber-300">
-                        Always be mindful of tides and weather conditions when collecting.
-                    </p>
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-8">
+                    <div class="flex items-start space-x-3">
+                        <div class="bg-amber-100 dark:bg-amber-900 p-2 rounded-lg">
+                            <svg class="w-6 h-6 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.864-.833-2.634 0L4.168 15.5C3.398 17.333 4.36 19 5.9 19z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-amber-800 dark:text-amber-200 mb-2">Safety</h3>
+                            <p class="text-amber-700 dark:text-amber-300">
+                                Always be mindful of tides and weather conditions when collecting. Check tide times before heading to the beach, wear appropriate footwear for rocky surfaces, and never turn your back on the sea. Be aware of changing weather conditions and inform someone of your plans when collecting alone.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
