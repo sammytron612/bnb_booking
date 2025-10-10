@@ -125,8 +125,12 @@
         <!-- Analytics Script (Only loads if cookies are accepted) -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Check cookie consent status
+                const cookieValue = document.cookie.split('; ').find(row => row.startsWith('laravel_cookie_consent='));
+                const consentStatus = cookieValue ? cookieValue.split('=')[1] : null;
+
                 // Check if user has consented to cookies
-                if (window.laravelCookieConsent) {
+                if (window.laravelCookieConsent && consentStatus !== 'declined') {
                     // User has accepted cookies - load analytics
                     console.log('Loading analytics - user has consented to cookies');
 
@@ -137,13 +141,19 @@
                     // fbq('init', 'YOUR_PIXEL_ID');
 
                 } else {
-                    console.log('Analytics not loaded - user has not consented to cookies');
+                    console.log('Analytics not loaded - user has not consented to cookies or declined');
                 }
 
                 // Listen for cookie consent changes
                 document.addEventListener('cookie-consent-given', function() {
                     console.log('User just accepted cookies - can now load analytics');
                     // Load analytics here when user accepts
+                });
+
+                // Listen for cookie consent declined
+                document.addEventListener('cookie-consent-declined', function() {
+                    console.log('User declined cookies - analytics will not load');
+                    // Optionally disable any tracking that was already loaded
                 });
             });
         </script>

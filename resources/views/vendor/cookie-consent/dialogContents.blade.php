@@ -17,6 +17,9 @@
                     </div>
                 </div>
                 <div class="flex-shrink-0 flex space-x-3">
+                    <button class="js-cookie-consent-decline cookie-consent__decline cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 transition-colors">
+                        Decline
+                    </button>
                     <button class="js-cookie-consent-agree cookie-consent__agree cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800 transition-colors">
                         {{ trans('cookie-consent::texts.agree') }}
                     </button>
@@ -25,3 +28,28 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle decline button
+    const declineButton = document.querySelector('.js-cookie-consent-decline');
+    if (declineButton) {
+        declineButton.addEventListener('click', function() {
+            // Set a cookie to remember the decline choice
+            document.cookie = 'laravel_cookie_consent=declined; path=/; max-age=' + (365 * 24 * 60 * 60) + '; SameSite=Lax';
+
+            // Hide the banner
+            const banner = document.querySelector('.js-cookie-consent');
+            if (banner) {
+                banner.style.display = 'none';
+            }
+
+            // Set global flag for declined cookies
+            window.laravelCookieConsent = false;
+
+            // Dispatch custom event
+            document.dispatchEvent(new CustomEvent('cookie-consent-declined'));
+        });
+    }
+});
+</script>
