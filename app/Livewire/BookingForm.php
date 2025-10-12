@@ -121,9 +121,53 @@ class BookingForm extends Component
     // Add sanitization method
     private function sanitizeInputs()
     {
-        $this->guestName = trim($this->guestName);
-        $this->guestEmail = trim(strtolower($this->guestEmail));
-        $this->guestPhone = trim($this->guestPhone);
+        $this->guestName = $this->sanitizeName($this->guestName);
+        $this->guestEmail = $this->sanitizeEmail($this->guestEmail);
+        $this->guestPhone = $this->sanitizePhone($this->guestPhone);
+    }
+
+    private function sanitizeName(?string $name): string
+    {
+        if (!$name) return '';
+
+        // Remove HTML tags and encode special characters
+        $name = strip_tags($name);
+        $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+
+        // Remove multiple spaces and trim
+        $name = preg_replace('/\s+/', ' ', trim($name));
+
+        // Remove any remaining suspicious characters (keep only letters, spaces, apostrophes, hyphens, dots)
+        $name = preg_replace('/[^\p{L}\s\'\-\.]/u', '', $name);
+
+        return $name;
+    }
+
+    private function sanitizeEmail(?string $email): string
+    {
+        if (!$email) return '';
+
+        // Basic sanitization and normalization
+        $email = trim(strtolower($email));
+        $email = filter_var($email, FILTER_SANITIZE_EMAIL);
+
+        // Remove potential XSS characters
+        $email = preg_replace('/[<>"\']/', '', $email);
+
+        return $email;
+    }
+
+    private function sanitizePhone(?string $phone): string
+    {
+        if (!$phone) return '';
+
+        // Remove everything except numbers, +, -, (, ), spaces, and dots
+        $phone = preg_replace('/[^0-9\+\-\(\)\s\.]/', '', trim($phone));
+
+        // Remove multiple spaces
+        $phone = preg_replace('/\s+/', ' ', $phone);
+
+        return trim($phone);
     }
 
     public function submitBooking()
