@@ -150,7 +150,7 @@ function initializeBookingCalendar() {
             const key = fmt(date);
             // Fix past date comparison to avoid timezone issues
             const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            const isPast = date < todayStart;
+            const isPast = date <= todayStart; // Block today and past dates
 
             // Determine availability based on new date categories
             const isCheckInDay = checkInDates.has(key);

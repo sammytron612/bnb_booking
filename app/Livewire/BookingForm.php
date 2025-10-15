@@ -30,7 +30,7 @@ class BookingForm extends Component
     'guestName' => 'required|string|min:2|max:100|regex:/^[a-zA-Z\s\-\'\.]+$/',
     'guestEmail' => 'required|email|max:255',
     'guestPhone' => 'required|string|min:8|max:20|regex:/^[\+]?[0-9\s\-\(\)\.]+$/',
-    'checkIn' => 'required|date|after_or_equal:today|before:+2 years',
+    'checkIn' => 'required|date|after:today|before:+2 years',
     'checkOut' => 'required|date|after:checkIn|after_or_equal:checkIn,+2 days|before:+2 years',
     ];
 
@@ -54,7 +54,7 @@ class BookingForm extends Component
 
         // Date validation messages
         'checkIn.required' => 'Please select a check-in date.',
-        'checkIn.after_or_equal' => 'Check-in date cannot be in the past.',
+        'checkIn.after' => 'Check-in date must be tomorrow or later.',
         'checkIn.before' => 'Check-in date cannot be more than 2 years in advance.',
         'checkOut.required' => 'Please select a check-out date.',
         'checkOut.after' => 'Check-out date must be after check-in date.',
@@ -78,6 +78,13 @@ class BookingForm extends Component
     // Method to receive dates from JavaScript calendar
     public function updateDates($checkIn, $checkOut)
     {
+        // Additional server-side check to prevent today's date
+        $checkInDate = Carbon::parse($checkIn);
+        if ($checkInDate->isToday()) {
+            $this->addError('checkIn', 'Check-in date must be tomorrow or later.');
+            return;
+        }
+
         $this->checkIn = $checkIn;
         $this->checkOut = $checkOut;
         $this->calculateBooking();
@@ -220,8 +227,14 @@ class BookingForm extends Component
 
         // Enhanced security validation
         try {
-            // 1. Validate dates are not too far in future
+            // 1. Validate check-in date is not today (same-day bookings not allowed)
             $checkInDate = Carbon::parse($this->checkIn);
+            if ($checkInDate->isToday()) {
+                session()->flash('booking_error', 'Same-day check-in is not available. Please select tomorrow or a later date.');
+                return;
+            }
+
+            // 2. Validate dates are not too far in future
             $checkOutDate = Carbon::parse($this->checkOut);
 
             if ($checkInDate->gt(now()->addYears(2)) || $checkOutDate->gt(now()->addYears(2))) {
@@ -229,14 +242,14 @@ class BookingForm extends Component
                 return;
             }
 
-            // 2. Validate maximum stay (prevent extremely long bookings)
+            // 3. Validate maximum stay (prevent extremely long bookings)
             $calculatedNights = $checkInDate->diffInDays($checkOutDate);
             if ($calculatedNights > 365) {
                 session()->flash('booking_error', 'Maximum stay is 365 nights.');
                 return;
             }
 
-            // 3. Check for duplicate booking attempt
+            // 4. Check for duplicate booking attempt
             $recentBooking = Booking::where('email', $this->guestEmail)
                 ->where('venue_id', $this->venueId)
                 ->where('check_in', $this->checkIn)
@@ -249,7 +262,7 @@ class BookingForm extends Component
                 return;
             }
 
-            // 4. Validate venue exists and price matches
+            // 5. Validate venue exists and price matches
             $venue = Venue::findOrFail($this->venueId);
 
             // Debug price comparison
@@ -274,11 +287,11 @@ class BookingForm extends Component
                 return;
             }
 
-            // 2. Calculate server-side values first
+            // 6. Calculate server-side values first
             $calculatedNights = Carbon::parse($this->checkIn)->diffInDays(Carbon::parse($this->checkOut));
             $calculatedTotal = $calculatedNights * $venue->price;
 
-            // 3. Use comprehensive validation service (includes external iCal checking)
+            // 7. Use comprehensive validation service (includes external iCal checking)
             $validationService = app(BookingValidationService::class);
             $validationErrors = $validationService->validateBookingDates(
                 $this->checkIn,
@@ -297,7 +310,7 @@ class BookingForm extends Component
                 return;
             }
 
-            // 4. Validate calculated totals match server-side calculation
+            // 8. Validate calculated totals match server-side calculation
             if ($this->nights != $calculatedNights || $this->totalPrice != $calculatedTotal) {
                 \Log::warning('Price calculation manipulation detected', [
                     'venue_id' => $this->venueId,
@@ -310,7 +323,7 @@ class BookingForm extends Component
                 return;
             }
 
-            // 5. Validate minimum stay requirement
+            // 9. Validate minimum stay requirement
             if ($calculatedNights < 2) {
                 session()->flash('booking_error', 'Minimum stay is 2 nights.');
                 return;
