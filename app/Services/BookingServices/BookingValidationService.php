@@ -43,6 +43,12 @@ class BookingValidationService
             $errors[] = 'These dates conflict with external calendar bookings.';
         }
 
+        // Check for orphaned dates (single nights that can't accommodate minimum stay)
+        $orphanedDateErrors = $this->checkForOrphanedDates($checkInDate, $checkOutDate, $venueId);
+        if (!empty($orphanedDateErrors)) {
+            $errors = array_merge($errors, $orphanedDateErrors);
+        }
+
         return $errors;
     }
 
@@ -116,5 +122,65 @@ class BookingValidationService
         }
 
         return true;
+    }
+
+    /**
+     * Check for orphaned dates that would be created by this booking
+     * An orphaned date is a single available night that can't accommodate minimum stay
+     */
+    public function checkForOrphanedDates(Carbon $checkIn, Carbon $checkOut, int $venueId): array
+    {
+        $errors = [];
+        $minNights = 2; // Minimum stay requirement
+
+        // Check for orphaned dates that would be created before the check-in
+        $beforeCheckIn = $checkIn->copy()->subDay();
+        if ($this->wouldCreateOrphanedDate($beforeCheckIn, $venueId, $minNights)) {
+            $errors[] = "Your check-in date would create an unbookable single night on " . $beforeCheckIn->format('j/n/Y') . ". Please adjust your dates.";
+        }
+
+        // Check for orphaned dates that would be created after the check-out
+        $afterCheckOut = $checkOut->copy();
+        if ($this->wouldCreateOrphanedDate($afterCheckOut, $venueId, $minNights)) {
+            $errors[] = "Your check-out date would create an unbookable single night on " . $afterCheckOut->format('j/n/Y') . ". Please adjust your dates.";
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Check if a specific date would be orphaned (single night surrounded by bookings)
+     */
+    private function wouldCreateOrphanedDate(Carbon $date, int $venueId, int $minNights): bool
+    {
+        // If the date itself is already booked, it can't be orphaned
+        if (!$this->isDateAvailable($date, $venueId)) {
+            return false;
+        }
+
+        // Check if there are enough consecutive available nights to accommodate minimum stay
+        // starting from this date
+        $canStartBooking = true;
+        for ($i = 0; $i < $minNights; $i++) {
+            $checkDate = $date->copy()->addDays($i);
+            if (!$this->isDateAvailable($checkDate, $venueId)) {
+                $canStartBooking = false;
+                break;
+            }
+        }
+
+        // Check if there are enough consecutive available nights to accommodate minimum stay
+        // ending on this date
+        $canEndBooking = true;
+        for ($i = 1; $i <= $minNights; $i++) {
+            $checkDate = $date->copy()->subDays($i);
+            if (!$this->isDateAvailable($checkDate, $venueId)) {
+                $canEndBooking = false;
+                break;
+            }
+        }
+
+        // Date is orphaned if you can neither start nor end a minimum stay booking there
+        return !$canStartBooking && !$canEndBooking;
     }
 }

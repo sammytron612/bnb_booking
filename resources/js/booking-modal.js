@@ -66,7 +66,26 @@ function isOrphanedDate(date) {
         return false;
     }
 
-    // Check if we can make a 2-night booking starting from this date
+    // Enhanced orphaned date detection - check for single isolated nights
+    // that can't accommodate the minimum 2-night stay
+
+    // Check if this is a single available night surrounded by bookings
+    const prevDate = addDays(date, -1);
+    const nextDate = addDays(date, 1);
+    const prevKey = fmt(prevDate);
+    const nextKey = fmt(nextDate);
+
+    // If both previous and next days are fully booked (and not checkout/checkin days)
+    const prevBlocked = fullyBookedDates.has(prevKey) && !checkOutDates.has(prevKey);
+    const nextBlocked = fullyBookedDates.has(nextKey) && !checkInDates.has(nextKey);
+
+    // Special case: single night orphaned
+    if (prevBlocked && nextBlocked) {
+        console.log(`Single night orphaned: ${dateKey} (surrounded by bookings)`);
+        return true;
+    }
+
+    // Check if we can make a minimum night booking starting from this date
     let canStartBooking = true;
     for (let i = 0; i < minNights; i++) {
         const checkDate = addDays(date, i);
@@ -76,38 +95,41 @@ function isOrphanedDate(date) {
         // 1. Date is completely free, OR
         // 2. Date is a check-out date (same-day turnover possible), OR
         // 3. Date is a check-in date (same-day turnover possible - guests arrive later)
-        const isAvailableForCheckIn = !fullyBookedDates.has(checkKey) ||
-                                     checkOutDates.has(checkKey) ||
-                                     checkInDates.has(checkKey);
+        const isAvailableForStay = !fullyBookedDates.has(checkKey) ||
+                                  checkOutDates.has(checkKey) ||
+                                  checkInDates.has(checkKey);
 
-        if (!isAvailableForCheckIn) {
+        if (!isAvailableForStay) {
             canStartBooking = false;
             break;
         }
     }
 
-    // Check if we can make a 2-night booking ending on this date
+    // Check if we can make a minimum night booking ending on this date
     let canEndBooking = true;
     for (let i = 1; i <= minNights; i++) {
         const checkDate = addDays(date, -i);
         const checkKey = fmt(checkDate);
 
-        // Can end a booking if:
-        // 1. Date is completely free, OR
-        // 2. Date is a check-out date (same-day turnover possible), OR
-        // 3. Date is a check-in date (same-day turnover possible - guests arrive later)
-        const isAvailableForCheckIn = !fullyBookedDates.has(checkKey) ||
-                                     checkOutDates.has(checkKey) ||
-                                     checkInDates.has(checkKey);
+        // Can end a booking if previous nights are available
+        const isAvailableForStay = !fullyBookedDates.has(checkKey) ||
+                                  checkOutDates.has(checkKey) ||
+                                  checkInDates.has(checkKey);
 
-        if (!isAvailableForCheckIn) {
+        if (!isAvailableForStay) {
             canEndBooking = false;
             break;
         }
     }
 
     // Date is orphaned if you can neither start nor end a booking there
-    return !canStartBooking && !canEndBooking;
+    const isOrphaned = !canStartBooking && !canEndBooking;
+
+    if (isOrphaned) {
+        console.log(`Orphaned date detected: ${dateKey} (canStart: ${canStartBooking}, canEnd: ${canEndBooking})`);
+    }
+
+    return isOrphaned;
 }// Wait for DOM to be ready
 function initializeBookingCalendar() {
     // Get elements with null checks
@@ -187,6 +209,7 @@ function initializeBookingCalendar() {
             // Style based on availability, with fully booked taking precedence
             if (isOrphaned) {
                 classNames.push('line-through text-gray-400 bg-red-50 cursor-not-allowed border border-red-200');
+                btn.setAttribute('title', 'Single night - cannot accommodate minimum 2-night stay');
             } else if (isCheckInDay && isFullyBooked) {
                 // Check-in days that are also fully booked - non-clickable, informational only
                 classNames.push('line-through bg-orange-50 text-orange-700 border border-orange-200 cursor-not-allowed');
