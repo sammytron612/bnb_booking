@@ -75,13 +75,26 @@ function isOrphanedDate(date) {
     const prevKey = fmt(prevDate);
     const nextKey = fmt(nextDate);
 
+    // More comprehensive blocking logic:
+    // Block if previous day is booked AND next day has a check-in (creating single night gap)
+    const prevIsBooked = fullyBookedDates.has(prevKey);
+    const nextHasCheckIn = checkInDates.has(nextKey);
+    
     // If both previous and next days are fully booked (and not checkout/checkin days)
     const prevBlocked = fullyBookedDates.has(prevKey) && !checkOutDates.has(prevKey);
     const nextBlocked = fullyBookedDates.has(nextKey) && !checkInDates.has(nextKey);
 
-    // Special case: single night orphaned
+    // Special case: single night orphaned between existing bookings
     if (prevBlocked && nextBlocked) {
         console.log(`Single night orphaned: ${dateKey} (surrounded by bookings)`);
+        return true;
+    }
+
+    // Additional special case: Check-out day that creates orphaned night
+    // If this is a checkout day, but someone checks in the next day, 
+    // this creates an impossible single-night gap
+    if (checkOutDates.has(dateKey) && nextHasCheckIn) {
+        console.log(`Checkout day creating orphaned night: ${dateKey} (checkout + next day checkin)`);
         return true;
     }
 
