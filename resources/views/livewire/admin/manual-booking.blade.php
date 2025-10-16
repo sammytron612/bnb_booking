@@ -52,7 +52,7 @@
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('venueId') border-red-500 @enderror">
                                     <option value="">Select a venue...</option>
                                     @foreach($venues as $venue)
-                                        <option value="{{ $venue->id }}">{{ $venue->name }} (£{{ $venue->price }}/night)</option>
+                                        <option value="{{ $venue->id }}">{{ $venue->venue_name }} (£{{ $venue->price }}/night)</option>
                                     @endforeach
                                 </select>
                                 @error('venueId')

@@ -91,7 +91,7 @@ class ManualBooking extends Component
 
     public function mount()
     {
-        $this->venues = Venue::orderBy('name')->get();
+        $this->venues = Venue::orderBy('venue_name')->get();
     }
 
     public function openModal()
