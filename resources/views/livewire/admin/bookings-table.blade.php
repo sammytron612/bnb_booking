@@ -8,9 +8,14 @@
             </div>
         @endif
 
-        <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-            Back to Dashboard
-        </a>
+        <div class="flex items-center space-x-3">
+            <!-- Manual Booking Component -->
+            <livewire:admin.manual-booking />
+
+            <a href="{{ route('admin.index') }}" class="inline-block mb-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Back to Dashboard
+            </a>
+        </div>
     </div>
 
     <!-- View Toggle -->
