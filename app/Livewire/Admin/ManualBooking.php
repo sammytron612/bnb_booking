@@ -218,9 +218,12 @@ class ManualBooking extends Component
                 'total_price' => $this->totalPrice
             ]);
 
+            // Store guest name before resetting form
+            $guestName = $this->guestName;
+
             // Close modal and show success message
             $this->closeModal();
-            session()->flash('booking_success', 'Manual booking created successfully for ' . $this->guestName . '.');
+            session()->flash('booking_success', 'Manual booking created successfully for ' . $guestName . '.');
 
             // Emit event to refresh bookings list
             $this->dispatch('bookingCreated');
