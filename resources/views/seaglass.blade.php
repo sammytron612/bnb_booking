@@ -1,5 +1,5 @@
 <x-layouts.app :seoData="$seoData">
-    <div class="container mx-auto px-1 py-8">
+    <div class="container mx-auto py-8">
         <!-- Header Section -->
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-slate-800 dark:text-slate-200 mb-4">Seaglass</h1>
